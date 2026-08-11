@@ -41,8 +41,28 @@ footer{text-align:center;color:#748195;font-size:11px;padding:18px}
 .authbox label{display:block;margin:16px 0 7px;color:#cbd5e1;font-size:13px}.authbox input{width:100%;padding:13px;border-radius:10px;border:1px solid #344154;background:#0b1017;color:#fff;outline:none}
 .authbox button{width:100%;margin-top:18px;padding:13px;border:0;border-radius:10px;font-weight:700;cursor:pointer}.authmsg{text-align:center;margin-top:12px;font-size:13px;min-height:18px;color:#ffad33}
 .userbar{display:flex;align-items:center;gap:8px;justify-content:flex-end;margin:8px 0;color:#aab5c4;font-size:12px}.userbar button{padding:6px 10px;border-radius:8px;border:1px solid #344154;background:#151d28;color:#fff}
+</style><style>
+body.auth-loading main, body.auth-loading footer, body.auth-loading .userbar, body.auth-loading .top {visibility:hidden}
+body.auth-loading #authGate{display:flex}
 </style></head>
-<body>
+<body class="auth-loading">
+
+<div id="authGate">
+  <div class="authbox">
+    <img class="authlogo" src="logo.jpg" alt="JAGESH ELECTRONIC">
+    <h1>JAGESH ELECTRONIC</h1>
+    <p>🔐 Private Customer Reminder</p>
+    <form id="loginForm">
+      <label>Email</label>
+      <input id="loginEmail" type="email" value="jageshelectronic@gmail.com" autocomplete="username" required>
+      <label>Password</label>
+      <input id="loginPassword" type="password" placeholder="अपना password डालें" autocomplete="current-password" required>
+      <button class="btn primary" type="submit">🔐 Login</button>
+      <div id="authMsg" class="authmsg"></div>
+    </form>
+  </div>
+</div>
+
 <header class="top">
  <div class="brand">
   <img src="logo.jpg" alt="JAGESH ELECTRONIC Logo">
@@ -308,9 +328,22 @@ if('serviceWorker' in navigator){
  }).catch(()=>{}));
 }
 
-function setAuthVisible(on){$('authGate').classList.toggle('hidden',!on);document.querySelector('main').style.visibility=on?'hidden':'visible';document.querySelector('footer').style.visibility=on?'hidden':'visible';document.querySelector('.userbar').style.visibility=on?'hidden':'visible';}
+function setAuthVisible(on){
+ document.body.classList.remove('auth-loading');
+ $('authGate').classList.toggle('hidden',!on);
+ document.querySelector('main').style.visibility=on?'hidden':'visible';
+ document.querySelector('footer').style.visibility=on?'hidden':'visible';
+ document.querySelector('.userbar').style.visibility=on?'hidden':'visible';
+ document.querySelector('.top').style.visibility=on?'hidden':'visible';
+}
 async function signOut(){await sb.auth.signOut();state={customers:[],settings:{address:'',phone:'',waPhone:'',backupEmail:'jageshelectronic@gmail.com',template:''}};setAuthVisible(true);}
-$('loginForm').onsubmit=async e=>{e.preventDefault();$('authMsg').textContent='Login हो रहा है…';const email=$('loginEmail').value.trim(),password=$('loginPassword').value;const {error}=await sb.auth.signInWithPassword({email,password});$('authMsg').textContent=error?('❌ '+error.message):'';};
+$('loginForm').onsubmit=async e=>{
+ e.preventDefault();
+ $('authMsg').textContent='Login हो रहा है…';
+ const email=$('loginEmail').value.trim(),password=$('loginPassword').value;
+ const {error}=await sb.auth.signInWithPassword({email,password});
+ $('authMsg').textContent=error?('❌ Email या Password सही नहीं है'): '✅ Login successful…';
+};
 sb.auth.onAuthStateChange(async (_event,session)=>{currentUser=session?.user||null;if(currentUser){$('signedInAs').textContent='🔐 '+(currentUser.email||'');setAuthVisible(false);await loadCloudCustomers();resetForm();updateHeader();render();}else{setAuthVisible(true);}});
 resetForm();updateHeader();render();
 </script>

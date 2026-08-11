@@ -34,7 +34,14 @@ input,select,textarea{width:100%;background:#0b1118;color:#fff;border:1px solid 
 footer{text-align:center;color:#748195;font-size:11px;padding:18px}
 @media(max-width:850px){.address{display:none}.grid{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,1fr)}.list{max-height:none}.brand img{width:64px;height:64px}.brand h1{font-size:18px}}
 </style>
-</head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
+#authGate{position:fixed;inset:0;z-index:9999;background:#080b10;display:flex;align-items:center;justify-content:center;padding:20px}
+#authGate.hidden{display:none}.authbox{width:min(440px,100%);background:#111720;border:1px solid #263241;border-radius:20px;padding:28px;box-shadow:0 20px 70px rgba(0,0,0,.45)}
+.authlogo{width:82px;height:82px;object-fit:cover;border-radius:18px;display:block;margin:0 auto 16px}.authbox h1{text-align:center;margin:0 0 8px;font-size:22px}.authbox p{text-align:center;color:#aab5c4;font-size:13px}
+.authbox label{display:block;margin:16px 0 7px;color:#cbd5e1;font-size:13px}.authbox input{width:100%;padding:13px;border-radius:10px;border:1px solid #344154;background:#0b1017;color:#fff;outline:none}
+.authbox button{width:100%;margin-top:18px;padding:13px;border:0;border-radius:10px;font-weight:700;cursor:pointer}.authmsg{text-align:center;margin-top:12px;font-size:13px;min-height:18px;color:#ffad33}
+.userbar{display:flex;align-items:center;gap:8px;justify-content:flex-end;margin:8px 0;color:#aab5c4;font-size:12px}.userbar button{padding:6px 10px;border-radius:8px;border:1px solid #344154;background:#151d28;color:#fff}
+</style></head>
 <body>
 <header class="top">
  <div class="brand">
@@ -147,16 +154,37 @@ footer{text-align:center;color:#748195;font-size:11px;padding:18px}
   </div>
  </section>
 </main>
-<footer>JAGESH ELECTRONIC • Customer Care & Reminder System</footer>
+<div class="userbar"><span id="signedInAs"></span><button onclick="signOut()">🚪 Logout</button></div><footer>JAGESH ELECTRONIC • Private Customer Care & Reminder System</footer>
 <div class="toast" id="toast"></div>
 
 <script>
-const KEY='jagesh_electronic_pro_v2';
-let state=JSON.parse(localStorage.getItem(KEY)||'null')||{customers:[],settings:{address:'',phone:'',waPhone:'',backupEmail:'jageshelectronic@gmail.com',template:'नमस्ते {name} जी 🙏\\nJAGESH ELECTRONIC की तरफ से याद दिलाना है कि आपके {appliance} की सर्विस का समय हो गया है।\\nकृपया सुविधानुसार समय बताएं।\\nधन्यवाद।\\n- JAGESH ELECTRONIC'}};
+const SUPABASE_URL='https://ihrktiuoyvjoornpaknb.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_mOi55EghYQ9yyQ4EWPQckA_p2NpSnjT';
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+const KEY='jagesh_electronic_secure_v1';
+let currentUser=null;
+let state={customers:[],settings:{address:'',phone:'',waPhone:'',backupEmail:'jageshelectronic@gmail.com',template:'नमस्ते {name} जी 🙏\nJAGESH ELECTRONIC की तरफ से याद दिलाना है कि आपके {appliance} की सर्विस का समय हो गया है।\nकृपया सुविधानुसार समय बताएं।\nधन्यवाद।\n- JAGESH ELECTRONIC'}};
 state.settings=Object.assign({address:'',phone:'',waPhone:'',backupEmail:'jageshelectronic@gmail.com',template:''},state.settings);
 const $=id=>document.getElementById(id);
 const today=()=>new Date().toISOString().slice(0,10);
-function persist(){localStorage.setItem(KEY,JSON.stringify(state));render();updateHeader()}
+function isUuid(v){return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(v||''));}
+async function persist(){
+ if(!currentUser)return;
+ localStorage.setItem(KEY,JSON.stringify(state));
+ const rows=state.customers.map(x=>({id:isUuid(x.id)?x.id:crypto.randomUUID(),user_id:currentUser.id,name:x.name||'',phone:x.phone||'',appliance:x.appliance||'',service_type:x.serviceType||'',notes:x.note||'',address:x.address||'',latitude:x.lat?Number(x.lat):null,longitude:x.lng?Number(x.lng):null,reminder_date:x.reminderDate||null,reminder_interval_months:x.interval&&x.interval!=='custom'?Number(x.interval):null,last_service_date:x.serviceDate||null,next_service_date:x.reminderDate||null}));
+ state.customers.forEach((x,i)=>x.id=rows[i].id);
+ rows.forEach((r,i)=>r.id=state.customers[i].id);
+ if(rows.length){const {error}=await sb.from('customers').upsert(rows,{onConflict:'id'});if(error){console.error(error);toast('Cloud save में समस्या: '+error.message);return;}}
+ render();updateHeader();
+}
+async function loadCloudCustomers(){
+ if(!currentUser)return;
+ const {data,error}=await sb.from('customers').select('*').order('reminder_date',{ascending:true});
+ if(error){toast('Cloud data load नहीं हुआ: '+error.message);return;}
+ state.customers=(data||[]).map(r=>({id:r.id,name:r.name||'',phone:r.phone||'',appliance:r.appliance||'',address:r.address||'',serviceDate:r.last_service_date||'',reminderDate:r.reminder_date||r.next_service_date||'',note:r.notes||'',lat:r.latitude==null?'':String(r.latitude),lng:r.longitude==null?'':String(r.longitude),done:false,serviceType:r.service_type||'',interval:r.reminder_interval_months?String(r.reminder_interval_months):''}));
+ localStorage.setItem(KEY,JSON.stringify(state));render();updateHeader();
+}
+async function deleteCloudCustomer(id){if(!currentUser)return;const {error}=await sb.from('customers').delete().eq('id',id).eq('user_id',currentUser.id);if(error)toast('Cloud delete में समस्या: '+error.message);}
 function toast(s){$('toast').textContent=s;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
 function addMonths(s,n){let d=new Date(s+'T00:00:00'),day=d.getDate();d.setMonth(d.getMonth()+Number(n));if(d.getDate()!=day)d.setDate(0);return d.toISOString().slice(0,10)}
 function fmt(s){if(!s)return'-';let [y,m,d]=s.split('-');return d+'-'+m+'-'+y}
@@ -175,10 +203,10 @@ function mapUrl(lat,lng){return 'https://www.google.com/maps/dir/?api=1&destinat
 function navigateSaved(){let lat=$('lat').value,lng=$('lng').value;if(lat&&lng)window.open(mapUrl(lat,lng),'_blank');}
 $('customerForm').onsubmit=e=>{
  e.preventDefault();
- let id=$('editId').value||Date.now().toString(), old=state.customers.find(x=>x.id===id);
+ let id=$('editId').value||crypto.randomUUID(), old=state.customers.find(x=>x.id===id);
  let rem=$('interval').value==='custom'?$('customDate').value:addMonths($('serviceDate').value,$('interval').value);
  if(!rem){toast('Reminder date चुनें');return}
- let x={id,name:$('name').value.trim(),phone:$('phone').value.trim(),appliance:$('appliance').value,address:$('address').value.trim(),serviceDate:$('serviceDate').value,reminderDate:rem,note:$('note').value.trim(),lat:$('lat').value||'',lng:$('lng').value||'',done:old?old.done:false};
+ let x={id,name:$('name').value.trim(),phone:$('phone').value.trim(),appliance:$('appliance').value,address:$('address').value.trim(),serviceDate:$('serviceDate').value,reminderDate:rem,note:$('note').value.trim(),lat:$('lat').value||'',lng:$('lng').value||'',interval:$('interval').value,done:old?old.done:false};
  let i=state.customers.findIndex(a=>a.id===id);if(i>=0)state.customers[i]=x;else state.customers.push(x);
  persist();resetForm();openTab('customers');toast('Customer और Reminder सेव हो गया');
 };
@@ -198,7 +226,7 @@ function editCustomer(id){
  $('interval').value=custom||'custom';$('customBox').classList.toggle('hidden',!!custom);if(!custom)$('customDate').value=x.reminderDate;
  $('coords').textContent=x.lat&&x.lng?'✅ Saved: '+x.lat+', '+x.lng:'Location अभी सेव नहीं है';$('navPreview').classList.toggle('hidden',!(x.lat&&x.lng));$('formTitle').textContent='✏️ Customer Edit';
 }
-function removeCustomer(id){if(confirm('इस Customer को Delete करना है?')){state.customers=state.customers.filter(x=>x.id!==id);persist();}}
+async function removeCustomer(id){if(confirm('इस Customer को Delete करना है?')){state.customers=state.customers.filter(x=>x.id!==id);await deleteCloudCustomer(id);await persist();toast('Customer Delete हो गया');}}
 function item(x){
  let s=status(x),label=s==='overdue'?'🔴 Overdue':s==='today'?'🟠 आज':s==='done'?'✅ Done':'🟢 Upcoming';
  return `<div class="item ${s}">
@@ -246,7 +274,7 @@ async function emailBackup(){
  window.location.href='mailto:'+encodeURIComponent(email)+'?subject='+subject+'&body='+body;
  toast('Backup download हो गया। Gmail में file attach करके भेजें।');
 }
-$('importFile').onchange=e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{state=JSON.parse(r.result);persist();toast('Backup Import हो गया')}catch{toast('Backup file गलत है')}};r.readAsText(f)};
+$('importFile').onchange=async e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=async()=>{try{let incoming=JSON.parse(r.result);state.settings=incoming.settings||state.settings;state.customers=(incoming.customers||[]).map(x=>({...x,id:isUuid(x.id)?x.id:crypto.randomUUID()}));await persist();toast('Backup Cloud में Import हो गया')}catch(err){toast('Backup file गलत है')}};r.readAsText(f)};
 
 let deferredInstallPrompt=null;
 window.addEventListener('beforeinstallprompt',e=>{
@@ -280,6 +308,10 @@ if('serviceWorker' in navigator){
  }).catch(()=>{}));
 }
 
+function setAuthVisible(on){$('authGate').classList.toggle('hidden',!on);document.querySelector('main').style.visibility=on?'hidden':'visible';document.querySelector('footer').style.visibility=on?'hidden':'visible';document.querySelector('.userbar').style.visibility=on?'hidden':'visible';}
+async function signOut(){await sb.auth.signOut();state={customers:[],settings:{address:'',phone:'',waPhone:'',backupEmail:'jageshelectronic@gmail.com',template:''}};setAuthVisible(true);}
+$('loginForm').onsubmit=async e=>{e.preventDefault();$('authMsg').textContent='Login हो रहा है…';const email=$('loginEmail').value.trim(),password=$('loginPassword').value;const {error}=await sb.auth.signInWithPassword({email,password});$('authMsg').textContent=error?('❌ '+error.message):'';};
+sb.auth.onAuthStateChange(async (_event,session)=>{currentUser=session?.user||null;if(currentUser){$('signedInAs').textContent='🔐 '+(currentUser.email||'');setAuthVisible(false);await loadCloudCustomers();resetForm();updateHeader();render();}else{setAuthVisible(true);}});
 resetForm();updateHeader();render();
 </script>
 </body>

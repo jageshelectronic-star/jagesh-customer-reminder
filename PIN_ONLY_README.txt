@@ -1,5 +1,4 @@
-JAGESH ELECTRONIC — PIN ONLY
-First launch: create a 6-digit PIN. Later launches require only that PIN.
-No email/password or Passkey is required to open the app.
-PIN is stored on this device as a SHA-256 hash, not as plain text.
-IMPORTANT: this is a device/app lock, not cloud identity authentication. If browser/site data is cleared, the PIN and local data can be lost. Keep backups.
+JAGESH ELECTRONIC — PIN ONLY v2
+This build opens with only a 6-digit PIN. No email/password login and no Passkey are required.
+IMPORTANT: Backup Email in Settings is only for backup sharing; it is not a login field.
+If an older login page still appears after deployment, uninstall the old PWA and clear the site's stored data/service worker, then reopen the site.

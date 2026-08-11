@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#080b10">
 <link rel="manifest" href="manifest.json">
-<title>JAGESH ELECTRONIC • Customer Care</title>
+<title>JAGESH ELECTRONIC • PIN Only</title>
 <style>
 :root{--bg:#080b10;--panel:#111720;--panel2:#151d28;--line:#263241;--gold:#e8b84b;--gold2:#ffda76;--text:#f6f7f9;--muted:#aab5c4;--green:#22c55e;--blue:#38a5ff;--red:#ff5b5b;--orange:#ffad33}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#07090d,#0c121a 55%,#07090d);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
@@ -40,6 +40,9 @@ footer{text-align:center;color:#748195;font-size:11px;padding:18px}
 .pinLogo{width:76px;height:76px;object-fit:cover;border-radius:18px}.pinDot{display:inline-block;width:13px;height:13px;border-radius:50%;border:1px solid #7d8aa0;margin:18px 5px}.pinDot.filled{background:#fff}
 #pinPad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:300px;margin:auto}.pinKey{padding:15px;border:1px solid #2a364b;background:#182131;color:#fff;border-radius:14px;font-size:20px}
 #pinMsg{min-height:20px;color:#ff9d9d;font-size:13px;margin:10px}
+</style><style id="pin-only-force">
+/* PIN-only build: legacy login UI is disabled */
+#login,#loginScreen,#auth,#authScreen,.login-screen,.auth-screen,[data-auth-screen]{display:none!important}
 </style></head>
 <body><div id="pinLock" style="display:none">
 <div id="pinCard">

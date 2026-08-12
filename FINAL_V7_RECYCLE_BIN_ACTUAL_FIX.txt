@@ -1,7 +1,0 @@
-V7 RECYCLE BIN ACTUAL FIX
-- Delete button now explicitly moves the selected customer from state.customers into the recycle bin before removing it.
-- Recycle Bin uses a real 6-digit PIN modal, not browser prompt.
-- First opening creates the PIN; later opening verifies it.
-- Restore adds the original customer back into the app's state.
-- Permanent delete and Empty Recycle Bin require the Recycle Bin PIN.
-- Cache bumped to v7.

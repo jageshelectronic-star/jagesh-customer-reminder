@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080b10">
+<link rel="manifest" href="manifest.json">
+<title>JAGESH ELECTRONIC • Customer Care</title>
+<style>
+:root{--bg:#080b10;--panel:#111720;--panel2:#151d28;--line:#263241;--gold:#e8b84b;--gold2:#ffda76;--text:#f6f7f9;--muted:#aab5c4;--green:#22c55e;--blue:#38a5ff;--red:#ff5b5b;--orange:#ffad33}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#07090d,#0c121a 55%,#07090d);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.top{position:sticky;top:0;z-index:20;background:rgba(8,11,16,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.brand{max-width:1180px;margin:auto;padding:10px 16px;display:flex;align-items:center;gap:14px}
+.brand img{width:76px;height:76px;border-radius:12px;object-fit:contain;background:#080b10;border:1px solid #80601c;padding:2px}
+.brand h1{margin:0;color:var(--gold2);font-size:22px}.brand .tag{color:#fff;font-size:12px}.address{margin-left:auto;text-align:right;color:var(--muted);font-size:12px;max-width:360px}
+.wrap{max-width:1180px;margin:auto;padding:18px 14px 40px}
+.nav{display:flex;gap:8px;overflow:auto;margin-bottom:15px}.nav button{white-space:nowrap;background:var(--panel);border:1px solid var(--line);color:#dce4ee;border-radius:10px;padding:10px 13px}.nav button.active{background:#251e0d;color:var(--gold2);border-color:#795d20}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}.card{background:linear-gradient(180deg,#131b25,#0f151e);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 8px 30px #0004}.num{font-size:26px;font-weight:850}.muted{color:var(--muted);font-size:12px}.gold{color:var(--gold2)}.green{color:#65e18a}.red{color:#ff8585}.orange{color:#ffc56d}
+.grid{display:grid;grid-template-columns:390px 1fr;gap:14px}.title{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.title h2{font-size:17px;margin:0}
+label{display:block;color:#cfd8e3;font-size:12px;font-weight:750;margin:10px 0 5px}
+input,select,textarea{width:100%;background:#0b1118;color:#fff;border:1px solid #2a3746;border-radius:10px;padding:11px;outline:none}input:focus,select:focus,textarea:focus{border-color:#c79a3a}textarea{min-height:75px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.btn{border:1px solid transparent;border-radius:10px;padding:10px 12px;font-weight:800}.primary{background:linear-gradient(135deg,#e3ad38,#f7d36d);color:#17120a}.secondary{background:#18222e;color:#dbe6f2;border-color:#334354}.greenbtn{background:#0d5d2b;color:#baffcf;border-color:#198f45}.bluebtn{background:#0c4c7c;color:#c8eaff;border-color:#1877bb}.danger{background:#5d1717;color:#ffd0d0;border-color:#8f2d2d}
+.searchrow{display:flex;gap:8px;margin-bottom:10px}.searchrow input{flex:1}.list{max-height:650px;overflow:auto;padding-right:2px}
+.item{border:1px solid var(--line);background:#101721;border-radius:13px;padding:12px;margin:8px 0}.item.today{border-left:4px solid var(--orange)}.item.overdue{border-left:4px solid var(--red)}.item.future{border-left:4px solid var(--green)}.item.done{opacity:.72}
+.itemtop{display:flex;justify-content:space-between;gap:10px}.name{font-weight:850}.date{font-weight:850;color:var(--gold2)}.meta{font-size:12px;color:var(--muted);margin-top:4px}.pill{display:inline-block;margin-top:7px;padding:4px 8px;border-radius:99px;background:#1c2735;color:#cbd8e6;font-size:10px;font-weight:850}
+.empty{text-align:center;color:var(--muted);padding:35px 10px}
+.locationbox{border:1px dashed #526172;background:#0b1118;border-radius:12px;padding:10px;margin-top:10px}.coords{font-size:12px;color:#aebdcd;word-break:break-all}
+.small{font-size:11px;padding:8px 9px}.hidden{display:none}.help{background:#0d141d;border:1px solid #253344;border-radius:12px;padding:11px;color:#aebbd0;font-size:12px;line-height:1.55}
+.modal{position:fixed;inset:0;background:#0009;z-index:50;display:none;align-items:center;justify-content:center;padding:15px}.modal.show{display:flex}.modalbox{width:min(620px,100%);max-height:92vh;overflow:auto;background:#101721;border:1px solid #334151;border-radius:18px;padding:16px}.close{float:right;border:0;background:#27313d;color:#fff;border-radius:50%;width:34px;height:34px}
+.installstate{margin-top:10px;color:#aebbd0;font-size:12px}
+.installstate.ok{color:#75e59a}.installstate.warn{color:#ffd37a}
+.toast{position:fixed;right:14px;bottom:16px;background:#e8b84b;color:#15110a;padding:12px 14px;border-radius:12px;font-weight:800;box-shadow:0 10px 30px #0008;display:none;z-index:100}.toast.show{display:block}
+footer{text-align:center;color:#748195;font-size:11px;padding:18px}
+@media(max-width:850px){.address{display:none}.grid{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,1fr)}.list{max-height:none}.brand img{width:64px;height:64px}.brand h1{font-size:18px}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
+#authGate{position:fixed;inset:0;z-index:9999;background:#080b10;display:flex;align-items:center;justify-content:center;padding:20px}
+#authGate.hidden{display:none}.authbox{width:min(440px,100%);background:#111720;border:1px solid #263241;border-radius:20px;padding:28px;box-shadow:0 20px 70px rgba(0,0,0,.45)}
+.authlogo{width:82px;height:82px;object-fit:cover;border-radius:18px;display:block;margin:0 auto 16px}.authbox h1{text-align:center;margin:0 0 8px;font-size:22px}.authbox p{text-align:center;color:#aab5c4;font-size:13px}
+.authbox label{display:block;margin:16px 0 7px;color:#cbd5e1;font-size:13px}.authbox input{width:100%;padding:13px;border-radius:10px;border:1px solid #344154;background:#0b1017;color:#fff;outline:none}
+.authbox button{width:100%;margin-top:18px;padding:13px;border:0;border-radius:10px;font-weight:700;cursor:pointer}.authmsg{text-align:center;margin-top:12px;font-size:13px;min-height:18px;color:#ffad33}
+.userbar{display:flex;align-items:center;gap:8px;justify-content:flex-end;margin:8px 0;color:#aab5c4;font-size:12px}.userbar button{padding:6px 10px;border-radius:8px;border:1px solid #344154;background:#151d28;color:#fff}
+</style></head>
+<body>
+<header class="top">
+ <div class="brand">
+  <img src="logo.jpg" alt="JAGESH ELECTRONIC Logo">
+  <div><h1>JAGESH ELECTRONIC</h1><div class="tag">SERVICE • REPAIR</div></div>
+  <div class="address" id="businessAddress">पता: Settings में अपना Business Address डालें</div>
+ </div>
+</header>
+
+<main class="wrap">
+ <div class="nav">
+  <button class="active" data-tab="dashboard">🏠 Dashboard</button>
+  <button data-tab="customers">👥 Customers</button>
+  <button data-tab="add">➕ Add Customer</button>
+  <button data-tab="settings">⚙️ Settings</button>
+ </div>
+
+ <section id="dashboard">
+  <div class="cards">
+   <div class="card"><div class="num gold" id="todayN">0</div><div class="muted">आज की Reminder</div></div>
+   <div class="card"><div class="num red" id="overdueN">0</div><div class="muted">Overdue</div></div>
+   <div class="card"><div class="num green" id="upcomingN">0</div><div class="muted">Upcoming</div></div>
+   <div class="card"><div class="num" id="totalN">0</div><div class="muted">कुल Customers</div></div>
+  </div>
+  <div class="card">
+   <div class="title"><h2>🔔 आज और बाकी Reminder</h2><button class="btn secondary small" onclick="openTab('customers')">सभी देखें</button></div>
+   <div id="dashboardList"></div>
+  </div>
+ </section>
+
+ <section id="customers" class="hidden">
+  <div class="card">
+   <div class="title"><h2>👥 Customer List</h2><button class="btn primary small" onclick="openTab('add')">+ नया Customer</button></div>
+   <div class="searchrow"><input id="search" placeholder="नाम, मोबाइल या appliance खोजें…"><select id="filter" style="max-width:150px"><option value="all">सभी</option><option value="today">आज</option><option value="overdue">Overdue</option><option value="upcoming">Upcoming</option><option value="done">Done</option></select></div>
+   <div class="list" id="customerList"></div>
+  </div>
+ </section>
+
+ <section id="add" class="hidden">
+  <div class="grid">
+   <div class="card">
+    <div class="title"><h2 id="formTitle">➕ नया Customer</h2></div>
+    <form id="customerForm">
+     <input type="hidden" id="editId">
+     <label>Customer Name *</label><input id="name" required placeholder="जैसे Rahul Kumar">
+     <div class="row">
+      <div><label>Mobile *</label><input id="phone" required inputmode="tel" placeholder="10 digit"></div>
+      <div><label>Appliance</label><select id="appliance"><option>AC</option><option>LED TV</option><option>Refrigerator</option><option>Microwave</option><option>Washing Machine</option><option>Other</option></select></div>
+     </div>
+     <label>Address (optional)</label><input id="address" placeholder="अगर location saved है तो पूरा address जरूरी नहीं">
+     <div class="row">
+      <div><label>Last Service Date *</label><input id="serviceDate" type="date" required></div>
+      <div><label>Reminder</label><select id="interval"><option value="1">1 महीना</option><option value="2">2 महीने</option><option value="3" selected>3 महीने</option><option value="6">6 महीने</option><option value="12">1 साल</option><option value="custom">Custom Date</option></select></div>
+     </div>
+     <div id="customBox" class="hidden"><label>Custom Reminder Date</label><input id="customDate" type="date"></div>
+     <label>Service / Work Note</label><textarea id="note" placeholder="जैसे AC general service, gas check, warranty…"></textarea>
+     <div class="locationbox">
+      <b>📍 Customer Current Location</b>
+      <div class="muted" style="margin-top:4px">Customer के घर पर खड़े होकर यह बटन दबाएँ। GPS coordinates सेव हो जाएंगे।</div>
+      <div class="actions">
+       <button class="btn greenbtn" type="button" onclick="getLocation()">📍 Current Location Save करें</button>
+       <button class="btn bluebtn hidden" type="button" id="navPreview" onclick="navigateSaved()">🗺️ Map देखें</button>
+      </div>
+      <div class="coords" id="coords">Location अभी सेव नहीं है</div>
+      <input type="hidden" id="lat"><input type="hidden" id="lng">
+     </div>
+     <div class="actions">
+      <button class="btn primary" type="submit">💾 Save Customer</button>
+      <button class="btn secondary" type="button" onclick="resetForm()">↩️ Reset</button>
+     </div>
+     <div class="help">💡 Reminder आपके device में save होगी। Customer को WhatsApp/SMS अपने-आप भेजने के लिए अलग messaging API/backend चाहिए। अभी WhatsApp/SMS buttons message तैयार करके आपके फोन में खोलते हैं।</div>
+    </form>
+   </div>
+   <div class="card">
+    <div class="title"><h2>📌 कैसे इस्तेमाल करें?</h2></div>
+    <div class="help">
+     <b>1.</b> Customer की service के समय नाम और मोबाइल भरें।<br><br>
+     <b>2.</b> Customer के घर पर खड़े होकर <b>Current Location Save</b> दबाएँ।<br><br>
+     <b>3.</b> 1/2/3/6 महीने, 1 साल या Custom Date चुनें।<br><br>
+     <b>4.</b> अगली बार Reminder आने पर <b>Navigate</b> दबाएँ—Google Maps में उसी saved location का रास्ता खुल जाएगा।<br><br>
+     <b>5.</b> WhatsApp पर तैयार reminder भेजने के लिए WhatsApp बटन दबाएँ।
+    </div>
+   </div>
+  </div>
+ </section>
+
+ <section id="settings" class="hidden">
+  <div class="card">
+   <div class="title"><h2>⚙️ Business Settings</h2></div>
+   <label>Business Address</label><textarea id="bizAddress" placeholder="ऊपर header में दिखने वाला आपका business address"></textarea>
+   <div class="row">
+    <div><label>Business Phone</label><input id="bizPhone" placeholder="10 digit mobile"></div>
+    <div><label>WhatsApp Number</label><input id="waPhone" placeholder="10 digit mobile"></div>
+   </div>
+   <label>Backup Email</label>
+   <input id="backupEmail" type="email" placeholder="jageshelectronic@gmail.com">
+   <div class="help" style="margin-top:8px">📧 यह email backup भेजने के लिए सेव रहेगा। Website अपने-आप email के अंदर backup upload नहीं कर सकती; <b>Email Backup</b> दबाने पर backup file share/download होगी, जिसे Gmail में भेज सकते हैं।</div>
+   <label>Reminder Message</label>
+   <textarea id="msgTemplate"></textarea>
+   <div class="actions">
+    <button class="btn primary" onclick="saveSettings()">💾 Save Settings</button>
+    <button class="btn bluebtn" onclick="requestNotifications()">🔔 Browser Notification ON करें</button>
+    <button class="btn greenbtn" onclick="installApp()">📲 App Install करें</button>
+    <button class="btn secondary" onclick="exportData()">⬇️ Backup Export</button>
+    <button class="btn secondary" onclick="emailBackup()">📧 Email Backup</button>
+    <label class="btn secondary" style="display:inline-block">⬆️ Backup Import<input type="file" id="importFile" accept=".json" style="display:none"></label>
+   </div>
+   <div id="installStatus" class="installstate">App install option तैयार किया जा रहा है…</div>
+   <div class="help" style="margin-top:12px"><b>Notification:</b> Browser notification permission ON होने पर आज/overdue reminders की browser notification मिल सकती है। <b>WhatsApp/SMS customer को अपने-आप भेजने</b> के लिए अलग WhatsApp Business API/SMS provider और backend चाहिए।</div>
+  </div>
+ </section>
+</main>
+<div class="userbar"><span id="signedInAs"></span><button onclick="signOut()">🚪 Logout</button></div><footer>JAGESH ELECTRONIC • Private Customer Care & Reminder System</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL='https://ihrktiuoyvjoornpaknb.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_mOi55EghYQ9yyQ4EWPQckA_p2NpSnjT';
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+const KEY='jagesh_electronic_secure_v1';
+let currentUser=null;
+let state={customers:[],settings:{address:'',phone:'',waPhone:'',backupEmail:'jageshelectronic@gmail.com',template:'नमस्ते {name} जी 🙏\nJAGESH ELECTRONIC की तरफ से याद दिलाना है कि आपके {appliance} की सर्विस का समय हो गया है।\nकृपया सुविधानुसार समय बताएं।\nधन्यवाद।\n- JAGESH ELECTRONIC'}};
+state.settings=Object.assign({address:'',phone:'',waPhone:'',backupEmail:'jageshelectronic@gmail.com',template:''},state.settings);
+const $=id=>document.getElementById(id);
+const today=()=>new Date().toISOString().slice(0,10);
+function isUuid(v){return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(v||''));}
+async function persist(){
+ if(!currentUser)return;
+ localStorage.setItem(KEY,JSON.stringify(state));
+ const rows=state.customers.map(x=>({id:isUuid(x.id)?x.id:crypto.randomUUID(),user_id:currentUser.id,name:x.name||'',phone:x.phone||'',appliance:x.appliance||'',service_type:x.serviceType||'',notes:x.note||'',address:x.address||'',latitude:x.lat?Number(x.lat):null,longitude:x.lng?Number(x.lng):null,reminder_date:x.reminderDate||null,reminder_interval_months:x.interval&&x.interval!=='custom'?Number(x.interval):null,last_service_date:x.serviceDate||null,next_service_date:x.reminderDate||null}));
+ state.customers.forEach((x,i)=>x.id=rows[i].id);
+ rows.forEach((r,i)=>r.id=state.customers[i].id);
+ if(rows.length){const {error}=await sb.from('customers').upsert(rows,{onConflict:'id'});if(error){console.error(error);toast('Cloud save में समस्या: '+error.message);return;}}
+ render();updateHeader();
+}
+async function loadCloudCustomers(){
+ if(!currentUser)return;
+ const {data,error}=await sb.from('customers').select('*').order('reminder_date',{ascending:true});
+ if(error){toast('Cloud data load नहीं हुआ: '+error.message);return;}
+ state.customers=(data||[]).map(r=>({id:r.id,name:r.name||'',phone:r.phone||'',appliance:r.appliance||'',address:r.address||'',serviceDate:r.last_service_date||'',reminderDate:r.reminder_date||r.next_service_date||'',note:r.notes||'',lat:r.latitude==null?'':String(r.latitude),lng:r.longitude==null?'':String(r.longitude),done:false,serviceType:r.service_type||'',interval:r.reminder_interval_months?String(r.reminder_interval_months):''}));
+ localStorage.setItem(KEY,JSON.stringify(state));render();updateHeader();
+}
+async function deleteCloudCustomer(id){if(!currentUser)return;const {error}=await sb.from('customers').delete().eq('id',id).eq('user_id',currentUser.id);if(error)toast('Cloud delete में समस्या: '+error.message);}
+function toast(s){$('toast').textContent=s;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
+function addMonths(s,n){let d=new Date(s+'T00:00:00'),day=d.getDate();d.setMonth(d.getMonth()+Number(n));if(d.getDate()!=day)d.setDate(0);return d.toISOString().slice(0,10)}
+function fmt(s){if(!s)return'-';let [y,m,d]=s.split('-');return d+'-'+m+'-'+y}
+function status(x){if(x.done)return'done';if(x.reminderDate<today())return'overdue';if(x.reminderDate===today())return'today';return'future'}
+function openTab(tab){document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));$(tab).classList.remove('hidden');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));if(tab==='customers')renderCustomers()}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>openTab(b.dataset.tab));
+function updateHeader(){$('businessAddress').textContent=state.settings.address||'पता: Settings में अपना Business Address डालें';$('bizAddress').value=state.settings.address||'';$('bizPhone').value=state.settings.phone||'';$('waPhone').value=state.settings.waPhone||'';$('backupEmail').value=state.settings.backupEmail||'jageshelectronic@gmail.com';$('msgTemplate').value=state.settings.template||''}
+function resetForm(){ $('customerForm').reset();$('editId').value='';$('serviceDate').value=today();$('interval').value='3';$('customBox').classList.add('hidden');$('lat').value='';$('lng').value='';$('coords').textContent='Location अभी सेव नहीं है';$('navPreview').classList.add('hidden');$('formTitle').textContent='➕ नया Customer'}
+$('interval').onchange=()=> $('customBox').classList.toggle('hidden',$('interval').value!=='custom');
+function getLocation(){
+ if(!navigator.geolocation){toast('इस browser में GPS उपलब्ध नहीं है');return}
+ $('coords').textContent='📡 Location मिल रही है…';
+ navigator.geolocation.getCurrentPosition(p=>{let lat=p.coords.latitude.toFixed(7),lng=p.coords.longitude.toFixed(7);$('lat').value=lat;$('lng').value=lng;$('coords').textContent='✅ Saved: '+lat+', '+lng;$('navPreview').classList.remove('hidden');toast('Customer की location मिल गई');},e=>{toast('Location नहीं मिली। GPS/Permission ON करें।')},{enableHighAccuracy:true,timeout:15000,maximumAge:0});
+}
+function mapUrl(lat,lng){return 'https://www.google.com/maps/dir/?api=1&destination='+lat+','+lng}
+function navigateSaved(){let lat=$('lat').value,lng=$('lng').value;if(lat&&lng)window.open(mapUrl(lat,lng),'_blank');}
+$('customerForm').onsubmit=e=>{
+ e.preventDefault();
+ let id=$('editId').value||crypto.randomUUID(), old=state.customers.find(x=>x.id===id);
+ let rem=$('interval').value==='custom'?$('customDate').value:addMonths($('serviceDate').value,$('interval').value);
+ if(!rem){toast('Reminder date चुनें');return}
+ let x={id,name:$('name').value.trim(),phone:$('phone').value.trim(),appliance:$('appliance').value,address:$('address').value.trim(),serviceDate:$('serviceDate').value,reminderDate:rem,note:$('note').value.trim(),lat:$('lat').value||'',lng:$('lng').value||'',interval:$('interval').value,done:old?old.done:false};
+ let i=state.customers.findIndex(a=>a.id===id);if(i>=0)state.customers[i]=x;else state.customers.push(x);
+ persist();resetForm();openTab('customers');toast('Customer और Reminder सेव हो गया');
+};
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function waDigits(p){let d=String(p||'').replace(/\D/g,'');return d.length===10?'91'+d:d}
+function messageFor(x){return (state.settings.template||'').replaceAll('{name}',x.name).replaceAll('{appliance}',x.appliance)}
+function callCustomer(p){location.href='tel:'+p}
+function whatsapp(x){let p=waDigits(x.phone);if(!p){toast('Mobile number सही नहीं है');return}window.open('https://wa.me/'+p+'?text='+encodeURIComponent(messageFor(x)),'_blank')}
+function sms(x){location.href='sms:'+x.phone+'?body='+encodeURIComponent(messageFor(x))}
+function navigate(x){if(x.lat&&x.lng)window.open(mapUrl(x.lat,x.lng),'_blank');else if(x.address)window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(x.address),'_blank');else toast('Customer की location सेव नहीं है')}
+function markDone(id){let x=state.customers.find(x=>x.id===id);if(x){x.done=true;persist();toast('Reminder Done');}}
+function markPending(id){let x=state.customers.find(x=>x.id===id);if(x){x.done=false;persist();}}
+function editCustomer(id){
+ let x=state.customers.find(x=>x.id===id);if(!x)return;openTab('add');
+ $('editId').value=x.id;$('name').value=x.name;$('phone').value=x.phone;$('appliance').value=x.appliance;$('address').value=x.address;$('serviceDate').value=x.serviceDate;$('note').value=x.note;$('lat').value=x.lat||'';$('lng').value=x.lng||'';
+ let custom=['1','2','3','6','12'].find(n=>addMonths(x.serviceDate,n)===x.reminderDate);
+ $('interval').value=custom||'custom';$('customBox').classList.toggle('hidden',!!custom);if(!custom)$('customDate').value=x.reminderDate;
+ $('coords').textContent=x.lat&&x.lng?'✅ Saved: '+x.lat+', '+x.lng:'Location अभी सेव नहीं है';$('navPreview').classList.toggle('hidden',!(x.lat&&x.lng));$('formTitle').textContent='✏️ Customer Edit';
+}
+async function removeCustomer(id){if(confirm('इस Customer को Delete करना है?')){state.customers=state.customers.filter(x=>x.id!==id);await deleteCloudCustomer(id);await persist();toast('Customer Delete हो गया');}}
+function item(x){
+ let s=status(x),label=s==='overdue'?'🔴 Overdue':s==='today'?'🟠 आज':s==='done'?'✅ Done':'🟢 Upcoming';
+ return `<div class="item ${s}">
+ <div class="itemtop"><div><div class="name">${esc(x.name)}</div><div class="meta">📱 ${esc(x.phone)} · 🔧 ${esc(x.appliance)}</div></div><div class="date">${fmt(x.reminderDate)}</div></div>
+ <span class="pill">${label}</span>
+ ${x.note?'<div class="meta">📝 '+esc(x.note)+'</div>':''}
+ ${x.address?'<div class="meta">🏠 '+esc(x.address)+'</div>':''}
+ ${x.lat&&x.lng?'<div class="meta">📍 GPS Saved</div>':'<div class="meta">📍 GPS Not Saved</div>'}
+ <div class="actions">
+  <button class="btn primary small" onclick='callCustomer(${JSON.stringify(x.phone)})'>📞 Call</button>
+  <button class="btn greenbtn small" onclick='whatsapp(${JSON.stringify(x)})'>💬 WhatsApp</button>
+  <button class="btn bluebtn small" onclick='sms(${JSON.stringify(x)})'>✉️ SMS</button>
+  <button class="btn bluebtn small" onclick='navigate(${JSON.stringify(x)})'>🗺️ Navigate</button>
+  ${s==='done'?'<button class="btn secondary small" onclick="markPending(\''+x.id+'\')">↩️ Pending</button>':'<button class="btn secondary small" onclick="markDone(\''+x.id+'\')">✅ Done</button>'}
+  <button class="btn secondary small" onclick="editCustomer('${x.id}')">✏️ Edit</button>
+  <button class="btn danger small" onclick="removeCustomer('${x.id}')">🗑️</button>
+ </div></div>`;
+}
+function renderCustomers(){
+ let q=($('search').value||'').toLowerCase(),f=$('filter').value;
+ let arr=state.customers.filter(x=>(x.name+' '+x.phone+' '+x.appliance).toLowerCase().includes(q)).filter(x=>f==='all'||status(x)===f).sort((a,b)=>a.reminderDate.localeCompare(b.reminderDate));
+ $('customerList').innerHTML=arr.length?arr.map(item).join(''):'<div class="empty">कोई Customer नहीं मिला।</div>';
+}
+$('search').oninput=renderCustomers;$('filter').onchange=renderCustomers;
+function renderDashboard(){
+ let t=state.customers.filter(x=>!x.done&&x.reminderDate===today()).length,o=state.customers.filter(x=>!x.done&&x.reminderDate<today()).length,u=state.customers.filter(x=>!x.done&&x.reminderDate>today()).length;
+ $('todayN').textContent=t;$('overdueN').textContent=o;$('upcomingN').textContent=u;$('totalN').textContent=state.customers.length;
+ let arr=state.customers.filter(x=>!x.done&&x.reminderDate<=today()).sort((a,b)=>a.reminderDate.localeCompare(b.reminderDate)).slice(0,12);
+ $('dashboardList').innerHTML=arr.length?arr.map(item).join(''):'<div class="empty">🎉 आज कोई pending Reminder नहीं है।</div>';
+}
+function render(){renderDashboard();renderCustomers();checkDueNotifications()}
+function saveSettings(){state.settings.address=$('bizAddress').value.trim();state.settings.phone=$('bizPhone').value.trim();state.settings.waPhone=$('waPhone').value.trim();state.settings.backupEmail=$('backupEmail').value.trim();state.settings.template=$('msgTemplate').value;persist();toast('Settings सेव हो गई');}
+async function requestNotifications(){if(!('Notification'in window)){toast('इस browser में notification उपलब्ध नहीं है');return}let p=await Notification.requestPermission();toast(p==='granted'?'Browser Notification ON हो गई':'Notification permission नहीं मिली');}
+function checkDueNotifications(){if(!('Notification'in window)||Notification.permission!=='granted')return;let due=state.customers.filter(x=>!x.done&&x.reminderDate<=today());if(due.length)new Notification('JAGESH ELECTRONIC',{body:'आज/Overdue Reminder: '+due.length+' Customer'});}
+function makeBackupFile(){return new File([JSON.stringify(state,null,2)],'JAGESH_ELECTRONIC_backup.json',{type:'application/json'})}
+function exportData(){let f=makeBackupFile(),a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);toast('Backup file सेव हो गई');}
+async function emailBackup(){
+ let email=state.settings.backupEmail||'jageshelectronic@gmail.com',f=makeBackupFile();
+ if(navigator.canShare && navigator.canShare({files:[f]})){
+   try{await navigator.share({title:'JAGESH ELECTRONIC Backup',text:'Customer Reminder Backup',files:[f]});toast('Share खुल गया — Gmail चुनकर भेज दें');return}catch(e){}
+ }
+ exportData();
+ let subject=encodeURIComponent('JAGESH ELECTRONIC Customer Backup');
+ let body=encodeURIComponent('नमस्ते,\n\nJAGESH ELECTRONIC Customer Reminder का backup file attach करके भेज रहा हूँ।\n\nBackup Email: '+email);
+ window.location.href='mailto:'+encodeURIComponent(email)+'?subject='+subject+'&body='+body;
+ toast('Backup download हो गया। Gmail में file attach करके भेजें।');
+}
+$('importFile').onchange=async e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=async()=>{try{let incoming=JSON.parse(r.result);state.settings=incoming.settings||state.settings;state.customers=(incoming.customers||[]).map(x=>({...x,id:isUuid(x.id)?x.id:crypto.randomUUID()}));await persist();toast('Backup Cloud में Import हो गया')}catch(err){toast('Backup file गलत है')}};r.readAsText(f)};
+
+let deferredInstallPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+ e.preventDefault(); deferredInstallPrompt=e;
+ const s=$('installStatus'); if(s){s.textContent='✅ App Install के लिए तैयार है।';s.className='installstate ok';}
+});
+window.addEventListener('appinstalled',()=>{
+ deferredInstallPrompt=null;
+ const s=$('installStatus'); if(s){s.textContent='✅ JAGESH ELECTRONIC App install हो गया।';s.className='installstate ok';}
+ toast('App install हो गया');
+});
+async function installApp(){
+ if(window.matchMedia('(display-mode: standalone)').matches){
+   toast('App पहले से installed है'); return;
+ }
+ if(deferredInstallPrompt){
+   deferredInstallPrompt.prompt();
+   const choice=await deferredInstallPrompt.userChoice;
+   deferredInstallPrompt=null;
+   const s=$('installStatus');
+   if(s){s.textContent=choice.outcome==='accepted'?'✅ App install हो रहा है…':'⚠️ Install cancel हुआ। Chrome menu से Add to Home screen भी कर सकते हैं।';s.className='installstate '+(choice.outcome==='accepted'?'ok':'warn');}
+   return;
+ }
+ const s=$('installStatus');
+ if(s){s.textContent='ℹ️ Chrome के ⋮ menu → Add to Home screen / Install app चुनें।';s.className='installstate warn';}
+ toast('Chrome menu से Install app / Add to Home screen चुनें');
+}
+if('serviceWorker' in navigator){
+ window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').then(()=>{
+   const s=$('installStatus'); if(s && !deferredInstallPrompt && !window.matchMedia('(display-mode: standalone)').matches){s.textContent='ℹ️ Chrome में Install app उपलब्ध होने पर button सक्रिय होगा।';}
+ }).catch(()=>{}));
+}
+
+function setAuthVisible(on){$('authGate').classList.toggle('hidden',!on);document.querySelector('main').style.visibility=on?'hidden':'visible';document.querySelector('footer').style.visibility=on?'hidden':'visible';document.querySelector('.userbar').style.visibility=on?'hidden':'visible';}
+async function signOut(){await sb.auth.signOut();state={customers:[],settings:{address:'',phone:'',waPhone:'',backupEmail:'jageshelectronic@gmail.com',template:''}};setAuthVisible(true);}
+$('loginForm').onsubmit=async e=>{e.preventDefault();$('authMsg').textContent='Login हो रहा है…';const email=$('loginEmail').value.trim(),password=$('loginPassword').value;const {error}=await sb.auth.signInWithPassword({email,password});$('authMsg').textContent=error?('❌ '+error.message):'';};
+sb.auth.onAuthStateChange(async (_event,session)=>{currentUser=session?.user||null;if(currentUser){$('signedInAs').textContent='🔐 '+(currentUser.email||'');setAuthVisible(false);await loadCloudCustomers();resetForm();updateHeader();render();}else{setAuthVisible(true);}});
+resetForm();updateHeader();render();
+</script>
+</body>
+</html>

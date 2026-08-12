@@ -72,7 +72,7 @@ footer{text-align:center;color:#748195;font-size:11px;padding:18px}
   <button class="active" data-tab="dashboard">🏠 Dashboard</button>
   <button data-tab="customers">👥 Customers</button>
   <button data-tab="add">➕ Add Customer</button>
-  <button data-tab="settings">⚙️ Settings</button><button type="button" onclick="showHistory()">📋 History</button><button type="button" onclick="showRecycleBin()">🗑️ Recycle Bin</button>
+  <button data-tab="settings">⚙️ Settings</button>
  </div>
 
  <section id="dashboard">
@@ -105,25 +105,15 @@ footer{text-align:center;color:#748195;font-size:11px;padding:18px}
      <label>Customer Name *</label><input id="name" required placeholder="जैसे Rahul Kumar">
      <div class="row">
       <div><label>Mobile *</label><input id="phone" required inputmode="tel" placeholder="10 digit"></div>
-      <div><label>Appliance</label><select id="appliance">
-<option>AC</option><option>LED TV</option><option>Refrigerator</option><option>Microwave</option><option>Washing Machine</option><option>Other</option>
-</select></div>
+      <div><label>Appliance</label><select id="appliance"><option>AC</option><option>LED TV</option><option>Refrigerator</option><option>Microwave</option><option>Washing Machine</option><option>Other</option></select></div>
      </div>
-     <label>क्या काम कराया गया? *</label>
-<select id="workType" required></select>
-<label>Address (optional)</label><input id="address" placeholder="अगर location saved है तो पूरा address जरूरी नहीं">
+     <label>Address (optional)</label><input id="address" placeholder="अगर location saved है तो पूरा address जरूरी नहीं">
      <div class="row">
       <div><label>Last Service Date *</label><input id="serviceDate" type="date" required></div>
       <div><label>Reminder</label><select id="interval"><option value="1">1 महीना</option><option value="2">2 महीने</option><option value="3" selected>3 महीने</option><option value="6">6 महीने</option><option value="12">1 साल</option><option value="custom">Custom Date</option></select></div>
      </div>
      <div id="customBox" class="hidden"><label>Custom Reminder Date</label><input id="customDate" type="date"></div>
      <label>Service / Work Note</label><textarea id="note" placeholder="जैसे AC general service, gas check, warranty…"></textarea>
-<div class="row">
- <div><label>Payment Amount (₹)</label><input id="payment" type="number" min="0" step="1" placeholder="जैसे 500"></div>
- <div><label>Payment Status</label><select id="paymentStatus"><option value="paid">Paid</option><option value="pending">Pending</option><option value="partial">Partial</option></select></div>
-</div>
-<label>Payment Method</label>
-<select id="paymentMethod"><option>Cash</option><option>UPI</option><option>Bank Transfer</option><option>Card</option><option>Other</option></select>
      <div class="locationbox">
       <b>📍 Customer Current Location</b>
       <div class="muted" style="margin-top:4px">Customer के घर पर खड़े होकर यह बटन दबाएँ। GPS coordinates सेव हो जाएंगे।</div>
@@ -181,7 +171,6 @@ footer{text-align:center;color:#748195;font-size:11px;padding:18px}
  </section>
 </main>
 <footer>JAGESH ELECTRONIC • Customer Care & Reminder System</footer>
-<div class="modal" id="modal"><div class="modalbox"><button class="close" onclick="closeModal()">×</button><h2 id="modalTitle" style="margin-top:0">Details</h2><div id="modalBody"></div></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -198,25 +187,7 @@ function status(x){if(x.done)return'done';if(x.reminderDate<today())return'overd
 function openTab(tab){document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));$(tab).classList.remove('hidden');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));if(tab==='customers')renderCustomers()}
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>openTab(b.dataset.tab));
 function updateHeader(){$('businessAddress').textContent=state.settings.address||'पता: Settings में अपना Business Address डालें';$('bizAddress').value=state.settings.address||'';$('bizPhone').value=state.settings.phone||'';$('waPhone').value=state.settings.waPhone||'';$('backupEmail').value=state.settings.backupEmail||'jageshelectronic@gmail.com';$('msgTemplate').value=state.settings.template||''}
-const WORK_TYPES={
- 'AC':['Service','Repair','Installation','Uninstallation'],
- 'LED TV':['Repair','Installation','Uninstallation'],
- 'Refrigerator':['Repair','Installation','Uninstallation'],
- 'Microwave':['Repair','Installation','Uninstallation'],
- 'Washing Machine':['Service','Repair','Installation','Uninstallation'],
- 'Other':['Service','Repair','Installation','Uninstallation']
-};
-function updateWorkTypes(){
- let a=$('appliance'), w=$('workType');
- if(!a||!w)return;
- let types=WORK_TYPES[a.value]||WORK_TYPES.Other;
- let current=w.value;
- w.innerHTML=types.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');
- if(types.includes(current))w.value=current;
-}
-$('appliance').addEventListener('change',updateWorkTypes);
-
-function resetForm(){ $('customerForm').reset();$('editId').value='';$('serviceDate').value=today();$('interval').value='3';$('workType').value='';updateWorkTypes();$('payment').value='';$('paymentStatus').value='paid';$('paymentMethod').value='Cash';$('customBox').classList.add('hidden');$('lat').value='';$('lng').value='';$('coords').textContent='Location अभी सेव नहीं है';$('navPreview').classList.add('hidden');$('formTitle').textContent='➕ नया Customer'}
+function resetForm(){ $('customerForm').reset();$('editId').value='';$('serviceDate').value=today();$('interval').value='3';$('customBox').classList.add('hidden');$('lat').value='';$('lng').value='';$('coords').textContent='Location अभी सेव नहीं है';$('navPreview').classList.add('hidden');$('formTitle').textContent='➕ नया Customer'}
 $('interval').onchange=()=> $('customBox').classList.toggle('hidden',$('interval').value!=='custom');
 function getLocation(){
  if(!navigator.geolocation){toast('इस browser में GPS उपलब्ध नहीं है');return}
@@ -230,7 +201,7 @@ $('customerForm').onsubmit=e=>{
  let id=$('editId').value||Date.now().toString(), old=state.customers.find(x=>x.id===id);
  let rem=$('interval').value==='custom'?$('customDate').value:addMonths($('serviceDate').value,$('interval').value);
  if(!rem){toast('Reminder date चुनें');return}
- let x={id,name:$('name').value.trim(),phone:$('phone').value.trim(),appliance:$('appliance').value,workType:$('workType').value,address:$('address').value.trim(),serviceDate:$('serviceDate').value,reminderDate:rem,note:$('note').value.trim(),payment:$('payment').value||'0',paymentStatus:$('paymentStatus').value,paymentMethod:$('paymentMethod').value,lat:$('lat').value||'',lng:$('lng').value||'',done:old?old.done:false,updatedAt:new Date().toISOString()};
+ let x={id,name:$('name').value.trim(),phone:$('phone').value.trim(),appliance:$('appliance').value,address:$('address').value.trim(),serviceDate:$('serviceDate').value,reminderDate:rem,note:$('note').value.trim(),lat:$('lat').value||'',lng:$('lng').value||'',done:old?old.done:false};
  let i=state.customers.findIndex(a=>a.id===id);if(i>=0)state.customers[i]=x;else state.customers.push(x);
  persist();resetForm();openTab('customers');toast('Customer और Reminder सेव हो गया');
 };
@@ -243,334 +214,123 @@ function sms(x){location.href='sms:'+x.phone+'?body='+encodeURIComponent(message
 function navigate(x){if(x.lat&&x.lng)window.open(mapUrl(x.lat,x.lng),'_blank');else if(x.address)window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(x.address),'_blank');else toast('Customer की location सेव नहीं है')}
 function markDone(id){let x=state.customers.find(x=>x.id===id);if(x){x.done=true;persist();toast('Reminder Done');}}
 function markPending(id){let x=state.customers.find(x=>x.id===id);if(x){x.done=false;persist();}}
-
 function editCustomer(id){
- let x=state.customers.find(x=>x.id===id);
- if(!x)return;
- openTab('add');
- $('editId').value=x.id;
- $('name').value=x.name||'';
- $('phone').value=x.phone||'';
- $('appliance').value=x.appliance||'AC';
- updateWorkTypes(); $('workType').value=x.workType||$('workType').options[0]?.value||'';
- $('address').value=x.address||'';
- $('payment').value=x.payment||''; $('paymentStatus').value=x.paymentStatus||'paid'; $('paymentMethod').value=x.paymentMethod||'Cash';
- $('serviceDate').value=x.serviceDate||today();
- $('note').value=x.note||'';
- $('lat').value=x.lat||'';
- $('lng').value=x.lng||'';
+ let x=state.customers.find(x=>x.id===id);if(!x)return;openTab('add');
+ $('editId').value=x.id;$('name').value=x.name;$('phone').value=x.phone;$('appliance').value=x.appliance;$('address').value=x.address;$('serviceDate').value=x.serviceDate;$('note').value=x.note;$('lat').value=x.lat||'';$('lng').value=x.lng||'';
  let custom=['1','2','3','6','12'].find(n=>addMonths(x.serviceDate,n)===x.reminderDate);
- $('interval').value=custom||'custom';
- $('customBox').classList.toggle('hidden',!!custom);
- if(!custom)$('customDate').value=x.reminderDate||'';
- $('coords').textContent=x.lat&&x.lng?'✅ Saved: '+x.lat+', '+x.lng:'Location अभी सेव नहीं है';
- $('navPreview').classList.toggle('hidden',!(x.lat&&x.lng));
- $('formTitle').textContent='✏️ Edit Customer';
+ $('interval').value=custom||'custom';$('customBox').classList.toggle('hidden',!!custom);if(!custom)$('customDate').value=x.reminderDate;
+ $('coords').textContent=x.lat&&x.lng?'✅ Saved: '+x.lat+', '+x.lng:'Location अभी सेव नहीं है';$('navPreview').classList.toggle('hidden',!(x.lat&&x.lng));$('formTitle').textContent='✏️ Customer Edit';
 }
-
-function renderItem(x){
- let s=status(x);
- let cls=s;
- let badge=s==='today'?'आज':s==='overdue'?'Overdue':s==='future'?'Upcoming':'Done';
- return `
- <div class="item ${cls}">
-  <div class="itemtop">
-   <div><div class="name">${esc(x.name)}</div>
-   <div class="meta">📱 ${esc(x.phone)} • ${esc(x.appliance)} • 🔧 ${esc(x.workType||'Work')} • ${esc(x.address||'Location saved')}</div></div>
-   <div class="date">${fmt(x.reminderDate)}</div>
-  </div>
-  <span class="pill">${badge} • ₹${esc(x.payment||'0')} ${esc(x.paymentStatus||'')} • ${esc(x.note||'')}</span>
-  <div class="actions">
-   <button class="btn small secondary" onclick="editCustomer('${x.id}')">✏️ Edit</button>
-   <button class="btn small bluebtn" onclick="navigate(${JSON.stringify(x).replace(/"/g,'&quot;')})">🗺️ Navigate</button>
-   <button class="btn small greenbtn" onclick="whatsapp(${JSON.stringify(x).replace(/"/g,'&quot;')})">💬 WhatsApp</button>
-   <button class="btn small secondary" onclick="sms(${JSON.stringify(x).replace(/"/g,'&quot;')})">📩 SMS</button>
-   ${x.done
-     ? `<button class="btn small secondary" onclick="markPending('${x.id}')">↩️ Pending</button>`
-     : `<button class="btn small greenbtn" onclick="markDone('${x.id}')">✓ Done</button>`}
-   <button class="btn small danger" onclick="removeCustomer('${x.id}')">🗑️ Delete</button>
-  </div>
- </div>`;
+function removeCustomer(id){if(confirm('इस Customer को Delete करना है?')){state.customers=state.customers.filter(x=>x.id!==id);persist();}}
+function item(x){
+ let s=status(x),label=s==='overdue'?'🔴 Overdue':s==='today'?'🟠 आज':s==='done'?'✅ Done':'🟢 Upcoming';
+ return `<div class="item ${s}">
+ <div class="itemtop"><div><div class="name">${esc(x.name)}</div><div class="meta">📱 ${esc(x.phone)} · 🔧 ${esc(x.appliance)}</div></div><div class="date">${fmt(x.reminderDate)}</div></div>
+ <span class="pill">${label}</span>
+ ${x.note?'<div class="meta">📝 '+esc(x.note)+'</div>':''}
+ ${x.address?'<div class="meta">🏠 '+esc(x.address)+'</div>':''}
+ ${x.lat&&x.lng?'<div class="meta">📍 GPS Saved</div>':'<div class="meta">📍 GPS Not Saved</div>'}
+ <div class="actions">
+  <button class="btn primary small" onclick='callCustomer(${JSON.stringify(x.phone)})'>📞 Call</button>
+  <button class="btn greenbtn small" onclick='whatsapp(${JSON.stringify(x)})'>💬 WhatsApp</button>
+  <button class="btn bluebtn small" onclick='sms(${JSON.stringify(x)})'>✉️ SMS</button>
+  <button class="btn bluebtn small" onclick='navigate(${JSON.stringify(x)})'>🗺️ Navigate</button>
+  ${s==='done'?'<button class="btn secondary small" onclick="markPending(\''+x.id+'\')">↩️ Pending</button>':'<button class="btn secondary small" onclick="markDone(\''+x.id+'\')">✅ Done</button>'}
+  <button class="btn secondary small" onclick="editCustomer('${x.id}')">✏️ Edit</button>
+  <button class="btn danger small" onclick="removeCustomer('${x.id}')">🗑️</button>
+ </div></div>`;
 }
-
 function renderCustomers(){
- let q=($('search')?.value||'').trim().toLowerCase();
- let f=$('filter')?.value||'all';
- let t=today();
- let arr=state.customers.filter(x=>{
-  let ok=f==='all' ||
-   (f==='today'&&!x.done&&x.reminderDate===t) ||
-   (f==='overdue'&&!x.done&&x.reminderDate<t) ||
-   (f==='upcoming'&&!x.done&&x.reminderDate>t) ||
-   (f==='done'&&x.done);
-  let s=!q||(x.name+' '+x.phone+' '+x.appliance+' '+x.note+' '+x.address).toLowerCase().includes(q);
-  return ok&&s;
- });
- $('customerList').innerHTML=arr.length?arr.map(renderItem).join(''):'<div class="empty">कोई Customer नहीं मिला।</div>';
+ let q=($('search').value||'').toLowerCase(),f=$('filter').value;
+ let arr=state.customers.filter(x=>(x.name+' '+x.phone+' '+x.appliance).toLowerCase().includes(q)).filter(x=>f==='all'||status(x)===f).sort((a,b)=>a.reminderDate.localeCompare(b.reminderDate));
+ $('customerList').innerHTML=arr.length?arr.map(item).join(''):'<div class="empty">कोई Customer नहीं मिला।</div>';
 }
-
-function removeCustomer(id){
- let x=state.customers.find(c=>c.id===id);
- if(!x)return;
- if(!confirm('Customer को Recycle Bin में भेजना है?'))return;
- x.deletedAt=new Date().toISOString();
- let bin=JSON.parse(localStorage.getItem('JAGESH_RECYCLE_BIN')||'[]');
- bin.push(x);
- localStorage.setItem('JAGESH_RECYCLE_BIN',JSON.stringify(bin));
- state.customers=state.customers.filter(c=>c.id!==id);
- persist();
- toast('Customer Recycle Bin में चला गया');
+$('search').oninput=renderCustomers;$('filter').onchange=renderCustomers;
+function renderDashboard(){
+ let t=state.customers.filter(x=>!x.done&&x.reminderDate===today()).length,o=state.customers.filter(x=>!x.done&&x.reminderDate<today()).length,u=state.customers.filter(x=>!x.done&&x.reminderDate>today()).length;
+ $('todayN').textContent=t;$('overdueN').textContent=o;$('upcomingN').textContent=u;$('totalN').textContent=state.customers.length;
+ let arr=state.customers.filter(x=>!x.done&&x.reminderDate<=today()).sort((a,b)=>a.reminderDate.localeCompare(b.reminderDate)).slice(0,12);
+ $('dashboardList').innerHTML=arr.length?arr.map(item).join(''):'<div class="empty">🎉 आज कोई pending Reminder नहीं है।</div>';
 }
-
-function render(){
- let t=today();
- let active=state.customers.filter(x=>!x.done);
- $('todayN').textContent=active.filter(x=>x.reminderDate===t).length;
- $('overdueN').textContent=active.filter(x=>x.reminderDate<t).length;
- $('upcomingN').textContent=active.filter(x=>x.reminderDate>t).length;
- $('totalN').textContent=state.customers.length;
-
- let list=active.filter(x=>x.reminderDate<=t||x.reminderDate===addMonths(t,0))
-   .sort((a,b)=>a.reminderDate.localeCompare(b.reminderDate));
-
- $('dashboardList').innerHTML=list.length?list.slice(0,12).map(renderItem).join(''):
-   '<div class="empty">आज कोई pending reminder नहीं है।</div>';
-
- if(!$('customers').classList.contains('hidden'))renderCustomers();
-}
-
-$('search').addEventListener('input',renderCustomers);
-$('filter').addEventListener('change',renderCustomers);
-
-function saveSettings(){
- state.settings.address=$('bizAddress').value.trim();
- state.settings.phone=$('bizPhone').value.trim();
- state.settings.waPhone=$('waPhone').value.trim();
- state.settings.backupEmail=$('backupEmail').value.trim();
- state.settings.template=$('msgTemplate').value;
- persist();
- toast('Settings सेव हो गईं');
-}
-
-function exportData(){
- let payload={
-  app:'JAGESH ELECTRONIC',
-  version:2,
-  exportedAt:new Date().toISOString(),
-  customers:state.customers,
-  settings:state.settings,
-  recycleBin:JSON.parse(localStorage.getItem('JAGESH_RECYCLE_BIN')||'[]')
- };
- let blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
- let a=document.createElement('a');
- a.href=URL.createObjectURL(blob);
- a.download='JAGESH-ELECTRONIC-BACKUP-'+today()+'.json';
- a.click();
- URL.revokeObjectURL(a.href);
- toast('Backup file तैयार है');
-}
-
-function emailBackup(){
- exportData();
- setTimeout(()=>{
-  let e=state.settings.backupEmail||'';
-  if(e)window.location.href='mailto:'+encodeURIComponent(e)+'?subject='+encodeURIComponent('JAGESH ELECTRONIC Customer Backup')+'&body='+encodeURIComponent('Backup file डाउनलोड होकर तैयार है। उसे इस email में attachment के रूप में जोड़कर भेजें।');
- },300);
-}
-
-$('importFile').addEventListener('change',e=>{
- let file=e.target.files[0];
- if(!file)return;
- let r=new FileReader();
- r.onload=()=>{
-  try{
-   let d=JSON.parse(r.result);
-   if(!confirm('Backup restore करने पर current data replace होगा। Continue?'))return;
-   state.customers=d.customers||[];
-   state.settings=Object.assign(state.settings,d.settings||{});
-   localStorage.setItem('JAGESH_RECYCLE_BIN',JSON.stringify(d.recycleBin||[]));
-   persist();
-   updateHeader();
-   toast('Backup successfully restored');
-  }catch(err){alert('Backup file सही नहीं है')}
- };
- r.readAsText(file);
-});
-
-function showHistory(){
- let rows=state.customers.slice().sort((a,b)=>(b.updatedAt||b.serviceDate||'').localeCompare(a.updatedAt||a.serviceDate||''));
- let html=rows.length?rows.map(x=>`
-  <div class="item">
-   <div class="itemtop"><div><div class="name">${esc(x.name)}</div>
-   <div class="meta">📱 ${esc(x.phone)} • ${esc(x.appliance)} • 🔧 ${esc(x.workType||'')}</div></div>
-   <div class="date">${fmt(x.serviceDate)}</div></div>
-   <div class="meta">💰 ₹${esc(x.payment||'0')} • ${esc(x.paymentStatus||'')} • ${esc(x.paymentMethod||'')}</div>
-   <div class="meta">🔔 Reminder: ${fmt(x.reminderDate)} • ${esc(x.note||'')}</div>
-  </div>`).join(''):'<div class="empty">History अभी खाली है।</div>';
- showModal('📋 Customer History',html);
-}
-
-
-function showRecycleBin(){
- let saved=localStorage.getItem('JAGESH_RECYCLE_PIN');
- if(!saved){
-  let p=prompt('Recycle Bin के लिए अलग 6-digit PIN बनाएँ');
-  if(!/^\d{6}$/.test(p||'')){toast('6 digit PIN जरूरी है');return}
-  localStorage.setItem('JAGESH_RECYCLE_PIN',btoa(p));
-  saved=localStorage.getItem('JAGESH_RECYCLE_PIN');
+function render(){renderDashboard();renderCustomers();checkDueNotifications()}
+function saveSettings(){state.settings.address=$('bizAddress').value.trim();state.settings.phone=$('bizPhone').value.trim();state.settings.waPhone=$('waPhone').value.trim();state.settings.backupEmail=$('backupEmail').value.trim();state.settings.template=$('msgTemplate').value;persist();toast('Settings सेव हो गई');}
+async function requestNotifications(){if(!('Notification'in window)){toast('इस browser में notification उपलब्ध नहीं है');return}let p=await Notification.requestPermission();toast(p==='granted'?'Browser Notification ON हो गई':'Notification permission नहीं मिली');}
+function checkDueNotifications(){if(!('Notification'in window)||Notification.permission!=='granted')return;let due=state.customers.filter(x=>!x.done&&x.reminderDate<=today());if(due.length)new Notification('JAGESH ELECTRONIC',{body:'आज/Overdue Reminder: '+due.length+' Customer'});}
+function makeBackupFile(){return new File([JSON.stringify(state,null,2)],'JAGESH_ELECTRONIC_backup.json',{type:'application/json'})}
+function exportData(){let f=makeBackupFile(),a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);toast('Backup file सेव हो गई');}
+async function emailBackup(){
+ let email=state.settings.backupEmail||'jageshelectronic@gmail.com',f=makeBackupFile();
+ if(navigator.canShare && navigator.canShare({files:[f]})){
+   try{await navigator.share({title:'JAGESH ELECTRONIC Backup',text:'Customer Reminder Backup',files:[f]});toast('Share खुल गया — Gmail चुनकर भेज दें');return}catch(e){}
  }
- let p=prompt('Recycle Bin PIN डालें');
- if(btoa(p||'')!==saved){alert('गलत Recycle Bin PIN');return}
- let bin=JSON.parse(localStorage.getItem('JAGESH_RECYCLE_BIN')||'[]');
- let html=bin.length?bin.map(x=>`
-  <div class="item"><div class="name">${esc(x.name)}</div>
-  <div class="meta">${esc(x.phone)} • ${esc(x.appliance)} • ${esc(x.workType||'')} • ${fmt(x.reminderDate)}</div>
-  <div class="actions"><button class="btn greenbtn" onclick="restoreCustomer('${x.id}')">♻️ Restore</button>
-  <button class="btn danger" onclick="permanentDelete('${x.id}')">❌ Permanent Delete</button></div></div>`).join('')
-  :'<div class="empty">Recycle Bin खाली है।</div>';
- showModal('🗑️ Recycle Bin',html);
+ exportData();
+ let subject=encodeURIComponent('JAGESH ELECTRONIC Customer Backup');
+ let body=encodeURIComponent('नमस्ते,\n\nJAGESH ELECTRONIC Customer Reminder का backup file attach करके भेज रहा हूँ।\n\nBackup Email: '+email);
+ window.location.href='mailto:'+encodeURIComponent(email)+'?subject='+subject+'&body='+body;
+ toast('Backup download हो गया। Gmail में file attach करके भेजें।');
 }
-function showModal(title,html){
- $('modalTitle').textContent=title;
- $('modalBody').innerHTML=html;
- $('modal').classList.add('show');
-}
+$('importFile').onchange=e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{state=JSON.parse(r.result);persist();toast('Backup Import हो गया')}catch{toast('Backup file गलत है')}};r.readAsText(f)};
 
-function restoreCustomer(id){
- let bin=JSON.parse(localStorage.getItem('JAGESH_RECYCLE_BIN')||'[]');
- let x=bin.find(a=>a.id===id);
- if(!x)return;
- delete x.deletedAt;
- state.customers.push(x);
- bin=bin.filter(a=>a.id!==id);
- localStorage.setItem('JAGESH_RECYCLE_BIN',JSON.stringify(bin));
- persist();
- showRecycleBin();
-}
-
-function permanentDelete(id){
- if(!confirm('यह Customer हमेशा के लिए delete होगा। Continue?'))return;
- let bin=JSON.parse(localStorage.getItem('JAGESH_RECYCLE_BIN')||'[]');
- bin=bin.filter(a=>a.id!==id);
- localStorage.setItem('JAGESH_RECYCLE_BIN',JSON.stringify(bin));
- showRecycleBin();
-}
-
-async function requestNotifications(){
- if(!('Notification' in window)){toast('इस browser में notification उपलब्ध नहीं है');return}
- let p=await Notification.requestPermission();
- toast(p==='granted'?'Notifications ON हो गईं':'Notification permission नहीं मिली');
-}
-
-let deferredPrompt=null;
+let deferredInstallPrompt=null;
 window.addEventListener('beforeinstallprompt',e=>{
- e.preventDefault();
- deferredPrompt=e;
- $('installStatus').textContent='📲 App install करने के लिए button दबाएँ।';
- $('installStatus').className='installstate ok';
+ e.preventDefault(); deferredInstallPrompt=e;
+ const s=$('installStatus'); if(s){s.textContent='✅ App Install के लिए तैयार है।';s.className='installstate ok';}
+});
+window.addEventListener('appinstalled',()=>{
+ deferredInstallPrompt=null;
+ const s=$('installStatus'); if(s){s.textContent='✅ JAGESH ELECTRONIC App install हो गया।';s.className='installstate ok';}
+ toast('App install हो गया');
 });
 async function installApp(){
- if(deferredPrompt){
-  deferredPrompt.prompt();
-  await deferredPrompt.userChoice;
-  deferredPrompt=null;
- }else{
-  toast('Chrome menu → Add to Home screen / Install app चुनें');
+ if(window.matchMedia('(display-mode: standalone)').matches){
+   toast('App पहले से installed है'); return;
  }
-}
-
-$('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
-function closeModal(){$('modal').classList.remove('show')}
-
-$('bizAddress').addEventListener('change',saveSettings);
-
-state.customers=state.customers.map(x=>Object.assign({workType:'',payment:'0',paymentStatus:'paid',paymentMethod:'Cash'},x));
-render();
-updateHeader();
-updateWorkTypes();
-resetForm();
-
-if('serviceWorker' in navigator){
- navigator.serviceWorker.register('./sw.js').catch(()=>{});
-}
-</script>
-
-<script>
-/* PIN-only security layer */
-(function(){
- const PIN_KEY='JAGESH_APP_PIN_V3';
- const lock=document.getElementById('pinLock');
- const title=document.getElementById('pinTitle');
- const dots=document.getElementById('pinDots');
- const msg=document.getElementById('pinMsg');
- const reset=document.getElementById('pinReset');
- let value='';
-
- function draw(){
-  dots.innerHTML='';
-  for(let i=0;i<6;i++){
-   let s=document.createElement('span');
-   s.className='pinDot'+(i<value.length?' filled':'');
-   dots.appendChild(s);
-  }
- }
-
- function show(){
-  lock.style.display='flex';
-  value='';
-  msg.textContent='';
-  title.textContent=localStorage.getItem(PIN_KEY)?'अपना 6-digit PIN डालें':'पहली बार 6-digit PIN बनाएँ';
-  reset.style.display=localStorage.getItem(PIN_KEY)?'block':'none';
-  draw();
- }
-
- function finish(){
-  if(value.length!==6){msg.textContent='6 digit PIN डालें';return}
-  if(!localStorage.getItem(PIN_KEY)){
-   localStorage.setItem(PIN_KEY,btoa(value));
-   lock.style.display='none';
+ if(deferredInstallPrompt){
+   deferredInstallPrompt.prompt();
+   const choice=await deferredInstallPrompt.userChoice;
+   deferredInstallPrompt=null;
+   const s=$('installStatus');
+   if(s){s.textContent=choice.outcome==='accepted'?'✅ App install हो रहा है…':'⚠️ Install cancel हुआ। Chrome menu से Add to Home screen भी कर सकते हैं।';s.className='installstate '+(choice.outcome==='accepted'?'ok':'warn');}
    return;
-  }
-  if(btoa(value)===localStorage.getItem(PIN_KEY)){
-   lock.style.display='none';
-  }else{
-   msg.textContent='गलत PIN';
-   value='';
-   draw();
-  }
  }
+ const s=$('installStatus');
+ if(s){s.textContent='ℹ️ Chrome के ⋮ menu → Add to Home screen / Install app चुनें।';s.className='installstate warn';}
+ toast('Chrome menu से Install app / Add to Home screen चुनें');
+}
+if('serviceWorker' in navigator){
+ window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').then(()=>{
+   const s=$('installStatus'); if(s && !deferredInstallPrompt && !window.matchMedia('(display-mode: standalone)').matches){s.textContent='ℹ️ Chrome में Install app उपलब्ध होने पर button सक्रिय होगा।';}
+ }).catch(()=>{}));
+}
 
- document.querySelectorAll('.pinKey').forEach(b=>{
-  b.onclick=()=>{
-   if(b.dataset.n!==undefined && value.length<6){
-    value+=b.dataset.n;
-    draw();
-    if(value.length===6)setTimeout(finish,120);
-   }else if(b.dataset.action==='clear'){
-    value=value.slice(0,-1);draw();
-   }else if(b.dataset.action==='ok'){
-    finish();
-   }
-  };
- });
-
- reset.onclick=()=>{
-  if(confirm('PIN reset करके नया PIN बनाना है?')){
-   localStorage.removeItem(PIN_KEY);
-   show();
-  }
- };
-
- window.JageshPin={change:()=>{
-  if(confirm('Current PIN हटाकर नया PIN बनाना है?')){
-   localStorage.removeItem(PIN_KEY);
-   show();
-  }
- }};
-
- show();
-})();
+resetForm();updateHeader();render();
 </script>
-
-</body>
+<script id="pin-lock-js">
+(function(){
+const K='jagesh_electronic_pin_hash_v1', S='JAGESH-ELECTRONIC-PIN-V1';
+let mode='unlock',buf='';
+const $=id=>document.getElementById(id);
+async function hashPin(p){
+ const d=new TextEncoder().encode(S+'|'+p);
+ const b=await crypto.subtle.digest('SHA-256',d);
+ return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+function dots(){ $('pinDots').innerHTML=Array.from({length:6},(_,i)=>'<span class="pinDot '+(i<buf.length?'filled':'')+'"></span>').join(''); }
+function show(m){mode=m;buf='';dots();$('pinLock').style.display='flex';$('pinTitle').textContent=m==='setup'?'पहली बार 6-digit PIN बनाइए':'अपना 6-digit PIN डालें';$('pinMsg').textContent='';$('pinReset').style.display=localStorage.getItem(K)?'inline-block':'none';}
+async function ok(){
+ if(buf.length!==6){$('pinMsg').textContent='6 digit PIN डालें';return}
+ const h=await hashPin(buf);
+ if(mode==='setup'){localStorage.setItem(K,h);$('pinLock').style.display='none';document.body.classList.remove('pinLocked');toast&&toast('PIN सेट हो गया');}
+ else if(h===localStorage.getItem(K)){ $('pinLock').style.display='none';document.body.classList.remove('pinLocked');}
+ else {buf='';dots();$('pinMsg').textContent='गलत PIN';navigator.vibrate&&navigator.vibrate(180);}
+}
+document.addEventListener('click',e=>{
+ const k=e.target.closest('.pinKey');
+ if(k){if(k.dataset.action==='clear')buf=buf.slice(0,-1);else if(k.dataset.action==='ok')ok();else if(buf.length<6)buf+=k.dataset.n;dots();if(buf.length===6)setTimeout(ok,100);}
+ if(e.target.id==='pinReset'){mode='change';buf='';$('pinTitle').textContent='नया 6-digit PIN डालें';$('pinMsg').textContent='पुराना PIN verify करने के लिए पहले उसे डालें';$('pinReset').style.display='none';}
+});
+window.JageshPin={lock:()=>show('unlock'),change:()=>show('setup')};
+window.addEventListener('load',()=>show(localStorage.getItem(K)?'unlock':'setup'));
+})();
+</script></body>
 </html>

@@ -1,0 +1,7 @@
+V8 — FINAL RECYCLE BIN FIX
+Recycle Bin is now stored inside the app's existing state object (state.recycleBin).
+Delete pushes the full customer record into state.recycleBin before removing it from customers.
+Recycle Bin reads the same state, so it cannot become empty because of a different localStorage key.
+6-digit PIN remains separate and protected.
+Restore, permanent delete and empty are PIN-protected.
+Service worker cache bumped to v8.

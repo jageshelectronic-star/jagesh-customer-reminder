@@ -210,7 +210,8 @@ footer{text-align:center;color:#748195;font-size:11px;padding:18px}
 
 <script>
 const KEY='jagesh_electronic_pro_v2';
-let state=JSON.parse(localStorage.getItem(KEY)||'null')||{customers:[],settings:{address:'',phone:'',waPhone:'',backupEmail:'jageshelectronic@gmail.com',template:'नमस्ते {name} जी 🙏\\nJAGESH ELECTRONIC की तरफ से याद दिलाना है कि आपके {appliance} की सर्विस का समय हो गया है।\\nकृपया सुविधानुसार समय बताएं।\\nधन्यवाद।\\n- JAGESH ELECTRONIC'}};
+let state=JSON.parse(localStorage.getItem(KEY)||'null')||{customers:[],recycleBin:[],settings:{address:'',phone:'',waPhone:'',backupEmail:'jageshelectronic@gmail.com',template:'नमस्ते {name} जी 🙏\\nJAGESH ELECTRONIC की तरफ से याद दिलाना है कि आपके {appliance} की सर्विस का समय हो गया है।\\nकृपया सुविधानुसार समय बताएं।\\nधन्यवाद।\\n- JAGESH ELECTRONIC'}};
+if(!Array.isArray(state.recycleBin))state.recycleBin=[];
 state.settings=Object.assign({address:'',phone:'',waPhone:'',backupEmail:'jageshelectronic@gmail.com',template:''},state.settings);
 const $=id=>document.getElementById(id);
 const today=()=>new Date().toISOString().slice(0,10);
@@ -261,7 +262,10 @@ function removeCustomer(id){
   const x=state.customers.find(c=>c.id===id);
   if(!x)return;
   if(!confirm('इस Customer को Recycle Bin में भेजना है?'))return;
-  if(window.JageshMoveToRecycleBin) window.JageshMoveToRecycleBin(x);
+  if(!Array.isArray(state.recycleBin)) state.recycleBin=[];
+  if(!state.recycleBin.some(r=>(r.data||r).id===x.id)){
+    state.recycleBin.push({id:String(Date.now())+'_'+Math.random().toString(36).slice(2),deletedAt:new Date().toLocaleString('en-IN'),data:JSON.parse(JSON.stringify(x))});
+  }
   state.customers=state.customers.filter(c=>c.id!==id);
   persist();
   toast('Customer Recycle Bin में चला गया');
@@ -430,96 +434,85 @@ window.addEventListener('load',()=>show(localStorage.getItem(K)?'unlock':'setup'
 
 
 
-<script id="jagesh-final-v7-js">
-(function(){
- const RK='jagesh_recycle_bin_v7', PK='jagesh_recycle_pin_v7';
- const getBin=()=>{try{return JSON.parse(localStorage.getItem(RK)||'[]')}catch(e){return[]}};
- const setBin=a=>localStorage.setItem(RK,JSON.stringify(a));
- const hash=p=>{let h=2166136261;for(const c of p){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return (h>>>0).toString(16)};
 
+
+<script id="jagesh-final-v8-recycle">
+(function(){
+ const PIN='jagesh_recycle_pin_v8';
+ const getBin=()=>Array.isArray(state.recycleBin)?state.recycleBin:[];
+ const save=()=>{if(typeof persist==='function')persist();else localStorage.setItem(KEY,JSON.stringify(state));};
+ const hash=p=>{let h=2166136261;for(const c of p){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return (h>>>0).toString(16)};
  function pinDialog(mode,done){
    let m=document.getElementById('recyclePinModal');
-   if(!m){
-     m=document.createElement('div');m.id='recyclePinModal';
-     m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100000;display:flex;align-items:center;justify-content:center;padding:20px';
-     m.innerHTML='<div style="background:#fff;color:#111;border-radius:18px;padding:22px;width:min(360px,100%);text-align:center">'+
-       '<h2 id="rPinTitle">🔐 Recycle Bin PIN</h2>'+
-       '<p id="rPinText"></p>'+
-       '<input id="rPinInput" inputmode="numeric" maxlength="6" type="password" autocomplete="off" placeholder="6-digit PIN" style="width:100%;box-sizing:border-box;padding:13px;font-size:22px;letter-spacing:7px;text-align:center">'+
-       '<input id="rPinConfirm" inputmode="numeric" maxlength="6" type="password" autocomplete="off" placeholder="PIN दोबारा" style="display:none;width:100%;box-sizing:border-box;padding:13px;font-size:22px;letter-spacing:7px;text-align:center;margin-top:10px">'+
-       '<div style="display:flex;gap:10px;margin-top:14px"><button id="rPinOk" style="flex:1;padding:12px">OK</button><button id="rPinCancel" style="flex:1;padding:12px">Cancel</button></div>'+
-       '<div id="rPinErr" style="color:#b91c1c;margin-top:8px;min-height:18px"></div></div>';
-     document.body.appendChild(m);
-     m.querySelector('#rPinCancel').onclick=()=>m.remove();
-   }
-   const title=m.querySelector('#rPinTitle'), text=m.querySelector('#rPinText'), inp=m.querySelector('#rPinInput'), conf=m.querySelector('#rPinConfirm'), err=m.querySelector('#rPinErr'), ok=m.querySelector('#rPinOk');
-   m.style.display='flex'; inp.value='';conf.value='';err.textContent='';
-   if(mode==='setup'){
-     title.textContent='🔐 Recycle Bin PIN बनाएं';text.textContent='नया 6-digit PIN सेट करें';conf.style.display='block';conf.placeholder='PIN दोबारा डालें';
-   }else{
-     title.textContent='🔐 Recycle Bin PIN';text.textContent='अपना 6-digit PIN डालें';conf.style.display='none';
-   }
-   setTimeout(()=>inp.focus(),50);
-   ok.onclick=()=>{
-     const p=inp.value;
+   if(m)m.remove();
+   m=document.createElement('div');m.id='recyclePinModal';
+   m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:100000;display:flex;align-items:center;justify-content:center;padding:20px';
+   m.innerHTML='<div style="background:#111827;color:#fff;border:1px solid #374151;border-radius:20px;padding:24px;width:min(360px,100%);text-align:center">'+
+   '<h2>🔐 Recycle Bin PIN</h2><p>'+(mode==='setup'?'नया 6-digit PIN बनाएं':'अपना 6-digit PIN डालें')+'</p>'+
+   '<input id="rp1" inputmode="numeric" maxlength="6" type="password" placeholder="6-digit PIN" style="width:100%;box-sizing:border-box;padding:14px;font-size:22px;letter-spacing:7px;text-align:center;border-radius:12px">'+
+   '<input id="rp2" inputmode="numeric" maxlength="6" type="password" placeholder="PIN दोबारा" style="'+(mode==='setup'?'':'display:none;')+';width:100%;box-sizing:border-box;padding:14px;font-size:22px;letter-spacing:7px;text-align:center;border-radius:12px;margin-top:10px">'+
+   '<div id="rpe" style="color:#fca5a5;min-height:22px;margin-top:8px"></div>'+
+   '<button id="rpo" style="width:100%;padding:13px;border-radius:12px;margin-top:8px">✓ OK</button>'+
+   '<button id="rpc" style="width:100%;padding:11px;border-radius:12px;margin-top:8px">Cancel</button></div>';
+   document.body.appendChild(m);
+   const p1=m.querySelector('#rp1'),p2=m.querySelector('#rp2'),err=m.querySelector('#rpe');
+   m.querySelector('#rpc').onclick=()=>m.remove();
+   m.querySelector('#rpo').onclick=()=>{
+     const p=p1.value;
      if(!/^\d{6}$/.test(p)){err.textContent='ठीक 6 digits का PIN डालें';return}
-     if(mode==='setup'){
-       if(conf.value!==p){err.textContent='दोनों PIN समान नहीं हैं';return}
-       localStorage.setItem(PK,hash(p));m.remove();done(true);
-     }else{
-       if(hash(p)!==localStorage.getItem(PK)){err.textContent='गलत PIN';inp.value='';inp.focus();return}
-       m.remove();done(true);
-     }
+     if(mode==='setup'&&p2.value!==p){err.textContent='दोनों PIN समान नहीं हैं';return}
+     if(mode==='unlock'&&hash(p)!==localStorage.getItem(PIN)){err.textContent='गलत PIN';p1.value='';return}
+     localStorage.setItem(PIN,hash(p));m.remove();done(true);
    };
-   inp.onkeydown=e=>{if(e.key==='Enter')ok.click()};
-   conf.onkeydown=e=>{if(e.key==='Enter')ok.click()};
+   setTimeout(()=>p1.focus(),50);
  }
  function auth(done){
-   if(!localStorage.getItem(PK)) pinDialog('setup',done);
-   else pinDialog('unlock',done);
+   if(localStorage.getItem(PIN))pinDialog('unlock',done);
+   else pinDialog('setup',done);
  }
- window.setRecyclePin=function(){auth(()=>alert('Recycle Bin PIN सेट/अपडेट हो गया।'))};
- window.JageshMoveToRecycleBin=function(customer){
-   if(!customer)return;
-   const a=getBin();
-   // Avoid duplicate copy of the same customer.
-   if(a.some(x=>(x.data||x).id===customer.id))return;
-   a.push({id:String(Date.now())+'_'+Math.random().toString(36).slice(2),deletedAt:new Date().toLocaleString('en-IN'),data:JSON.parse(JSON.stringify(customer))});
-   setBin(a);
- };
  window.openRecycleBin=function(){auth(render)};
+ window.setRecyclePin=function(){auth(()=>alert('Recycle Bin PIN सेव हो गया।'))};
+ window.renderRecycleBin=render;
  function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
  function render(){
+   if(!Array.isArray(state.recycleBin))state.recycleBin=[];
    let box=document.getElementById('recycleBinView');
-   if(!box){box=document.createElement('div');box.id='recycleBinView';box.style.cssText='position:fixed;inset:0;background:#fff;color:#111;z-index:99999;overflow:auto;padding:18px';document.body.appendChild(box)}
-   const a=getBin();
-   box.innerHTML='<h2>🗑️ Recycle Bin</h2><p>'+a.length+' deleted customer(s)</p>'+
-     '<button onclick="setRecyclePin()">🔐 Change PIN</button> '+
-     '<button onclick="emptyRecycle()" style="background:#b91c1c;color:#fff">Empty Recycle Bin</button> '+
-     '<button onclick="this.parentElement.remove()">Close</button><hr>'+
-     (a.length?a.map((x,i)=>{const d=x.data||x;return '<div style="padding:12px;border:1px solid #ddd;border-radius:12px;margin:8px 0"><b>'+esc(d.name||'Customer')+'</b><br>📱 '+esc(d.phone||'')+'<br><small>Deleted: '+esc(x.deletedAt||'')+'</small><br><button onclick="restoreRecycle('+i+')">↩️ Restore</button> <button onclick="permanentDeleteRecycle('+i+')" style="background:#b91c1c;color:#fff">🗑️ Permanently Delete</button></div>'}).join(''):'<p>Recycle Bin खाली है।') ;
+   if(!box){box=document.createElement('div');box.id='recycleBinView';document.body.appendChild(box)}
+   box.style.cssText='position:fixed;inset:0;background:#080b10;color:#fff;z-index:99999;overflow:auto;padding:18px';
+   const a=state.recycleBin;
+   box.innerHTML='<div style="max-width:700px;margin:auto">'+
+   '<h2>🗑️ Recycle Bin</h2><p>Deleted Customers: <b>'+a.length+'</b></p>'+
+   '<button onclick="setRecyclePin()">🔐 Change PIN</button> '+
+   '<button onclick="emptyRecycle()" style="background:#b91c1c;color:#fff">🗑️ Empty</button> '+
+   '<button onclick="this.parentElement.parentElement.remove()">✕ Close</button><hr>'+
+   (a.length?a.map((r,i)=>{const d=r.data||r;return '<div style="padding:14px;border:1px solid #334155;border-radius:14px;margin:10px 0;background:#111827">'+
+   '<b style="font-size:18px">'+esc(d.name||'Customer')+'</b><br>📱 '+esc(d.phone||'')+
+   '<br>🔧 '+esc(d.appliance||'')+'<br><small>Deleted: '+esc(r.deletedAt||'')+'</small><br><br>'+
+   '<button onclick="restoreRecycle('+i+')">↩️ Restore</button> '+
+   '<button onclick="permanentDeleteRecycle('+i+')" style="background:#b91c1c;color:#fff">🗑️ Permanently Delete</button></div>'}).join(''):'<p style="opacity:.8">Recycle Bin अभी खाली है।</p>')+
+   '</div>';
  }
  window.restoreRecycle=function(i){
-   auth(ok=>{
-     const a=getBin(),x=a[i];if(!x)return;
-     const d=x.data||x;
-     // Restore directly into the actual app state when available.
-     if(typeof state!=='undefined' && Array.isArray(state.customers)){
-       if(!state.customers.some(c=>c.id===d.id)) state.customers.push(d);
-       if(typeof persist==='function')persist();
-     }
-     a.splice(i,1);setBin(a);render();alert('Customer restore हो गया।');
+   auth(()=>{
+     const r=state.recycleBin[i];if(!r)return;
+     const d=JSON.parse(JSON.stringify(r.data||r));
+     if(!state.customers.some(c=>c.id===d.id))state.customers.push(d);
+     state.recycleBin.splice(i,1);save();render();alert('Customer वापस restore हो गया।');
    });
  };
  window.permanentDeleteRecycle=function(i){
-   auth(ok=>{
-     const a=getBin();if(!a[i])return;
-     if(confirm('यह Customer हमेशा के लिए delete हो जाएगा। Continue?')){a.splice(i,1);setBin(a);render();}
+   auth(()=>{
+     if(!state.recycleBin[i])return;
+     if(confirm('यह Customer हमेशा के लिए delete हो जाएगा। Continue?')){
+       state.recycleBin.splice(i,1);save();render();
+     }
    });
  };
  window.emptyRecycle=function(){
-   auth(ok=>{
-     if(confirm('Recycle Bin के सभी customers permanently delete करें?')){setBin([]);render();}
+   auth(()=>{
+     if(confirm('Recycle Bin के सभी Customers permanently delete करें?')){
+       state.recycleBin=[];save();render();
+     }
    });
  };
 })();

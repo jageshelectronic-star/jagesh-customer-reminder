@@ -1,4 +1,4 @@
-const CACHE='jagesh-reminder-v10-clean';
+const CACHE='jagesh-reminder-v11-otp';
 const ASSETS=['./','./index.html','./manifest.json','./logo.jpg','./icon-192.png','./icon-512.png','./icon-512-maskable.png'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});

@@ -33,7 +33,12 @@ input,select,textarea{width:100%;background:#0b1118;color:#fff;border:1px solid 
 .toast{position:fixed;right:14px;bottom:16px;background:#e8b84b;color:#15110a;padding:12px 14px;border-radius:12px;font-weight:800;box-shadow:0 10px 30px #0008;display:none;z-index:100}.toast.show{display:block}
 footer{text-align:center;color:#748195;font-size:11px;padding:18px}
 @media(max-width:850px){.address{display:none}.grid{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,1fr)}.list{max-height:none}.brand img{width:64px;height:64px}.brand h1{font-size:18px}}
-</style>
+<style id="jagesh-final-v4-css">
+.dashCard{cursor:pointer;text-align:left;width:100%;color:inherit}
+.dashCard:active{transform:scale(.99)}
+.workTypeBox{margin-top:10px}.workTypeBox.hidden,#customBox.hidden{display:none}
+.smallHint{font-size:12px;opacity:.72;margin-top:5px}
+</style></style>
 <style id="pin-lock-css">
 #pinLock{position:fixed;inset:0;z-index:999999;background:#080b10;display:flex;align-items:center;justify-content:center;padding:20px}
 #pinCard{width:min(420px,100%);background:#111722;border:1px solid #263247;border-radius:22px;padding:28px;text-align:center}
@@ -43,7 +48,7 @@ footer{text-align:center;color:#748195;font-size:11px;padding:18px}
 </style><style id="pin-only-force">
 /* PIN-only build: legacy login UI is disabled */
 #login,#loginScreen,#auth,#authScreen,.login-screen,.auth-screen,[data-auth-screen]{display:none!important}
-</style></head>
+</style><style id="jagesh-hide-legacy-login">.loginForm,#loginForm,.email-login,.password-login{display:none!important}</style></head>
 <body><div id="pinLock" style="display:none">
 <div id="pinCard">
 <img class="pinLogo" src="logo.jpg" alt="JAGESH ELECTRONIC">
@@ -77,10 +82,10 @@ footer{text-align:center;color:#748195;font-size:11px;padding:18px}
 
  <section id="dashboard">
   <div class="cards">
-   <div class="card"><div class="num gold" id="todayN">0</div><div class="muted">आज की Reminder</div></div>
-   <div class="card"><div class="num red" id="overdueN">0</div><div class="muted">Overdue</div></div>
-   <div class="card"><div class="num green" id="upcomingN">0</div><div class="muted">Upcoming</div></div>
-   <div class="card"><div class="num" id="totalN">0</div><div class="muted">कुल Customers</div></div>
+   <button type="button" class="card dashCard" onclick="openCustomerFilter('today')"><div class="num gold" id="todayN">0</div><div class="muted">आज की Reminder<br><b>Tap करके खोलें</b></div></button>
+   <button type="button" class="card dashCard" onclick="openCustomerFilter('overdue')"><div class="num red" id="overdueN">0</div><div class="muted">Overdue<br><b>Tap करके खोलें</b></div></button>
+   <button type="button" class="card dashCard" onclick="openCustomerFilter('upcoming')"><div class="num green" id="upcomingN">0</div><div class="muted">Upcoming Customers<br><b>Tap करके खोलें</b></div></button>
+   <button type="button" class="card dashCard" onclick="openCustomerFilter('all')"><div class="num" id="totalN">0</div><div class="muted">कुल Customers<br><b>Tap करके पूरी List खोलें</b></div></button>
   </div>
   <div class="card">
    <div class="title"><h2>🔔 आज और बाकी Reminder</h2><button class="btn secondary small" onclick="openTab('customers')">सभी देखें</button></div>
@@ -105,7 +110,11 @@ footer{text-align:center;color:#748195;font-size:11px;padding:18px}
      <label>Customer Name *</label><input id="name" required placeholder="जैसे Rahul Kumar">
      <div class="row">
       <div><label>Mobile *</label><input id="phone" required inputmode="tel" placeholder="10 digit"></div>
-      <div><label>Appliance</label><select id="appliance"><option>AC</option><option>LED TV</option><option>Refrigerator</option><option>Microwave</option><option>Washing Machine</option><option>Other</option></select></div>
+      <div><label>Appliance</label><select id="appliance"><option>AC</option><option>LED TV</option><option>Refrigerator</option><option>Microwave</option><option>Washing Machine</option><option>Other</option></select><div class="workTypeBox">
+<label>🔧 क्या काम हुआ / कराना है?</label>
+<select id="workType"><option value="">पहले Appliance चुनें</option></select>
+<div class="smallHint">Appliance के अनुसार options अपने-आप बदलेंगे।</div>
+</div></div>
      </div>
      <label>Address (optional)</label><input id="address" placeholder="अगर location saved है तो पूरा address जरूरी नहीं">
      <div class="row">
@@ -200,6 +209,7 @@ $('customerForm').onsubmit=e=>{
  e.preventDefault();
  let id=$('editId').value||Date.now().toString(), old=state.customers.find(x=>x.id===id);
  let rem=$('interval').value==='custom'?$('customDate').value:addMonths($('serviceDate').value,$('interval').value);
+ if($('interval').value==='custom' && !$('customDate').value){toast('Custom Reminder के लिए पहले तारीख चुनें');$('customDate').focus();return}
  if(!rem){toast('Reminder date चुनें');return}
  let x={id,name:$('name').value.trim(),phone:$('phone').value.trim(),appliance:$('appliance').value,address:$('address').value.trim(),serviceDate:$('serviceDate').value,reminderDate:rem,note:$('note').value.trim(),lat:$('lat').value||'',lng:$('lng').value||'',done:old?old.done:false};
  let i=state.customers.findIndex(a=>a.id===id);if(i>=0)state.customers[i]=x;else state.customers.push(x);
@@ -332,5 +342,54 @@ document.addEventListener('click',e=>{
 window.JageshPin={lock:()=>show('unlock'),change:()=>show('setup')};
 window.addEventListener('load',()=>show(localStorage.getItem(K)?'unlock':'setup'));
 })();
-</script></body>
+</script>
+<script id="jagesh-final-v4-js">
+(function(){
+  const WORKS={
+    "AC":["Service","Repair","Installation","Uninstallation","Gas Charging","Other"],
+    "LED TV":["Repair","Installation","Uninstallation","Board/Panel Work","Other"],
+    "Refrigerator":["Repair","Installation","Uninstallation","Gas Charging","Compressor Work","Other"],
+    "Microwave":["Repair","Installation","Uninstallation","Parts/Component Work","Other"],
+    "Washing Machine":["Service","Repair","Installation","Uninstallation","Parts Work","Other"],
+    "Other":["Repair","Service","Installation","Uninstallation","Other"]
+  };
+  function $(id){return document.getElementById(id)}
+  function applianceEl(){return $('appliance')||$('device')}
+  function updateWorkTypes(selected){
+    const a=applianceEl(), w=$('workType'); if(!w)return;
+    const list=WORKS[a&&a.value]||WORKS.Other;
+    w.innerHTML='<option value="">काम चुनें</option>';
+    list.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;w.appendChild(o)});
+    if(selected)w.value=selected;
+  }
+  window.JageshWorkTypes={update:updateWorkTypes};
+  window.openCustomerFilter=function(filter){
+    try{if(typeof openTab==='function')openTab('customers')}catch(e){}
+    if($('filter'))$('filter').value=filter;
+    if($('search'))$('search').value='';
+    try{if(typeof renderCustomers==='function')renderCustomers()}catch(e){}
+  };
+  function setup(){
+    const a=applianceEl();
+    if(a){a.addEventListener('change',()=>updateWorkTypes());updateWorkTypes()}
+    const interval=$('interval'), custom=$('customBox'), date=$('customDate');
+    if(interval){
+      const refresh=()=>{
+        const on=interval.value==='custom';
+        if(custom)custom.classList.toggle('hidden',!on);
+        if(on&&date){date.min=(typeof today==='function'?today():'');}
+        if(!on&&date)date.value='';
+      };
+      interval.addEventListener('change',refresh);
+      interval.addEventListener('input',refresh);
+      refresh();
+    }
+  }
+  document.addEventListener('DOMContentLoaded',setup);
+  window.JageshReminderText=function(appliance,work,name){
+    return '🔔 JAGESH ELECTRONIC Reminder\\nप्रिय '+(name||'ग्राहक')+', आपके '+(appliance||'Appliance')+' की '+(work||'काम')+' के लिए reminder का समय हो गया है। आवश्यकता होने पर कृपया संपर्क करें।';
+  };
+})();
+</script>
+</body>
 </html>

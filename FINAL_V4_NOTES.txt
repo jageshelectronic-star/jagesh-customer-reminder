@@ -1,0 +1,12 @@
+JAGESH ELECTRONIC Customer Reminder — FINAL V4
+
+Included:
+- 6-digit PIN-only access from the base PIN build.
+- Dashboard cards open filtered customer lists.
+- Appliance-specific Work Type options.
+- Custom reminder date picker and validation.
+- Reminder wording can use Appliance + Work Type.
+- Cache bumped to v4.
+
+Upload/replace index.html and sw.js (and other files) in jagesh-customer-reminder.
+If an installed PWA still shows the old screen, remove it, clear site data, open the GitHub Pages URL in Chrome, then reinstall.

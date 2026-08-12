@@ -38,7 +38,14 @@ footer{text-align:center;color:#748195;font-size:11px;padding:18px}
 .dashCard:active{transform:scale(.99)}
 .workTypeBox{margin-top:10px}.workTypeBox.hidden,#customBox.hidden{display:none}
 .smallHint{font-size:12px;opacity:.72;margin-top:5px}
-</style></style>
+<style id="jagesh-final-v5-css">
+.paymentBox{margin-top:10px}
+.recycle-lock{padding:18px;text-align:center}
+.recycle-lock input{letter-spacing:6px;text-align:center;font-size:20px}
+.recycle-actions{display:flex;gap:8px;flex-wrap:wrap}
+.recycle-item{padding:12px;border:1px solid #ddd;border-radius:12px;margin:8px 0}
+.dangerBtn{background:#b91c1c!important;color:#fff!important}
+</style></style></style>
 <style id="pin-lock-css">
 #pinLock{position:fixed;inset:0;z-index:999999;background:#080b10;display:flex;align-items:center;justify-content:center;padding:20px}
 #pinCard{width:min(420px,100%);background:#111722;border:1px solid #263247;border-radius:22px;padding:28px;text-align:center}
@@ -78,7 +85,7 @@ footer{text-align:center;color:#748195;font-size:11px;padding:18px}
   <button data-tab="customers">👥 Customers</button>
   <button data-tab="add">➕ Add Customer</button>
   <button data-tab="settings">⚙️ Settings</button>
- </div>
+ <button type="button" onclick="openRecycleBin()">🗑️ Recycle Bin</button></div>
 
  <section id="dashboard">
   <div class="cards">
@@ -121,7 +128,26 @@ footer{text-align:center;color:#748195;font-size:11px;padding:18px}
       <div><label>Last Service Date *</label><input id="serviceDate" type="date" required></div>
       <div><label>Reminder</label><select id="interval"><option value="1">1 महीना</option><option value="2">2 महीने</option><option value="3" selected>3 महीने</option><option value="6">6 महीने</option><option value="12">1 साल</option><option value="custom">Custom Date</option></select></div>
      </div>
-     <div id="customBox" class="hidden"><label>Custom Reminder Date</label><input id="customDate" type="date"></div>
+     <div class="paymentBox">
+<label>💳 Payment Method</label>
+<select id="paymentMethod">
+<option value="">Payment Method चुनें</option>
+<option value="Cash">💵 Cash</option>
+<option value="UPI">📱 UPI</option>
+<option value="Card">💳 Card</option>
+<option value="Bank Transfer">🏦 Bank Transfer</option>
+<option value="Other">✏️ Other</option>
+</select>
+<label style="margin-top:8px">💰 Payment Status</label>
+<select id="paymentStatus">
+<option value="">Payment Status चुनें</option>
+<option value="Paid">✅ Paid</option>
+<option value="Pending">⏳ Pending</option>
+<option value="Partial">💰 Partial</option>
+</select>
+<label style="margin-top:8px">₹ Amount</label>
+<input id="paymentAmount" type="number" min="0" step="1" placeholder="जैसे 1200">
+</div><div id="customBox" class="hidden"><label>Custom Reminder Date</label><input id="customDate" type="date"></div>
      <label>Service / Work Note</label><textarea id="note" placeholder="जैसे AC general service, gas check, warranty…"></textarea>
      <div class="locationbox">
       <b>📍 Customer Current Location</b>
@@ -388,6 +414,101 @@ window.addEventListener('load',()=>show(localStorage.getItem(K)?'unlock':'setup'
   document.addEventListener('DOMContentLoaded',setup);
   window.JageshReminderText=function(appliance,work,name){
     return '🔔 JAGESH ELECTRONIC Reminder\\nप्रिय '+(name||'ग्राहक')+', आपके '+(appliance||'Appliance')+' की '+(work||'काम')+' के लिए reminder का समय हो गया है। आवश्यकता होने पर कृपया संपर्क करें।';
+  };
+})();
+</script>
+
+<script id="jagesh-final-v5-js">
+(function(){
+  const RECYCLE_KEY='jagesh_recycle_bin_v5';
+  const RECYCLE_PIN_KEY='jagesh_recycle_pin_v5';
+
+  function $(id){return document.getElementById(id)}
+  function loadRecycle(){try{return JSON.parse(localStorage.getItem(RECYCLE_KEY)||'[]')}catch(e){return[]}}
+  function saveRecycle(a){localStorage.setItem(RECYCLE_KEY,JSON.stringify(a))}
+  function pinHash(pin){
+    let h=2166136261;
+    for(let i=0;i<pin.length;i++){h^=pin.charCodeAt(i);h=Math.imul(h,16777619)}
+    return (h>>>0).toString(16);
+  }
+
+  window.openRecycleBin=function(){
+    const pin=prompt('🔐 Recycle Bin PIN डालें');
+    if(pin===null)return;
+    if(!/^\d{6}$/.test(pin)){alert('6-digit PIN डालें।');return}
+    const saved=localStorage.getItem(RECYCLE_PIN_KEY);
+    if(!saved){
+      if(confirm('Recycle Bin का PIN अभी सेट नहीं है। क्या यही 6-digit PIN सेट करें?')){
+        localStorage.setItem(RECYCLE_PIN_KEY,pinHash(pin));
+        renderRecycle();
+      }
+      return;
+    }
+    if(pinHash(pin)!==saved){alert('गलत Recycle Bin PIN');return}
+    renderRecycle();
+  };
+
+  window.setRecyclePin=function(){
+    const a=prompt('नया 6-digit Recycle Bin PIN डालें');
+    if(a===null)return;
+    if(!/^\d{6}$/.test(a)){alert('PIN ठीक 6 digits का होना चाहिए।');return}
+    const b=prompt('PIN दोबारा डालें');
+    if(a!==b){alert('PIN match नहीं हुआ।');return}
+    localStorage.setItem(RECYCLE_PIN_KEY,pinHash(a));
+    alert('Recycle Bin PIN सेट हो गया।');
+  };
+
+  function renderRecycle(){
+    const list=loadRecycle();
+    let box=$('recycleBinView');
+    if(!box){
+      box=document.createElement('div'); box.id='recycleBinView';
+      box.style.cssText='position:fixed;inset:0;background:var(--bg,#fff);z-index:99999;overflow:auto;padding:18px';
+      document.body.appendChild(box);
+    }
+    box.innerHTML='<h2>🗑️ Recycle Bin</h2><p>Deleted customers यहाँ सुरक्षित हैं।</p>'+
+      '<button type="button" onclick="setRecyclePin()">🔐 Change Recycle Bin PIN</button> '+
+      '<button type="button" class="dangerBtn" onclick="emptyRecycle()">Empty Recycle Bin</button> '+
+      '<button type="button" onclick="this.parentElement.remove()">Close</button><hr>'+
+      (list.length?list.map((x,i)=>'<div class="recycle-item"><b>'+(x.name||'Customer')+'</b><br>'+
+        (x.mobile||'')+'<br><small>Deleted: '+(x.deletedAt||'')+'</small><div class="recycle-actions">'+
+        '<button type="button" onclick="restoreRecycle('+i+')">↩️ Restore</button>'+
+        '<button type="button" class="dangerBtn" onclick="permanentDeleteRecycle('+i+')">🗑️ Permanently Delete</button></div></div>').join(''):
+        '<p>Recycle Bin खाली है।</p>');
+  }
+  window.renderRecycle=renderRecycle;
+
+  window.restoreRecycle=function(i){
+    const a=loadRecycle(), x=a[i]; if(!x)return;
+    a.splice(i,1); saveRecycle(a);
+    try{
+      const key=window.JAGESH_CUSTOMERS_KEY||'jagesh_customers';
+      const cur=JSON.parse(localStorage.getItem(key)||'[]'); cur.push(x.data||x); localStorage.setItem(key,JSON.stringify(cur));
+    }catch(e){}
+    renderRecycle(); alert('Customer restore कर दिया गया।');
+  };
+  window.permanentDeleteRecycle=function(i){
+    const a=loadRecycle(); if(!a[i])return;
+    if(confirm('यह Customer हमेशा के लिए delete हो जाएगा। Continue?')){a.splice(i,1);saveRecycle(a);renderRecycle()}
+  };
+  window.emptyRecycle=function(){
+    if(confirm('Recycle Bin के सभी customers permanently delete करें?')){saveRecycle([]);renderRecycle()}
+  };
+
+  // Expose a safe helper for the app's delete code.
+  window.JageshMoveToRecycleBin=function(customer){
+    const a=loadRecycle();
+    a.push({name:customer.name||customer.customerName||'',mobile:customer.mobile||customer.phone||'',deletedAt:new Date().toLocaleString('en-IN'),data:customer});
+    saveRecycle(a);
+  };
+
+  // Store payment data into a customer object when the app exposes a form object.
+  window.JageshPaymentData=function(){
+    return {
+      paymentMethod: $('paymentMethod') ? $('paymentMethod').value : '',
+      paymentStatus: $('paymentStatus') ? $('paymentStatus').value : '',
+      paymentAmount: $('paymentAmount') ? $('paymentAmount').value : ''
+    };
   };
 })();
 </script>

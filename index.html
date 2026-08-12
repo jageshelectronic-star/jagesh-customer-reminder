@@ -20,7 +20,7 @@ label{display:block;color:#cfd8e3;font-size:12px;font-weight:750;margin:10px 0 5
 .searchrow{display:flex;gap:8px;margin-bottom:10px}.searchrow input{flex:1}.list{max-height:650px;overflow:auto}.item{border:1px solid var(--line);background:#101721;border-radius:13px;padding:12px;margin:8px 0}.item.today{border-left:4px solid var(--orange)}.item.overdue{border-left:4px solid var(--red)}.item.future{border-left:4px solid var(--green)}.item.done{opacity:.72}.itemtop{display:flex;justify-content:space-between;gap:10px}.name{font-weight:850}.date{font-weight:850;color:var(--gold2)}.meta{font-size:12px;color:var(--muted);margin-top:4px}.pill{display:inline-block;margin-top:7px;padding:4px 8px;border-radius:99px;background:#1c2735;color:#cbd8e6;font-size:10px;font-weight:850}.empty{text-align:center;color:var(--muted);padding:35px 10px}
 .locationbox{border:1px dashed #526172;background:#0b1118;border-radius:12px;padding:10px;margin-top:10px}.coords{font-size:12px;color:#aebdcd;word-break:break-all}.help{background:#0d141d;border:1px solid #253344;border-radius:12px;padding:11px;color:#aebbd0;font-size:12px;line-height:1.55}.installstate{margin-top:10px;color:#aebbd0;font-size:12px}.installstate.ok{color:#75e59a}
 .modal{position:fixed;inset:0;background:#000c;z-index:100000;display:flex;align-items:center;justify-content:center;padding:15px}.modalbox{width:min(620px,100%);max-height:92vh;overflow:auto;background:#101721;border:1px solid #334151;border-radius:18px;padding:16px}.toast{position:fixed;right:14px;bottom:16px;background:#e8b84b;color:#15110a;padding:12px 14px;border-radius:12px;font-weight:800;box-shadow:0 10px 30px #0008;display:none;z-index:200000}.toast.show{display:block}
-#pinLock{position:fixed;inset:0;z-index:150000;background:#080b10;display:flex;align-items:center;justify-content:center;padding:20px}#pinCard{width:min(420px,100%);background:#111722;border:1px solid #263247;border-radius:22px;padding:28px;text-align:center}.pinLogo{width:76px;height:76px;object-fit:cover;border-radius:18px}.pinDots{min-height:30px}.pinDot{display:inline-block;width:13px;height:13px;border-radius:50%;border:1px solid #7d8aa0;margin:18px 5px}.pinDot.filled{background:#fff}.pinPad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:300px;margin:auto}.pinKey{padding:15px;border:1px solid #2a364b;background:#182131;color:#fff;border-radius:14px;font-size:20px}.pinMsg{min-height:20px;color:#ff9d9d;font-size:13px;margin:10px}
+#pinLock{position:fixed;inset:0;z-index:150000;background:#080b10;display:flex;align-items:center;justify-content:center;padding:20px}#pinCard{width:min(420px,100%);background:#111722;border:1px solid #263247;border-radius:22px;padding:28px;text-align:center}.pinLogo{width:76px;height:76px;object-fit:cover;border-radius:18px}.pinDots{min-height:30px}.pinDot{display:inline-block;width:13px;height:13px;border-radius:50%;border:1px solid #7d8aa0;margin:18px 5px}.pinDot.filled{background:#fff}.pinPad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:300px;margin:auto}.pinKey{padding:15px;border:1px solid #2a364b;background:#182131;color:#fff;border-radius:14px;font-size:20px}.pinMsg{min-height:20px;color:#ff9d9d;font-size:13px;margin:10px}.otpBox{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}.otpBox input{letter-spacing:4px;text-align:center;font-size:20px}.otpHint{color:var(--muted);font-size:12px;line-height:1.5;margin:8px 0}.linkbtn{background:none;border:0;color:#79c8ff;text-decoration:underline;font-weight:800;padding:8px;cursor:pointer}
 .recycleRow{border:1px solid var(--line);background:#101721;border-radius:12px;padding:12px;margin:8px 0}.recycleActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
 @media(max-width:850px){.address{display:none}.grid{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,1fr)}.list{max-height:none}.brand img{width:64px;height:64px}.brand h1{font-size:18px}}
 </style>
@@ -40,6 +40,19 @@ label{display:block;color:#cfd8e3;font-size:12px;font-weight:750;margin:10px 0 5
       <button class="pinKey" data-action="clear">⌫</button><button class="pinKey" data-n="0">0</button><button class="pinKey" data-action="ok">✓</button>
     </div>
     <div id="pinMsg" class="pinMsg"></div>
+    <button id="forgotPinBtn" class="linkbtn">🔑 PIN भूल गए? Mobile OTP से बदलें</button>
+    <div id="otpBox" class="otpBox hidden">
+      <div class="otpHint">अपने registered mobile number पर OTP भेजें। OTP verify होने के बाद नया 6-digit PIN बनाया जा सकेगा।</div>
+      <label for="otpPhone">Registered Mobile Number</label>
+      <input id="otpPhone" inputmode="tel" maxlength="13" value="+917007373771" placeholder="+917XXXXXXXXX">
+      <div class="actions"><button id="sendOtpBtn" class="btn bluebtn" type="button">📲 OTP भेजें</button><button id="backPinBtn" class="btn secondary" type="button">← PIN पर वापस</button></div>
+      <div id="otpVerifyArea" class="hidden">
+        <label for="otpCode">6-digit OTP</label>
+        <input id="otpCode" inputmode="numeric" maxlength="6" placeholder="123456">
+        <div class="actions"><button id="verifyOtpBtn" class="btn primary" type="button">✅ OTP Verify करके PIN बदलें</button></div>
+      </div>
+      <div id="otpMsg" class="pinMsg"></div>
+    </div>
     <button id="pinReset" class="secondary btn hidden">PIN बदलें</button>
   </div>
 </div>
@@ -348,34 +361,78 @@ async function emailBackup(){
 async function requestNotifications(){if(!('Notification'in window)){toast('Browser notification उपलब्ध नहीं है');return}const p=await Notification.requestPermission();toast(p==='granted'?'Notifications ON':'Permission नहीं मिली');}
 function checkNotifications(){if('Notification'in window&&Notification.permission==='granted'){const n=state.customers.filter(x=>!x.done&&(x.reminderDate||'')<=today()).length;if(n)new Notification('JAGESH ELECTRONIC',{body:'आज/Overdue Reminder: '+n+' Customer'});}}
 
+const SUPABASE_URL='https://ihrktiuoyvjoornpaknb.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_mOi55EghYQ9yyQ4EWPQckA_p2NpSnjT';
+const RECOVERY_PHONE='+917007373771';
+let otpVerified=false;
 function hashPin(pin){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(PIN_SALT+'|'+pin)).then(b=>Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join(''));}
 function showPin(mode){
- pinMode=mode;pinBuf='';$('pinDots').innerHTML='';$('pinMsg').textContent='';$('pinLock').style.display='flex';
+ pinMode=mode;pinBuf='';$('pinDots').innerHTML='';$('pinMsg').textContent='';$('otpBox').classList.add('hidden');$('otpVerifyArea').classList.add('hidden');$('otpMsg').textContent='';$('pinLock').style.display='flex';
  $('pinTitle').textContent=mode==='setup'?'पहली बार 6-digit PIN बनाइए':mode==='change'?'नया 6-digit PIN डालें':'अपना 6-digit PIN डालें';
+ $('forgotPinBtn').style.display=mode==='unlock'?'inline-block':'none';
 }
 function drawPin(){ $('pinDots').innerHTML=Array.from({length:6},(_,i)=>`<span class="pinDot ${i<pinBuf.length?'filled':''}"></span>`).join('');}
 async function submitPin(){
  if(pinBuf.length!==6){$('pinMsg').textContent='ठीक 6 digits का PIN डालें';return;}
  const h=await hashPin(pinBuf);
- if(pinMode==='setup'||pinMode==='change'){localStorage.setItem(PINKEY,h);$('pinLock').style.display='none';pinBuf='';toast('PIN सेव हो गया');return;}
- if(h===localStorage.getItem(PINKEY)){$('pinLock').style.display='none';pinBuf='';}
- else{$('pinMsg').textContent='गलत PIN';pinBuf='';drawPin();}
+ if(pinMode==='setup'||pinMode==='change'){
+   localStorage.setItem(PINKEY,h);$('pinLock').style.display='none';pinBuf='';toast('PIN सेव हो गया');return;
+ }
+ if(h===localStorage.getItem(PINKEY)){
+   $('pinLock').style.display='none';pinBuf='';
+   const d=window.__afterPin;window.__afterPin=null;if(d)d();
+ }else{$('pinMsg').textContent='गलत PIN. अगर PIN याद नहीं है तो नीचे “PIN भूल गए?” दबाएँ।';pinBuf='';drawPin();}
 }
-document.querySelectorAll('.pinKey').forEach(k=>k.onclick=()=>{if(k.dataset.action==='clear')pinBuf=pinBuf.slice(0,-1);else if(k.dataset.action==='ok')submitPin();else if(pinBuf.length<6)pinBuf+=k.dataset.n;drawPin();if(pinBuf.length===6)setTimeout(submitPin,120);});
-function requirePin(done){if(!localStorage.getItem(PINKEY)){toast('पहले App PIN सेट करें');showPin('setup');return;}let oldDone=()=>{done();};let savedDone=window.__pinDone;window.__pinDone=done;showPin('unlock');window.__afterPin=done;}
-async function unlockForAction(){
- if(pinMode==='unlock'){if(pinBuf.length!==6)return;const h=await hashPin(pinBuf);if(h===localStorage.getItem(PINKEY)){$('pinLock').style.display='none';pinBuf='';const d=window.__afterPin;window.__afterPin=null;if(d)d();}else{$('pinMsg').textContent='गलत PIN';pinBuf='';drawPin();}}
+document.querySelectorAll('.pinKey').forEach(k=>k.onclick=()=>{
+ if(k.dataset.action==='clear')pinBuf=pinBuf.slice(0,-1);else if(k.dataset.action==='ok'){submitPin();return;}else if(pinBuf.length<6)pinBuf+=k.dataset.n;
+ drawPin();
+ if(pinBuf.length===6)setTimeout(submitPin,120);
+});
+function requirePin(done){
+ if(!localStorage.getItem(PINKEY)){toast('पहले App PIN सेट करें');showPin('setup');return;}
+ window.__afterPin=done;showPin('unlock');
 }
-const originalSubmitPin=submitPin;
-submitPin=async function(){
- if(pinBuf.length!==6){$('pinMsg').textContent='ठीक 6 digits का PIN डालें';return;}
- const h=await hashPin(pinBuf);
- if(pinMode==='setup'||pinMode==='change'){localStorage.setItem(PINKEY,h);$('pinLock').style.display='none';pinBuf='';toast('PIN सेव हो गया');return;}
- if(h===localStorage.getItem(PINKEY)){$('pinLock').style.display='none';pinBuf='';const d=window.__afterPin;window.__afterPin=null;if(d)d();}
- else{$('pinMsg').textContent='गलत PIN';pinBuf='';drawPin();}
-};
 function changePin(){if(!localStorage.getItem(PINKEY)){showPin('setup');return;}showPin('change');}
 $('pinReset').onclick=changePin;
+
+function openOtpRecovery(){
+ pinBuf='';drawPin();$('pinMsg').textContent='';$('otpBox').classList.remove('hidden');$('otpPhone').value=localStorage.getItem('jagesh_recovery_phone')||RECOVERY_PHONE;$('otpCode').value='';$('otpVerifyArea').classList.add('hidden');$('otpMsg').textContent='';
+}
+function normalizePhone(v){v=(v||'').replace(/[^\d+]/g,'');if(/^0\d{10}$/.test(v))v='+91'+v.slice(1);if(/^91\d{10}$/.test(v))v='+'+v;return v;}
+async function supabaseAuth(path,body){
+ const r=await fetch(SUPABASE_URL+'/auth/v1/'+path,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_PUBLISHABLE_KEY,'Authorization':'Bearer '+SUPABASE_PUBLISHABLE_KEY},body:JSON.stringify(body)});
+ const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.msg||data.message||data.error_description||data.error||'Supabase request failed');return data;
+}
+$('forgotPinBtn').onclick=openOtpRecovery;
+$('backPinBtn').onclick=()=>{ $('otpBox').classList.add('hidden');$('otpMsg').textContent='';showPin('unlock'); };
+$('sendOtpBtn').onclick=async()=>{
+ const phone=normalizePhone($('otpPhone').value);if(!/^\+\d{8,15}$/.test(phone)){ $('otpMsg').textContent='मोबाइल नंबर सही format में डालें, जैसे +917007373771';return; }
+ $('sendOtpBtn').disabled=true;$('otpMsg').textContent='OTP भेजा जा रहा है...';
+ try{
+   await supabaseAuth('otp',{phone,create_user:true});
+   localStorage.setItem('jagesh_recovery_phone',phone);$('otpVerifyArea').classList.remove('hidden');$('otpMsg').textContent='✅ OTP भेज दिया गया है।';$('otpCode').focus();
+ }catch(e){$('otpMsg').textContent='❌ OTP नहीं भेजा गया: '+e.message+' | Supabase में Phone/SMS provider enable होना जरूरी है.';}
+ finally{$('sendOtpBtn').disabled=false;}
+};
+$('verifyOtpBtn').onclick=async()=>{
+ const phone=normalizePhone($('otpPhone').value),token=($('otpCode').value||'').replace(/\D/g,'');
+ if(token.length!==6){$('otpMsg').textContent='6-digit OTP डालें';return;}
+ $('verifyOtpBtn').disabled=true;$('otpMsg').textContent='OTP verify हो रहा है...';
+ try{
+   await supabaseAuth('verify',{type:'sms',phone,token});
+   otpVerified=true;$('otpMsg').textContent='✅ Mobile verify हो गया। अब नया 6-digit PIN बनाइए।';
+   $('otpBox').classList.add('hidden');pinMode='change';pinBuf='';drawPin();$('pinTitle').textContent='नया 6-digit PIN बनाइए';$('pinMsg').textContent='OTP verified — अब नया PIN डालें';
+ }catch(e){$('otpMsg').textContent='❌ OTP गलत/expire हो गया: '+e.message;}
+ finally{$('verifyOtpBtn').disabled=false;}
+};
+const oldSubmitPin=submitPin;
+submitPin=async function(){
+ if(pinBuf.length!==6){$('pinMsg').textContent='ठीक 6 digits का PIN डालें';return;}
+ if(pinMode==='change' && otpVerified){
+   const h=await hashPin(pinBuf);localStorage.setItem(PINKEY,h);otpVerified=false;pinBuf='';$('pinLock').style.display='none';toast('✅ नया PIN सेव हो गया');return;
+ }
+ return oldSubmitPin();
+};
 
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e; $('installStatus').textContent='✅ App Install के लिए तैयार है।';$('installStatus').className='installstate ok';});
 window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;$('installStatus').textContent='✅ App install हो गया।';toast('App install हो गया');});

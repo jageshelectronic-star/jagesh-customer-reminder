@@ -5,459 +5,230 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#080b10">
 <link rel="manifest" href="manifest.json">
-<title>JAGESH ELECTRONIC • Customer Reminder</title>
+<title>JAGESH ELECTRONIC • PIN Only</title>
 <style>
-:root{--bg:#080b10;--panel:#111720;--line:#263241;--gold:#e8b84b;--gold2:#ffda76;--text:#f6f7f9;--muted:#aab5c4;--green:#22c55e;--blue:#38a5ff;--red:#ff5b5b;--orange:#ffad33}
+:root{--bg:#080b10;--panel:#111720;--panel2:#151d28;--line:#263241;--gold:#e8b84b;--gold2:#ffda76;--text:#f6f7f9;--muted:#aab5c4;--green:#22c55e;--blue:#38a5ff;--red:#ff5b5b;--orange:#ffad33}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#07090d,#0c121a 55%,#07090d);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
-button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}
-.top{position:sticky;top:0;z-index:20;background:rgba(8,11,16,.97);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
-.brand{max-width:1180px;margin:auto;padding:10px 16px;display:flex;align-items:center;gap:14px}.brand img{width:72px;height:72px;border-radius:12px;object-fit:contain;border:1px solid #80601c}.brand h1{margin:0;color:var(--gold2);font-size:22px}.tag{font-size:12px}.address{margin-left:auto;text-align:right;color:var(--muted);font-size:12px;max-width:360px}
-.wrap{max-width:1180px;margin:auto;padding:18px 14px 40px}.nav{display:flex;gap:8px;overflow:auto;margin-bottom:15px}.nav button{white-space:nowrap;background:var(--panel);border:1px solid var(--line);color:#dce4ee;border-radius:10px;padding:10px 13px}.nav button.active{background:#251e0d;color:var(--gold2);border-color:#795d20}
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}.card{background:linear-gradient(180deg,#131b25,#0f151e);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 8px 30px #0004}.dashCard{cursor:pointer;text-align:left;width:100%;color:inherit}.num{font-size:26px;font-weight:850}.muted{color:var(--muted);font-size:12px}.gold{color:var(--gold2)}.green{color:#65e18a}.red{color:#ff8585}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.top{position:sticky;top:0;z-index:20;background:rgba(8,11,16,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.brand{max-width:1180px;margin:auto;padding:10px 16px;display:flex;align-items:center;gap:14px}
+.brand img{width:76px;height:76px;border-radius:12px;object-fit:contain;background:#080b10;border:1px solid #80601c;padding:2px}
+.brand h1{margin:0;color:var(--gold2);font-size:22px}.brand .tag{color:#fff;font-size:12px}.address{margin-left:auto;text-align:right;color:var(--muted);font-size:12px;max-width:360px}
+.wrap{max-width:1180px;margin:auto;padding:18px 14px 40px}
+.nav{display:flex;gap:8px;overflow:auto;margin-bottom:15px}.nav button{white-space:nowrap;background:var(--panel);border:1px solid var(--line);color:#dce4ee;border-radius:10px;padding:10px 13px}.nav button.active{background:#251e0d;color:var(--gold2);border-color:#795d20}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}.card{background:linear-gradient(180deg,#131b25,#0f151e);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 8px 30px #0004}.num{font-size:26px;font-weight:850}.muted{color:var(--muted);font-size:12px}.gold{color:var(--gold2)}.green{color:#65e18a}.red{color:#ff8585}.orange{color:#ffc56d}
 .grid{display:grid;grid-template-columns:390px 1fr;gap:14px}.title{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.title h2{font-size:17px;margin:0}
-label{display:block;color:#cfd8e3;font-size:12px;font-weight:750;margin:10px 0 5px}input,select,textarea{width:100%;background:#0b1118;color:#fff;border:1px solid #2a3746;border-radius:10px;padding:11px;outline:none}input:focus,select:focus,textarea:focus{border-color:#c79a3a}textarea{min-height:75px;resize:vertical}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.btn{border:1px solid transparent;border-radius:10px;padding:10px 12px;font-weight:800}.primary{background:linear-gradient(135deg,#e3ad38,#f7d36d);color:#17120a}.secondary{background:#18222e;color:#dbe6f2;border-color:#334354}.greenbtn{background:#0d5d2b;color:#baffcf;border-color:#198f45}.bluebtn{background:#0c4c7c;color:#c8eaff;border-color:#1877bb}.danger{background:#5d1717;color:#ffd0d0;border-color:#8f2d2d}.small{font-size:11px;padding:8px 9px}
-.searchrow{display:flex;gap:8px;margin-bottom:10px}.searchrow input{flex:1}.list{max-height:650px;overflow:auto}.item{border:1px solid var(--line);background:#101721;border-radius:13px;padding:12px;margin:8px 0}.item.today{border-left:4px solid var(--orange)}.item.overdue{border-left:4px solid var(--red)}.item.future{border-left:4px solid var(--green)}.item.done{opacity:.72}.itemtop{display:flex;justify-content:space-between;gap:10px}.name{font-weight:850}.date{font-weight:850;color:var(--gold2)}.meta{font-size:12px;color:var(--muted);margin-top:4px}.pill{display:inline-block;margin-top:7px;padding:4px 8px;border-radius:99px;background:#1c2735;color:#cbd8e6;font-size:10px;font-weight:850}.empty{text-align:center;color:var(--muted);padding:35px 10px}
-.locationbox{border:1px dashed #526172;background:#0b1118;border-radius:12px;padding:10px;margin-top:10px}.coords{font-size:12px;color:#aebdcd;word-break:break-all}.help{background:#0d141d;border:1px solid #253344;border-radius:12px;padding:11px;color:#aebbd0;font-size:12px;line-height:1.55}.installstate{margin-top:10px;color:#aebbd0;font-size:12px}.installstate.ok{color:#75e59a}
-.modal{position:fixed;inset:0;background:#000c;z-index:100000;display:flex;align-items:center;justify-content:center;padding:15px}.modalbox{width:min(620px,100%);max-height:92vh;overflow:auto;background:#101721;border:1px solid #334151;border-radius:18px;padding:16px}.toast{position:fixed;right:14px;bottom:16px;background:#e8b84b;color:#15110a;padding:12px 14px;border-radius:12px;font-weight:800;box-shadow:0 10px 30px #0008;display:none;z-index:200000}.toast.show{display:block}
-#pinLock{position:fixed;inset:0;z-index:150000;background:#080b10;display:flex;align-items:center;justify-content:center;padding:12px;overflow-y:auto;-webkit-overflow-scrolling:touch}#pinCard{width:min(420px,100%);max-height:calc(100dvh - 24px);overflow-y:auto;background:#111722;border:1px solid #263247;border-radius:22px;padding:20px 18px;text-align:center;box-shadow:0 12px 45px #0008}.pinLogo{width:64px;height:64px;object-fit:cover;border-radius:16px}.pinCard h2{margin:10px 0 8px;font-size:22px}.pinDots{min-height:30px}.pinDot{display:inline-block;width:12px;height:12px;border-radius:50%;border:1px solid #7d8aa0;margin:14px 5px}.pinDot.filled{background:#fff}.pinPad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:300px;margin:auto}.pinKey{padding:13px;border:1px solid #2a364b;background:#182131;color:#fff;border-radius:14px;font-size:20px;min-height:54px}.pinMsg{min-height:20px;color:#ff9d9d;font-size:13px;margin:8px}.otpBox{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}.otpBox input{letter-spacing:4px;text-align:center;font-size:20px}.otpHint{color:var(--muted);font-size:12px;line-height:1.45;margin:6px 0}.linkbtn{background:none;border:0;color:#79c8ff;text-decoration:underline;font-weight:800;padding:7px;cursor:pointer}.otpStatus{min-height:20px;font-size:12px;margin-top:8px;color:#aab5c4}.otpStatus.ok{color:#75e59a}.otpStatus.err{color:#ff9d9d}.otpTimer{font-size:12px;color:#aab5c4;margin-top:5px}@media(max-width:480px){#pinLock{align-items:flex-start;padding:8px}#pinCard{max-height:calc(100dvh - 16px);padding:16px 12px;border-radius:18px}.pinLogo{width:54px;height:54px}.pinCard h2{font-size:19px}.pinKey{min-height:48px;padding:10px}.pinDot{margin:10px 4px;width:11px;height:11px}.actions .btn{flex:1;min-width:0;padding:9px 8px;font-size:13px}.otpBox{margin-top:8px;padding-top:8px}}
-.recycleRow{border:1px solid var(--line);background:#101721;border-radius:12px;padding:12px;margin:8px 0}.recycleActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+label{display:block;color:#cfd8e3;font-size:12px;font-weight:750;margin:10px 0 5px}
+input,select,textarea{width:100%;background:#0b1118;color:#fff;border:1px solid #2a3746;border-radius:10px;padding:11px;outline:none}input:focus,select:focus,textarea:focus{border-color:#c79a3a}textarea{min-height:75px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.btn{border:1px solid transparent;border-radius:10px;padding:10px 12px;font-weight:800}.primary{background:linear-gradient(135deg,#e3ad38,#f7d36d);color:#17120a}.secondary{background:#18222e;color:#dbe6f2;border-color:#334354}.greenbtn{background:#0d5d2b;color:#baffcf;border-color:#198f45}.bluebtn{background:#0c4c7c;color:#c8eaff;border-color:#1877bb}.danger{background:#5d1717;color:#ffd0d0;border-color:#8f2d2d}
+.searchrow{display:flex;gap:8px;margin-bottom:10px}.searchrow input{flex:1}.list{max-height:650px;overflow:auto;padding-right:2px}
+.item{border:1px solid var(--line);background:#101721;border-radius:13px;padding:12px;margin:8px 0}.item.today{border-left:4px solid var(--orange)}.item.overdue{border-left:4px solid var(--red)}.item.future{border-left:4px solid var(--green)}.item.done{opacity:.72}
+.itemtop{display:flex;justify-content:space-between;gap:10px}.name{font-weight:850}.date{font-weight:850;color:var(--gold2)}.meta{font-size:12px;color:var(--muted);margin-top:4px}.pill{display:inline-block;margin-top:7px;padding:4px 8px;border-radius:99px;background:#1c2735;color:#cbd8e6;font-size:10px;font-weight:850}
+.empty{text-align:center;color:var(--muted);padding:35px 10px}
+.locationbox{border:1px dashed #526172;background:#0b1118;border-radius:12px;padding:10px;margin-top:10px}.coords{font-size:12px;color:#aebdcd;word-break:break-all}
+.small{font-size:11px;padding:8px 9px}.hidden{display:none}.help{background:#0d141d;border:1px solid #253344;border-radius:12px;padding:11px;color:#aebbd0;font-size:12px;line-height:1.55}
+.modal{position:fixed;inset:0;background:#0009;z-index:50;display:none;align-items:center;justify-content:center;padding:15px}.modal.show{display:flex}.modalbox{width:min(620px,100%);max-height:92vh;overflow:auto;background:#101721;border:1px solid #334151;border-radius:18px;padding:16px}.close{float:right;border:0;background:#27313d;color:#fff;border-radius:50%;width:34px;height:34px}
+.installstate{margin-top:10px;color:#aebbd0;font-size:12px}
+.installstate.ok{color:#75e59a}.installstate.warn{color:#ffd37a}
+.toast{position:fixed;right:14px;bottom:16px;background:#e8b84b;color:#15110a;padding:12px 14px;border-radius:12px;font-weight:800;box-shadow:0 10px 30px #0008;display:none;z-index:100}.toast.show{display:block}
+footer{text-align:center;color:#748195;font-size:11px;padding:18px}
 @media(max-width:850px){.address{display:none}.grid{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,1fr)}.list{max-height:none}.brand img{width:64px;height:64px}.brand h1{font-size:18px}}
 </style>
-</head>
-<body>
-
-<div id="pinLock">
-  <div id="pinCard">
-    <img class="pinLogo" src="logo.jpg" alt="JAGESH ELECTRONIC">
-    <h2>🔐 JAGESH ELECTRONIC</h2>
-    <p id="pinTitle">अपना 6-digit PIN डालें</p>
-    <div id="pinDots" class="pinDots"></div>
-    <div class="pinPad">
-      <button class="pinKey" data-n="1">1</button><button class="pinKey" data-n="2">2</button><button class="pinKey" data-n="3">3</button>
-      <button class="pinKey" data-n="4">4</button><button class="pinKey" data-n="5">5</button><button class="pinKey" data-n="6">6</button>
-      <button class="pinKey" data-n="7">7</button><button class="pinKey" data-n="8">8</button><button class="pinKey" data-n="9">9</button>
-      <button class="pinKey" data-action="clear">⌫</button><button class="pinKey" data-n="0">0</button><button class="pinKey" data-action="ok">✓</button>
-    </div>
-    <div id="pinMsg" class="pinMsg"></div>
-    <button id="forgotPinBtn" class="linkbtn">🔑 PIN भूल गए? Mobile OTP से बदलें</button>
-    <div id="otpBox" class="otpBox hidden">
-      <div class="otpHint">अपने registered mobile number पर OTP भेजें। OTP verify होने के बाद नया 6-digit PIN बनाया जा सकेगा।</div>
-      <label for="otpPhone">Registered Mobile Number</label>
-      <input id="otpPhone" inputmode="tel" maxlength="13" value="+917007373771" placeholder="+917XXXXXXXXX">
-      <div class="actions"><button id="sendOtpBtn" class="btn bluebtn" type="button">📲 OTP भेजें</button><button id="backPinBtn" class="btn secondary" type="button">← PIN पर वापस</button></div>
-      <div id="otpVerifyArea" class="hidden">
-        <label for="otpCode">OTP यहाँ डालें</label>
-        <input id="otpCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit OTP">
-        <div class="actions"><button id="verifyOtpBtn" class="btn primary" type="button">✅ Verify OTP</button></div>
-        <div id="otpTimer" class="otpTimer"></div>
-      </div>
-      <div id="otpMsg" class="otpStatus"></div>
-    </div>
-    <button id="pinReset" class="secondary btn hidden">PIN बदलें</button>
-  </div>
+<style id="pin-lock-css">
+#pinLock{position:fixed;inset:0;z-index:999999;background:#080b10;display:flex;align-items:center;justify-content:center;padding:20px}
+#pinCard{width:min(420px,100%);background:#111722;border:1px solid #263247;border-radius:22px;padding:28px;text-align:center}
+.pinLogo{width:76px;height:76px;object-fit:cover;border-radius:18px}.pinDot{display:inline-block;width:13px;height:13px;border-radius:50%;border:1px solid #7d8aa0;margin:18px 5px}.pinDot.filled{background:#fff}
+#pinPad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:300px;margin:auto}.pinKey{padding:15px;border:1px solid #2a364b;background:#182131;color:#fff;border-radius:14px;font-size:20px}
+#pinMsg{min-height:20px;color:#ff9d9d;font-size:13px;margin:10px}
+</style><style id="pin-only-force">
+/* PIN-only build: legacy login UI is disabled */
+#login,#loginScreen,#auth,#authScreen,.login-screen,.auth-screen,[data-auth-screen]{display:none!important}
+</style></head>
+<body><div id="pinLock" style="display:none">
+<div id="pinCard">
+<img class="pinLogo" src="logo.jpg" alt="JAGESH ELECTRONIC">
+<h2>🔐 JAGESH ELECTRONIC</h2>
+<p id="pinTitle">अपना 6-digit PIN डालें</p>
+<div id="pinDots"></div>
+<div id="pinPad">
+<button class="pinKey" data-n="1">1</button><button class="pinKey" data-n="2">2</button><button class="pinKey" data-n="3">3</button>
+<button class="pinKey" data-n="4">4</button><button class="pinKey" data-n="5">5</button><button class="pinKey" data-n="6">6</button>
+<button class="pinKey" data-n="7">7</button><button class="pinKey" data-n="8">8</button><button class="pinKey" data-n="9">9</button>
+<button class="pinKey" data-action="clear">⌫</button><button class="pinKey" data-n="0">0</button><button class="pinKey" data-action="ok">✓</button>
 </div>
-
-<header class="top"><div class="brand">
+<div id="pinMsg"></div>
+<button id="pinReset" style="display:none;background:none;border:0;color:#8fc7ff">PIN बदलें / Reset</button>
+</div></div>
+<header class="top">
+ <div class="brand">
   <img src="logo.jpg" alt="JAGESH ELECTRONIC Logo">
   <div><h1>JAGESH ELECTRONIC</h1><div class="tag">SERVICE • REPAIR</div></div>
-  <div class="address" id="businessAddress"></div>
-</div></header>
+  <div class="address" id="businessAddress">पता: Settings में अपना Business Address डालें</div>
+ </div>
+</header>
 
 <main class="wrap">
-<div class="nav">
-<button class="active" data-tab="dashboard">🏠 Dashboard</button>
-<button data-tab="customers">👥 Customers</button>
-<button data-tab="add">➕ Add Customer</button>
-<button data-tab="settings">⚙️ Settings</button>
-<button id="recycleBtn">🗑️ Recycle Bin</button>
+ <div class="nav">
+  <button class="active" data-tab="dashboard">🏠 Dashboard</button>
+  <button data-tab="customers">👥 Customers</button>
+  <button data-tab="add">➕ Add Customer</button>
+  <button data-tab="settings">⚙️ Settings</button><button type="button" onclick="showHistory()">📋 History</button><button type="button" onclick="showRecycleBin()">🗑️ Recycle Bin</button>
+ </div>
+
+ <section id="dashboard">
+  <div class="cards">
+   <div class="card"><div class="num gold" id="todayN">0</div><div class="muted">आज की Reminder</div></div>
+   <div class="card"><div class="num red" id="overdueN">0</div><div class="muted">Overdue</div></div>
+   <div class="card"><div class="num green" id="upcomingN">0</div><div class="muted">Upcoming</div></div>
+   <div class="card"><div class="num" id="totalN">0</div><div class="muted">कुल Customers</div></div>
+  </div>
+  <div class="card">
+   <div class="title"><h2>🔔 आज और बाकी Reminder</h2><button class="btn secondary small" onclick="openTab('customers')">सभी देखें</button></div>
+   <div id="dashboardList"></div>
+  </div>
+ </section>
+
+ <section id="customers" class="hidden">
+  <div class="card">
+   <div class="title"><h2>👥 Customer List</h2><button class="btn primary small" onclick="openTab('add')">+ नया Customer</button></div>
+   <div class="searchrow"><input id="search" placeholder="नाम, मोबाइल या appliance खोजें…"><select id="filter" style="max-width:150px"><option value="all">सभी</option><option value="today">आज</option><option value="overdue">Overdue</option><option value="upcoming">Upcoming</option><option value="done">Done</option></select></div>
+   <div class="list" id="customerList"></div>
+  </div>
+ </section>
+
+ <section id="add" class="hidden">
+  <div class="grid">
+   <div class="card">
+    <div class="title"><h2 id="formTitle">➕ नया Customer</h2></div>
+    <form id="customerForm">
+     <input type="hidden" id="editId">
+     <label>Customer Name *</label><input id="name" required placeholder="जैसे Jageshwar Kumar">
+     <div class="row">
+      <div><label>Mobile *</label><input id="phone" required inputmode="tel" placeholder="10 digit"></div>
+      <div><label>Appliance</label><select id="appliance">
+<option>AC</option><option>LED TV</option><option>Refrigerator</option><option>Microwave</option><option>Washing Machine</option><option>Other</option>
+</select></div>
+     </div>
+     <label>क्या काम कराया गया? *</label>
+<select id="workType" required></select>
+<label>Address (optional)</label><input id="address" placeholder="अगर location saved है तो पूरा address जरूरी नहीं">
+     <div class="row">
+      <div><label>Last Service Date *</label><input id="serviceDate" type="date" required></div>
+      <div><label>Reminder</label><select id="interval"><option value="1">1 महीना</option><option value="2">2 महीने</option><option value="3" selected>3 महीने</option><option value="6">6 महीने</option><option value="12">1 साल</option><option value="custom">Custom Date</option></select></div>
+     </div>
+     <div id="customBox" class="hidden"><label>Custom Reminder Date</label><input id="customDate" type="date"></div>
+     <label>Service / Work Note</label><textarea id="note" placeholder="जैसे AC general service, gas check, warranty…"></textarea>
+<div class="row">
+ <div><label>Payment Amount (₹)</label><input id="payment" type="number" min="0" step="1" placeholder="जैसे 500"></div>
+ <div><label>Payment Status</label><select id="paymentStatus"><option value="paid">Paid</option><option value="pending">Pending</option><option value="partial">Partial</option></select></div>
 </div>
+<label>Payment Method</label>
+<select id="paymentMethod"><option>Cash</option><option>UPI</option><option>Bank Transfer</option><option>Card</option><option>Other</option></select>
+     <div class="locationbox">
+      <b>📍 Customer Current Location</b>
+      <div class="muted" style="margin-top:4px">Customer के घर पर खड़े होकर यह बटन दबाएँ। GPS coordinates सेव हो जाएंगे।</div>
+      <div class="actions">
+       <button class="btn greenbtn" type="button" onclick="getLocation()">📍 Current Location Save करें</button>
+       <button class="btn bluebtn hidden" type="button" id="navPreview" onclick="navigateSaved()">🗺️ Map देखें</button>
+      </div>
+      <div class="coords" id="coords">Location अभी सेव नहीं है</div>
+      <input type="hidden" id="lat"><input type="hidden" id="lng">
+     </div>
+     <div class="actions">
+      <button class="btn primary" type="submit">💾 Save Customer</button>
+      <button class="btn secondary" type="button" onclick="resetForm()">↩️ Reset</button>
+     </div>
+     <div class="help">💡 Reminder आपके device में save होगी। Customer को WhatsApp/SMS अपने-आप भेजने के लिए अलग messaging API/backend चाहिए। अभी WhatsApp/SMS buttons message तैयार करके आपके फोन में खोलते हैं।</div>
+    </form>
+   </div>
+   <div class="card">
+    <div class="title"><h2>📌 कैसे इस्तेमाल करें?</h2></div>
+    <div class="help">
+     <b>1.</b> Customer की service के समय नाम और मोबाइल भरें।<br><br>
+     <b>2.</b> Customer के घर पर खड़े होकर <b>Current Location Save</b> दबाएँ।<br><br>
+     <b>3.</b> 1/2/3/6 महीने, 1 साल या Custom Date चुनें।<br><br>
+     <b>4.</b> अगली बार Reminder आने पर <b>Navigate</b> दबाएँ—Google Maps में उसी saved location का रास्ता खुल जाएगा।<br><br>
+     <b>5.</b> WhatsApp पर तैयार reminder भेजने के लिए WhatsApp बटन दबाएँ।
+    </div>
+   </div>
+  </div>
+ </section>
 
-<section id="dashboard">
-<div class="cards">
-<button class="card dashCard" onclick="openCustomerFilter('today')"><div class="num gold" id="todayN">0</div><div class="muted">आज की Reminder<br><b>Tap करके खोलें</b></div></button>
-<button class="card dashCard" onclick="openCustomerFilter('overdue')"><div class="num red" id="overdueN">0</div><div class="muted">Overdue<br><b>Tap करके खोलें</b></div></button>
-<button class="card dashCard" onclick="openCustomerFilter('upcoming')"><div class="num green" id="upcomingN">0</div><div class="muted">Upcoming Customers<br><b>Tap करके खोलें</b></div></button>
-<button class="card dashCard" onclick="openCustomerFilter('all')"><div class="num" id="totalN">0</div><div class="muted">कुल Customers<br><b>Tap करके पूरी List खोलें</b></div></button>
-</div>
-<div class="card"><div class="title"><h2>🔔 आज और बाकी Reminder</h2><button class="btn secondary small" onclick="openTab('customers')">सभी देखें</button></div><div id="dashboardList"></div></div>
-</section>
-
-<section id="customers" class="hidden"><div class="card">
-<div class="title"><h2>👥 Customer List</h2><button class="btn primary small" onclick="openTab('add')">+ नया Customer</button></div>
-<div class="searchrow"><input id="search" placeholder="नाम, मोबाइल या appliance खोजें…"><select id="filter" style="max-width:160px"><option value="all">सभी</option><option value="today">आज</option><option value="overdue">Overdue</option><option value="upcoming">Upcoming</option><option value="done">Done</option></select></div>
-<div class="list" id="customerList"></div>
-</div></section>
-
-<section id="add" class="hidden"><div class="grid">
-<div class="card"><div class="title"><h2 id="formTitle">➕ नया Customer</h2></div>
-<form id="customerForm">
-<input type="hidden" id="editId">
-<label>Customer Name *</label><input id="name" required placeholder="जैसे Rahul Kumar">
-<div class="row"><div><label>Mobile *</label><input id="phone" required inputmode="tel" placeholder="10 digit"></div>
-<div><label>Appliance</label><select id="appliance"><option>AC</option><option>LED TV</option><option>Refrigerator</option><option>Microwave</option><option>Other</option></select></div></div>
-<label>🔧 क्या काम हुआ / कराना है?</label><select id="workType"></select>
-<label>Address (optional)</label><input id="address" placeholder="अगर GPS saved है तो address जरूरी नहीं">
-<div class="row"><div><label>Work/Service Date *</label><input id="serviceDate" type="date" required></div>
-<div><label>Reminder</label><select id="interval"><option value="1">1 महीना</option><option value="2">2 महीने</option><option value="3" selected>3 महीने</option><option value="6">6 महीने</option><option value="12">1 साल</option><option value="custom">Custom Date</option></select></div></div>
-<div id="customBox" class="hidden"><label>Custom Reminder Date *</label><input id="customDate" type="date"></div>
-<label>💳 Payment Method</label><select id="paymentMethod"><option value="">Payment Method चुनें</option><option>Cash</option><option>UPI</option><option>Card</option><option>Bank Transfer</option><option>Other</option></select>
-<label>💰 Payment Status</label><select id="paymentStatus"><option value="">Payment Status चुनें</option><option>Paid</option><option>Pending</option><option>Partial</option></select>
-<label>₹ Amount</label><input id="paymentAmount" type="number" min="0" step="1" placeholder="जैसे 1200">
-<label>Service / Work Note</label><textarea id="note" placeholder="जैसे AC general service, LED TV repair, refrigerator compressor work…"></textarea>
-<div class="locationbox"><b>📍 Customer Current Location</b><div class="muted">Customer के घर पर खड़े होकर यह बटन दबाएँ।</div>
-<div class="actions"><button class="btn greenbtn" type="button" onclick="getLocation()">📍 Current Location Save करें</button><button class="btn bluebtn hidden" type="button" id="navPreview" onclick="navigateSaved()">🗺️ Map देखें</button></div>
-<div class="coords" id="coords">Location अभी सेव नहीं है</div><input type="hidden" id="lat"><input type="hidden" id="lng"></div>
-<div class="actions"><button class="btn primary" type="submit">💾 Save Customer</button><button class="btn secondary" type="button" onclick="resetForm()">↩️ Reset</button></div>
-</form></div>
-<div class="card"><div class="title"><h2>📌 कैसे इस्तेमाल करें?</h2></div><div class="help">
-<b>1.</b> Customer की जानकारी भरें।<br><br><b>2.</b> Appliance चुनने पर काम के options बदलेंगे।<br><br>
-<b>3.</b> Installation/Uninstallation/Repair/Service के अनुसार सही Work चुनें।<br><br>
-<b>4.</b> Reminder के लिए 1/2/3/6/12 महीने या Custom Date चुनें।<br><br>
-<b>5.</b> Customer की current location GPS से save करें।<br><br>
-<b>6.</b> Delete करने पर customer सीधे Recycle Bin में जाएगा।
-</div></div>
-</div></section>
-
-<section id="settings" class="hidden"><div class="card">
-<div class="title"><h2>⚙️ Business Settings</h2></div>
-<label>Business Address</label><textarea id="bizAddress"></textarea>
-<div class="row"><div><label>Business Phone</label><input id="bizPhone"></div><div><label>WhatsApp Number</label><input id="waPhone"></div></div>
-<label>Backup Email</label><input id="backupEmail" type="email" placeholder="jageshelectronic@gmail.com">
-<label>Reminder Message</label><textarea id="msgTemplate"></textarea>
-<div class="actions">
-<button class="btn primary" onclick="saveSettings()">💾 Save Settings</button>
-<button class="btn secondary" onclick="changePin()">🔢 Change PIN</button>
-<button class="btn bluebtn" onclick="requestNotifications()">🔔 Notifications</button>
-<button class="btn greenbtn" onclick="installApp()">📲 App Install</button>
-<button class="btn secondary" onclick="exportData()">⬇️ Backup Export</button>
-<button class="btn secondary" onclick="emailBackup()">📧 Email Backup</button>
-<label class="btn secondary">⬆️ Backup Import<input type="file" id="importFile" accept=".json" style="display:none"></label>
-</div>
-<div id="installStatus" class="installstate"></div>
-<div class="help" style="margin-top:12px">Backup इस device में local रहता है। Export की JSON file को सुरक्षित रखें। Import करने पर Customers, Customer History, Recycle Bin और Settings वापस आते हैं।</div>
-</div></section>
+ <section id="settings" class="hidden">
+  <div class="card">
+   <div class="title"><h2>⚙️ Business Settings</h2></div>
+   <label>Business Address</label><textarea id="bizAddress" placeholder="ऊपर header में दिखने वाला आपका business address"></textarea>
+   <div class="row">
+    <div><label>Business Phone</label><input id="bizPhone" placeholder="10 digit mobile"></div>
+    <div><label>WhatsApp Number</label><input id="waPhone" placeholder="10 digit mobile"></div>
+   </div>
+   <label>Backup Email</label>
+   <input id="backupEmail" type="email" placeholder="jageshelectronic@gmail.com">
+   <div class="help" style="margin-top:8px">📧 यह email backup भेजने के लिए सेव रहेगा। Website अपने-आप email के अंदर backup upload नहीं कर सकती; <b>Email Backup</b> दबाने पर backup file share/download होगी, जिसे Gmail में भेज सकते हैं।</div>
+   <label>Reminder Message</label>
+   <textarea id="msgTemplate"></textarea>
+   <div class="actions">
+    <button class="btn primary" onclick="saveSettings()">💾 Save Settings</button><button class="btn primary" onclick="JageshPin.change()">🔢 Change PIN</button>
+    <button class="btn bluebtn" onclick="requestNotifications()">🔔 Browser Notification ON करें</button>
+    <button class="btn greenbtn" onclick="installApp()">📲 App Install करें</button>
+    <button class="btn secondary" onclick="exportData()">⬇️ Backup Export</button>
+    <button class="btn secondary" onclick="emailBackup()">📧 Email Backup</button>
+    <label class="btn secondary" style="display:inline-block">⬆️ Backup Import<input type="file" id="importFile" accept=".json" style="display:none"></label>
+   </div>
+   <div id="installStatus" class="installstate">App install option तैयार किया जा रहा है…</div>
+   <div class="help" style="margin-top:12px"><b>Notification:</b> Browser notification permission ON होने पर आज/overdue reminders की browser notification मिल सकती है। <b>WhatsApp/SMS customer को अपने-आप भेजने</b> के लिए अलग WhatsApp Business API/SMS provider और backend चाहिए।</div>
+  </div>
+ </section>
 </main>
-<footer>JAGESH ELECTRONIC • Customer Care & Reminder System • V10 Clean Build</footer>
-<div id="toast" class="toast"></div>
+<footer>JAGESH ELECTRONIC • Customer Care & Reminder System</footer>
+<div class="modal" id="modal"><div class="modalbox"><button class="close" onclick="closeModal()">×</button><h2 id="modalTitle" style="margin-top:0">Details</h2><div id="modalBody"></div></div></div>
+<div class="toast" id="toast"></div>
 
 <script>
-const STORE='jagesh_electronic_v10_state';
-const PINKEY='jagesh_electronic_v10_pin_hash';
-const PIN_SALT='JAGESH-ELECTRONIC-V10';
-const DEFAULT_SETTINGS={
- address:'',phone:'',waPhone:'',backupEmail:'jageshelectronic@gmail.com',
- template:'नमस्ते {name} जी 🙏\\nआपके {appliance} के {work} का reminder समय हो गया है।\\nकृपया सुविधानुसार समय बताएं।\\nधन्यवाद।\\n- JAGESH ELECTRONIC'
-};
+const KEY='jagesh_electronic_pro_v2';
+let state=JSON.parse(localStorage.getItem(KEY)||'null')||{customers:[],settings:{address:'',phone:'',waPhone:'',backupEmail:'jageshelectronic@gmail.com',template:'नमस्ते {name} जी 🙏\\nJAGESH ELECTRONIC की तरफ से याद दिलाना है कि आपके {appliance} की सर्विस का समय हो गया है।\\nकृपया सुविधानुसार समय बताएं।\\nधन्यवाद।\\n- JAGESH ELECTRONIC'}};
+state.settings=Object.assign({address:'',phone:'',waPhone:'',backupEmail:'jageshelectronic@gmail.com',template:''},state.settings);
 const $=id=>document.getElementById(id);
-let state=loadState();
-let pinMode='unlock',pinBuf='';
-let deferredInstallPrompt=null;
-
-function loadState(){
- try{
-  let raw=localStorage.getItem(STORE);
-  if(!raw){
-   // Migrate the existing V9/V8 local data automatically so replacing index.html
-   // does not wipe the customer's existing records.
-   raw=localStorage.getItem('jagesh_electronic_pro_v2');
-  }
-  const x=raw?JSON.parse(raw):{};
-  return normalizeState(x||{});
- }catch(e){return normalizeState({});}
-}
-function normalizeState(x){
- x=x||{};
- const customers=Array.isArray(x.customers)?x.customers.map(normalizeCustomer):[];
- const recycleBin=Array.isArray(x.recycleBin)?x.recycleBin.map(normalizeRecycle):[];
- return {customers,recycleBin,settings:Object.assign({},DEFAULT_SETTINGS,x.settings||{})};
-}
-function normalizeCustomer(c){
- c=Object.assign({},c||{});
- c.id=String(c.id||Date.now()+'_'+Math.random().toString(36).slice(2));
- c.history=Array.isArray(c.history)?c.history:(Array.isArray(c.serviceHistory)?c.serviceHistory:[]);
- c.workType=c.workType||c.work||'';
- c.paymentMethod=c.paymentMethod||'';
- c.paymentStatus=c.paymentStatus||'';
- c.amount=c.amount??c.paymentAmount??'';
- c.lat=c.lat??'';c.lng=c.lng??'';
- c.done=!!c.done;
- return c;
-}
-function normalizeRecycle(r){
- if(r&&r.data)return {id:String(r.id||Date.now()),deletedAt:r.deletedAt||'',data:normalizeCustomer(r.data)};
- return {id:String(Date.now()),deletedAt:'',data:normalizeCustomer(r)};
-}
-function persist(){localStorage.setItem(STORE,JSON.stringify(state));render();updateHeader();}
-function toast(s){$('toast').textContent=s;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2500);}
-function today(){return new Date().toISOString().slice(0,10);}
-function addMonths(s,n){if(!s)return'';let d=new Date(s+'T00:00:00'),day=d.getDate();d.setMonth(d.getMonth()+Number(n));if(d.getDate()!=day)d.setDate(0);return d.toISOString().slice(0,10);}
-function fmt(s){if(!s)return'-';let a=s.split('-');return a.length===3?a[2]+'-'+a[1]+'-'+a[0]:s;}
-function status(x){if(x.done)return'done';if(!x.reminderDate)return'future';if(x.reminderDate<today())return'overdue';if(x.reminderDate===today())return'today';return'future';}
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function openTab(tab){document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));$(tab).classList.remove('hidden');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));if(tab==='customers')renderCustomers();}
-document.querySelectorAll('.nav button[data-tab]').forEach(b=>b.onclick=()=>openTab(b.dataset.tab));
-
-const WORKS={
- AC:['Service','Repair','Installation','Uninstallation','Gas Charging','Other'],
- 'LED TV':['Repair','Installation','Uninstallation','Board/Panel Work','Other'],
- Refrigerator:['Repair','Installation','Uninstallation','Gas Charging','Compressor Work','Other'],
- Microwave:['Repair','Installation','Uninstallation','Parts/Component Work','Other'],
- Other:['Repair','Installation','Uninstallation','Service','Other']
+const today=()=>new Date().toISOString().slice(0,10);
+function persist(){localStorage.setItem(KEY,JSON.stringify(state));render();updateHeader()}
+function toast(s){$('toast').textContent=s;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
+function addMonths(s,n){let d=new Date(s+'T00:00:00'),day=d.getDate();d.setMonth(d.getMonth()+Number(n));if(d.getDate()!=day)d.setDate(0);return d.toISOString().slice(0,10)}
+function fmt(s){if(!s)return'-';let [y,m,d]=s.split('-');return d+'-'+m+'-'+y}
+function status(x){if(x.done)return'done';if(x.reminderDate<today())return'overdue';if(x.reminderDate===today())return'today';return'future'}
+function openTab(tab){document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));$(tab).classList.remove('hidden');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));if(tab==='customers')renderCustomers()}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>openTab(b.dataset.tab));
+function updateHeader(){$('businessAddress').textContent=state.settings.address||'पता: Settings में अपना Business Address डालें';$('bizAddress').value=state.settings.address||'';$('bizPhone').value=state.settings.phone||'';$('waPhone').value=state.settings.waPhone||'';$('backupEmail').value=state.settings.backupEmail||'jageshelectronic@gmail.com';$('msgTemplate').value=state.settings.template||''}
+const WORK_TYPES={
+ 'AC':['Service','Repair','Installation','Uninstallation'],
+ 'LED TV':['Repair','Installation','Uninstallation'],
+ 'Refrigerator':['Repair','Installation','Uninstallation'],
+ 'Microwave':['Repair','Installation','Uninstallation'],
+ 'Washing Machine':['Service','Repair','Installation','Uninstallation'],
+ 'Other':['Service','Repair','Installation','Uninstallation']
 };
-function updateWorkTypes(selected=''){
- const list=WORKS[$('appliance').value]||WORKS.Other;
- $('workType').innerHTML='<option value="">काम चुनें</option>'+list.map(v=>'<option>'+esc(v)+'</option>').join('');
- if(selected)$('workType').value=selected;
+function updateWorkTypes(){
+ let a=$('appliance'), w=$('workType');
+ if(!a||!w)return;
+ let types=WORK_TYPES[a.value]||WORK_TYPES.Other;
+ let current=w.value;
+ w.innerHTML=types.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');
+ if(types.includes(current))w.value=current;
 }
-$('appliance').onchange=()=>updateWorkTypes();
+$('appliance').addEventListener('change',updateWorkTypes);
 
-function resetForm(){
- $('customerForm').reset();$('editId').value='';$('serviceDate').value=today();$('interval').value='3';$('customDate').value='';$('customBox').classList.add('hidden');
- $('lat').value='';$('lng').value='';$('coords').textContent='Location अभी सेव नहीं है';$('navPreview').classList.add('hidden');$('formTitle').textContent='➕ नया Customer';updateWorkTypes();
-}
-$('interval').onchange=()=>{const on=$('interval').value==='custom';$('customBox').classList.toggle('hidden',!on);if(on)$('customDate').min=today();};
-
+function resetForm(){ $('customerForm').reset();$('editId').value='';$('serviceDate').value=today();$('interval').value='3';$('workType').value='';updateWorkTypes();$('payment').value='';$('paymentStatus').value='paid';$('paymentMethod').value='Cash';$('customBox').classList.add('hidden');$('lat').value='';$('lng').value='';$('coords').textContent='Location अभी सेव नहीं है';$('navPreview').classList.add('hidden');$('formTitle').textContent='➕ नया Customer'}
+$('interval').onchange=()=> $('customBox').classList.toggle('hidden',$('interval').value!=='custom');
 function getLocation(){
- if(!navigator.geolocation){toast('इस browser में GPS उपलब्ध नहीं है');return;}
+ if(!navigator.geolocation){toast('इस browser में GPS उपलब्ध नहीं है');return}
  $('coords').textContent='📡 Location मिल रही है…';
- navigator.geolocation.getCurrentPosition(p=>{
-  $('lat').value=p.coords.latitude.toFixed(7);$('lng').value=p.coords.longitude.toFixed(7);
-  $('coords').textContent='✅ Saved: '+$('lat').value+', '+$('lng').value;$('navPreview').classList.remove('hidden');toast('Customer की location सेव हो गई');
- },()=>toast('Location नहीं मिली। GPS/Permission ON करें।'),{enableHighAccuracy:true,timeout:15000,maximumAge:0});
+ navigator.geolocation.getCurrentPosition(p=>{let lat=p.coords.latitude.toFixed(7),lng=p.coords.longitude.toFixed(7);$('lat').value=lat;$('lng').value=lng;$('coords').textContent='✅ Saved: '+lat+', '+lng;$('navPreview').classList.remove('hidden');toast('Customer की location मिल गई');},e=>{toast('Location नहीं मिली। GPS/Permission ON करें।')},{enableHighAccuracy:true,timeout:15000,maximumAge:0});
 }
-function mapUrl(lat,lng){return'https://www.google.com/maps/dir/?api=1&destination='+lat+','+lng;}
-function navigateSaved(){if($('lat').value&&$('lng').value)window.open(mapUrl($('lat').value,$('lng').value),'_blank');}
-
+function mapUrl(lat,lng){return 'https://www.google.com/maps/dir/?api=1&destination='+lat+','+lng}
+function navigateSaved(){let lat=$('lat').value,lng=$('lng').value;if(lat&&lng)window.open(mapUrl(lat,lng),'_blank');}
 $('customerForm').onsubmit=e=>{
  e.preventDefault();
- if(!$('name').value.trim()||!$('phone').value.trim()){toast('Name और Mobile भरें');return;}
- let id=$('editId').value||Date.now().toString(),old=state.customers.find(x=>x.id===id);
+ let id=$('editId').value||Date.now().toString(), old=state.customers.find(x=>x.id===id);
  let rem=$('interval').value==='custom'?$('customDate').value:addMonths($('serviceDate').value,$('interval').value);
- if($('interval').value==='custom'&&!$('customDate').value){toast('Custom Reminder Date चुनें');return;}
- if(!rem){toast('Reminder date चुनें');return;}
- const work=$('workType').value||'';
- const entry={date:$('serviceDate').value,reminderDate:rem,workType:work,note:$('note').value.trim(),paymentMethod:$('paymentMethod').value,paymentStatus:$('paymentStatus').value,amount:$('paymentAmount').value||'',updatedAt:new Date().toISOString()};
- let history=Array.isArray(old?.history)?old.history.slice():[];
- if(!old||JSON.stringify(history[history.length-1]||{})!==JSON.stringify(entry))history.push(entry);
- const x=normalizeCustomer({id,name:$('name').value.trim(),phone:$('phone').value.trim(),appliance:$('appliance').value,workType:work,address:$('address').value.trim(),serviceDate:$('serviceDate').value,reminderDate:rem,note:$('note').value.trim(),lat:$('lat').value||'',lng:$('lng').value||'',done:old?old.done:false,paymentMethod:$('paymentMethod').value,paymentStatus:$('paymentStatus').value,amount:$('paymentAmount').value||'',customReminderDate:$('customDate').value||'',history});
- const i=state.customers.findIndex(a=>a.id===id);if(i>=0)state.customers[i]=x;else state.customers.push(x);
- persist();resetForm();openTab('customers');toast('Customer सेव हो गया');
-};
-
-function messageFor(x){return(state.settings.template||'').replaceAll('{name}',x.name||'').replaceAll('{appliance}',x.appliance||'').replaceAll('{work}',x.workType||'काम');}
-function waDigits(p){let d=String(p||'').replace(/\D/g,'');return d.length===10?'91'+d:d;}
-function callCustomer(p){location.href='tel:'+p;}
-function whatsapp(x){const p=waDigits(x.phone);if(p)window.open('https://wa.me/'+p+'?text='+encodeURIComponent(messageFor(x)),'_blank');}
-function sms(x){location.href='sms:'+x.phone+'?body='+encodeURIComponent(messageFor(x));}
-function navigate(x){if(x.lat&&x.lng)window.open(mapUrl(x.lat,x.lng),'_blank');else if(x.address)window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(x.address),'_blank');else toast('Customer की location सेव नहीं है');}
-function markDone(id){const x=state.customers.find(c=>c.id===id);if(x){x.done=true;persist();toast('Reminder Done');}}
-function markPending(id){const x=state.customers.find(c=>c.id===id);if(x){x.done=false;persist();}}
-
-function editCustomer(id){
- const x=state.customers.find(c=>c.id===id);if(!x)return;openTab('add');
- $('editId').value=x.id;$('name').value=x.name||'';$('phone').value=x.phone||'';$('appliance').value=x.appliance||'AC';updateWorkTypes(x.workType||'');
- $('address').value=x.address||'';$('serviceDate').value=x.serviceDate||today();$('note').value=x.note||'';$('lat').value=x.lat||'';$('lng').value=x.lng||'';
- $('paymentMethod').value=x.paymentMethod||'';$('paymentStatus').value=x.paymentStatus||'';$('paymentAmount').value=x.amount||'';
- const isPreset=['1','2','3','6','12'].find(n=>addMonths($('serviceDate').value,n)===x.reminderDate);
- $('interval').value=isPreset||'custom';$('customBox').classList.toggle('hidden',!!isPreset);$('customDate').value=isPreset?'':(x.reminderDate||'');
- $('coords').textContent=x.lat&&x.lng?'✅ Saved: '+x.lat+', '+x.lng:'Location अभी सेव नहीं है';$('navPreview').classList.toggle('hidden',!(x.lat&&x.lng));$('formTitle').textContent='✏️ Customer Edit';
-}
-
-function deleteCustomer(id){
- const x=state.customers.find(c=>c.id===id);if(!x)return;
- if(!confirm('इस Customer को Recycle Bin में भेजना है?'))return;
- const copy=JSON.parse(JSON.stringify(x));
- state.recycleBin.push({id:'rb_'+Date.now()+'_'+Math.random().toString(36).slice(2),deletedAt:new Date().toISOString(),data:copy});
- state.customers=state.customers.filter(c=>c.id!==id);
- persist();toast('Customer Recycle Bin में चला गया');
-}
-
-function customerItem(x){
- const s=status(x),label=s==='overdue'?'🔴 Overdue':s==='today'?'🟠 आज':s==='done'?'✅ Done':'🟢 Upcoming';
- const hist=Array.isArray(x.history)?x.history:[];
- return `<div class="item ${s}">
- <div class="itemtop"><div><div class="name">${esc(x.name)}</div><div class="meta">📱 ${esc(x.phone)} · 🔧 ${esc(x.appliance)}${x.workType?' · '+esc(x.workType):''}</div></div><div class="date">${fmt(x.reminderDate)}</div></div>
- <span class="pill">${label}</span>
- ${x.note?'<div class="meta">📝 '+esc(x.note)+'</div>':''}
- ${x.paymentStatus?'<div class="meta">💳 '+esc(x.paymentMethod||'')+' · '+esc(x.paymentStatus)+(x.amount?' · ₹'+esc(x.amount):'')+'</div>':''}
- ${x.lat&&x.lng?'<div class="meta">📍 GPS Saved</div>':'<div class="meta">📍 GPS Not Saved</div>'}
- <div class="actions">
- <button class="btn primary small" onclick='callCustomer(${JSON.stringify(x.phone)})'>📞 Call</button>
- <button class="btn greenbtn small" onclick='whatsapp(${JSON.stringify(x)})'>💬 WhatsApp</button>
- <button class="btn bluebtn small" onclick='sms(${JSON.stringify(x)})'>✉️ SMS</button>
- <button class="btn bluebtn small" onclick='navigate(${JSON.stringify(x)})'>🗺️ Navigate</button>
- <button class="btn secondary small" onclick="showHistory('${esc(x.id)}')">📜 History (${hist.length})</button>
- ${s==='done'?`<button class="btn secondary small" onclick="markPending('${esc(x.id)}')">↩️ Pending</button>`:`<button class="btn secondary small" onclick="markDone('${esc(x.id)}')">✅ Done</button>`}
- <button class="btn secondary small" onclick="editCustomer('${esc(x.id)}')">✏️ Edit</button>
- <button class="btn danger small" onclick="deleteCustomer('${esc(x.id)}')">🗑️ Delete</button>
- </div></div>`;
-}
-function renderCustomers(){
- const q=($('search').value||'').toLowerCase(),f=$('filter').value;
- const arr=state.customers.filter(x=>(x.name+' '+x.phone+' '+x.appliance+' '+x.workType).toLowerCase().includes(q)).filter(x=>f==='all'||status(x)===f).sort((a,b)=>(a.reminderDate||'').localeCompare(b.reminderDate||''));
- $('customerList').innerHTML=arr.length?arr.map(customerItem).join(''):'<div class="empty">कोई Customer नहीं मिला।</div>';
-}
-$('search').oninput=renderCustomers;$('filter').onchange=renderCustomers;
-
-function showHistory(id){
- const x=state.customers.find(c=>c.id===id);if(!x)return;
- const h=Array.isArray(x.history)?x.history:[];
- const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="modalbox"><div class="title"><h2>📜 ${esc(x.name)} की Customer History</h2><button class="btn secondary" id="closeHistory">✕</button></div>
- ${h.length?h.slice().reverse().map(v=>`<div class="recycleRow">📅 Work Date: <b>${esc(fmt(v.date))}</b><br>🔧 ${esc(v.workType||'')}<br>🔔 Next Reminder: ${esc(fmt(v.reminderDate))}<br>${v.paymentStatus?'💳 '+esc(v.paymentMethod||'')+' · '+esc(v.paymentStatus)+(v.amount?' · ₹'+esc(v.amount):'')+'<br>':''}${v.note?'📝 '+esc(v.note):''}</div>`).join(''):'<div class="empty">इस Customer की अभी कोई History नहीं है।</div>'}</div>`;
- document.body.appendChild(m);m.querySelector('#closeHistory').onclick=()=>m.remove();
-}
-
-function renderDashboard(){
- const t=state.customers.filter(x=>!x.done&&status(x)==='today').length,o=state.customers.filter(x=>!x.done&&status(x)==='overdue').length,u=state.customers.filter(x=>!x.done&&status(x)==='future').length;
- $('todayN').textContent=t;$('overdueN').textContent=o;$('upcomingN').textContent=u;$('totalN').textContent=state.customers.length;
- const arr=state.customers.filter(x=>!x.done&&(x.reminderDate||'')<=today()).sort((a,b)=>(a.reminderDate||'').localeCompare(b.reminderDate||'')).slice(0,12);
- $('dashboardList').innerHTML=arr.length?arr.map(customerItem).join(''):'<div class="empty">🎉 आज कोई pending Reminder नहीं है।</div>';
-}
-function render(){renderDashboard();renderCustomers();}
-function updateHeader(){$('businessAddress').textContent=state.settings.address||'Settings में Business Address डालें';$('bizAddress').value=state.settings.address||'';$('bizPhone').value=state.settings.phone||'';$('waPhone').value=state.settings.waPhone||'';$('backupEmail').value=state.settings.backupEmail||DEFAULT_SETTINGS.backupEmail;$('msgTemplate').value=state.settings.template||DEFAULT_SETTINGS.template;}
-function saveSettings(){state.settings.address=$('bizAddress').value.trim();state.settings.phone=$('bizPhone').value.trim();state.settings.waPhone=$('waPhone').value.trim();state.settings.backupEmail=$('backupEmail').value.trim()||DEFAULT_SETTINGS.backupEmail;state.settings.template=$('msgTemplate').value;persist();toast('Settings सेव हो गई');}
-function openCustomerFilter(f){openTab('customers');$('filter').value=f;$('search').value='';renderCustomers();}
-
-function recycleBin(){
- if(!state.recycleBin.length){showRecycleModal();return;}
- showRecycleModal();
-}
-function showRecycleModal(){
- const m=document.createElement('div');m.className='modal';
- const rows=state.recycleBin.slice().reverse().map((r,idx)=>{const x=r.data;const realIndex=state.recycleBin.length-1-idx;return `<div class="recycleRow"><b>${esc(x.name)}</b> · ${esc(x.phone)}<div class="meta">🔧 ${esc(x.appliance)}${x.workType?' · '+esc(x.workType):''} · Deleted: ${esc(new Date(r.deletedAt).toLocaleString('en-IN'))}</div><div class="recycleActions"><button class="btn greenbtn small" onclick="restoreCustomer(${realIndex})">↩️ Restore</button><button class="btn danger small" onclick="permanentDelete(${realIndex})">🗑️ Permanently Delete</button></div></div>`}).join('');
- m.innerHTML=`<div class="modalbox"><div class="title"><h2>🗑️ Recycle Bin</h2><button class="btn secondary" id="closeRecycle">✕</button></div>
- <div class="help">Deleted customer यहाँ सुरक्षित रहता है। Restore करने पर उसकी History, Location और Payment data भी वापस आएगा।</div>
- ${rows||'<div class="empty">Recycle Bin खाली है।</div>'}
- ${state.recycleBin.length?'<button class="btn danger" id="emptyRecycle" style="width:100%;margin-top:10px">🧹 Empty Recycle Bin</button>':''}
- </div>`;
- document.body.appendChild(m);m.querySelector('#closeRecycle').onclick=()=>m.remove();
- if($('emptyRecycle'))$('emptyRecycle').onclick=()=>requirePin(()=>{state.recycleBin=[];persist();m.remove();toast('Recycle Bin खाली कर दिया गया');});
-}
-function restoreCustomer(i){requirePin(()=>{const r=state.recycleBin[i];if(!r)return;const x=normalizeCustomer(r.data);if(state.customers.some(c=>c.id===x.id))x.id=Date.now()+'_'+Math.random().toString(36).slice(2);state.customers.push(x);state.recycleBin.splice(i,1);persist();document.querySelector('.modal')?.remove();toast('Customer Restore हो गया');});}
-function permanentDelete(i){requirePin(()=>{if(!confirm('यह Customer हमेशा के लिए delete होगा।'))return;state.recycleBin.splice(i,1);persist();document.querySelector('.modal')?.remove();toast('Customer permanently delete हो गया');});}
-$('recycleBtn').onclick=()=>requirePin(recycleBin);
-
-function backupObject(){return{format:'JAGESH-ELECTRONIC-BACKUP',version:10,exportedAt:new Date().toISOString(),customers:state.customers,recycleBin:state.recycleBin,settings:state.settings};}
-function exportData(){const blob=new Blob([JSON.stringify(backupObject(),null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='JAGESH_ELECTRONIC_BACKUP_V10.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);toast('Backup तैयार है — History भी शामिल है');}
-function normalizeIncoming(raw){
- let x=raw;
- if(raw&&raw.data&&(raw.data.customers||raw.data.state))x=raw.data;
- if(raw&&raw.state)x=raw.state;
- if(Array.isArray(x))return normalizeState({customers:x,recycleBin:[],settings:{}});
- return normalizeState(x||{});
-}
-$('importFile').onchange=e=>{
- const f=e.target.files[0];if(!f)return;const r=new FileReader();
- r.onload=()=>{try{const incoming=normalizeIncoming(JSON.parse(r.result));if(!incoming.customers.length&&!incoming.recycleBin.length){toast('Backup में कोई Customer/Recycle data नहीं मिला');return;}state=incoming;persist();openTab('customers');toast('Backup Restore हो गया — Customer History सहित');}catch(err){toast('Backup restore नहीं हुआ');}};
- r.readAsText(f);e.target.value='';
-};
-async function emailBackup(){
- const email=state.settings.backupEmail||DEFAULT_SETTINGS.backupEmail;
- const blob=new Blob([JSON.stringify(backupObject(),null,2)],{type:'application/json'});
- const file=new File([blob],'JAGESH_ELECTRONIC_BACKUP_V10.json',{type:'application/json'});
- if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({title:'JAGESH ELECTRONIC Backup',text:'Customer Backup — History सहित',files:[file]});return;}catch(e){}}
- exportData();location.href='mailto:'+encodeURIComponent(email)+'?subject='+encodeURIComponent('JAGESH ELECTRONIC Customer Backup')+'&body='+encodeURIComponent('Backup file download हुई है। कृपया इसे Gmail में attach करके भेजें।');
-}
-async function requestNotifications(){if(!('Notification'in window)){toast('Browser notification उपलब्ध नहीं है');return}const p=await Notification.requestPermission();toast(p==='granted'?'Notifications ON':'Permission नहीं मिली');}
-function checkNotifications(){if('Notification'in window&&Notification.permission==='granted'){const n=state.customers.filter(x=>!x.done&&(x.reminderDate||'')<=today()).length;if(n)new Notification('JAGESH ELECTRONIC',{body:'आज/Overdue Reminder: '+n+' Customer'});}}
-
-const SUPABASE_URL='https://ihrktiuoyvjoornpaknb.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY='sb_publishable_mOi55EghYQ9yyQ4EWPQckA_p2NpSnjT';
-const RECOVERY_PHONE='+917007373771';
-let otpVerified=false;
-function hashPin(pin){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(PIN_SALT+'|'+pin)).then(b=>Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join(''));}
-function showPin(mode){
- pinMode=mode;pinBuf='';$('pinDots').innerHTML='';$('pinMsg').textContent='';$('otpBox').classList.add('hidden');$('otpVerifyArea').classList.add('hidden');$('otpMsg').textContent='';$('pinLock').style.display='flex';
- $('pinTitle').textContent=mode==='setup'?'पहली बार 6-digit PIN बनाइए':mode==='change'?'नया 6-digit PIN डालें':'अपना 6-digit PIN डालें';
- $('forgotPinBtn').style.display=mode==='unlock'?'inline-block':'none';
-}
-function drawPin(){ $('pinDots').innerHTML=Array.from({length:6},(_,i)=>`<span class="pinDot ${i<pinBuf.length?'filled':''}"></span>`).join('');}
-async function submitPin(){
- if(pinBuf.length!==6){$('pinMsg').textContent='ठीक 6 digits का PIN डालें';return;}
- const h=await hashPin(pinBuf);
- if(pinMode==='setup'||pinMode==='change'){
-   localStorage.setItem(PINKEY,h);$('pinLock').style.display='none';pinBuf='';toast('PIN सेव हो गया');return;
- }
- if(h===localStorage.getItem(PINKEY)){
-   $('pinLock').style.display='none';pinBuf='';
-   const d=window.__afterPin;window.__afterPin=null;if(d)d();
- }else{$('pinMsg').textContent='गलत PIN. अगर PIN याद नहीं है तो नीचे “PIN भूल गए?” दबाएँ।';pinBuf='';drawPin();}
-}
-document.querySelectorAll('.pinKey').forEach(k=>k.onclick=()=>{
- if(k.dataset.action==='clear')pinBuf=pinBuf.slice(0,-1);else if(k.dataset.action==='ok'){submitPin();return;}else if(pinBuf.length<6)pinBuf+=k.dataset.n;
- drawPin();
- if(pinBuf.length===6)setTimeout(submitPin,120);
-});
-function requirePin(done){
- if(!localStorage.getItem(PINKEY)){toast('पहले App PIN सेट करें');showPin('setup');return;}
- window.__afterPin=done;showPin('unlock');
-}
-function changePin(){if(!localStorage.getItem(PINKEY)){showPin('setup');return;}showPin('change');}
-$('pinReset').onclick=changePin;
-
-function openOtpRecovery(){
- pinBuf='';drawPin();$('pinMsg').textContent='';$('otpBox').classList.remove('hidden');$('otpPhone').value=localStorage.getItem('jagesh_recovery_phone')||RECOVERY_PHONE;$('otpCode').value='';$('otpVerifyArea').classList.add('hidden');$('otpMsg').textContent='';$('otpMsg').className='otpStatus';$('otpTimer').textContent='';
-}
-function normalizePhone(v){v=(v||'').replace(/[^\d+]/g,'');if(/^0\d{10}$/.test(v))v='+91'+v.slice(1);if(/^91\d{10}$/.test(v))v='+'+v;return v;}
-async function supabaseAuth(path,body){
- const r=await fetch(SUPABASE_URL+'/auth/v1/'+path,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_PUBLISHABLE_KEY,'Authorization':'Bearer '+SUPABASE_PUBLISHABLE_KEY},body:JSON.stringify(body)});
- const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.msg||data.message||data.error_description||data.error||'Supabase request failed');return data;
-}
-$('forgotPinBtn').onclick=openOtpRecovery;
-$('backPinBtn').onclick=()=>{ $('otpBox').classList.add('hidden');$('otpMsg').textContent='';showPin('unlock'); };
-$('sendOtpBtn').onclick=async()=>{
- const phone=normalizePhone($('otpPhone').value);
- if(!/^\+\d{8,15}$/.test(phone)){ $('otpMsg').textContent='❌ मोबाइल नंबर सही format में डालें, जैसे +917007373771';$('otpMsg').className='otpStatus err';return; }
- $('sendOtpBtn').disabled=true;$('otpMsg').textContent='OTP भेजा जा रहा है…';$('otpMsg').className='otpStatus';$('otpVerifyArea').classList.add('hidden');
- try{
-   // Supabase Auth REST API: phone OTP
-   await supabaseAuth('otp',{phone,create_user:false});
-   localStorage.setItem('jagesh_recovery_phone',phone);
-   $('otpVerifyArea').classList.remove('hidden');$('otpMsg').textContent='✅ OTP भेज दिया गया है। नीचे OTP डालें।';$('otpMsg').className='otpStatus ok';$('otpCode').focus();
-   let left=60; $('otpTimer').textContent='दोबारा OTP भेजने से पहले '+left+' सेकंड प्रतीक्षा करें।';
-   clearInterval(window.__otpTimer);window.__otpTimer=setInterval(()=>{left--;if(left<=0){clearInterval(window.__otpTimer);$('otpTimer').textContent='अब OTP दोबारा भेज सकते हैं।';}else $('otpTimer').textContent='दोबारा OTP भेजने से पहले '+left+' सेकंड प्रतीक्षा करें।';},1000);
- }catch(e){
-   const msg=e.message||'Supabase request failed';
-   $('otpMsg').textContent='❌ OTP नहीं भेजा गया: '+msg;
-   $('otpMsg').className='otpStatus err';
-   $('otpVerifyArea').classList.add('hidden');
- } finally{$('sendOtpBtn').disabled=false;}
-};
-$('verifyOtpBtn').onclick=async()=>{
- const phone=normalizePhone($('otpPhone').value),token=($('otpCode').value||'').replace(/\D/g,'');
- if(token.length!==6){$('otpMsg').textContent='❌ 6-digit OTP डालें';$('otpMsg').className='otpStatus err';return;}
- $('verifyOtpBtn').disabled=true;$('otpMsg').textContent='OTP verify हो रहा है…';$('otpMsg').className='otpStatus';
- try{
-   await supabaseAuth('verify',{type:'sms',phone,token});
-   otpVerified=true;clearInterval(window.__otpTimer);
-   $('otpMsg').textContent='✅ Mobile verify हो गया। अब नया 6-digit PIN नीचे keypad से बनाइए।';$('otpMsg').className='otpStatus ok';
-   $('otpBox').classList.add('hidden');pinMode='change';pinBuf='';drawPin();$('pinTitle').textContent='नया 6-digit PIN बनाइए';$('pinMsg').textContent='OTP verified — नया PIN डालें';
- }catch(e){$('otpMsg').textContent='❌ OTP गलत/expire हो गया: '+e.message;$('otpMsg').className='otpStatus err';}
- finally{$('verifyOtpBtn').disabled=false;}
-};
-document.getElementById('otpCode').addEventListener('keydown',e=>{if(e.key==='Enter')$('verifyOtpBtn').click();});
-const oldSubmitPin=submitPin;
-submitPin=async function(){
- if(pinBuf.length!==6){$('pinMsg').textContent='ठीक 6 digits का PIN डालें';return;}
- if(pinMode==='change' && otpVerified){
-   const h=await hashPin(pinBuf);localStorage.setItem(PINKEY,h);otpVerified=false;pinBuf='';$('pinLock').style.display='none';toast('✅ नया PIN सेव हो गया');return;
- }
- return oldSubmitPin();
-};
-
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e; $('installStatus').textContent='✅ App Install के लिए तैयार है।';$('installStatus').className='installstate ok';});
-window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;$('installStatus').textContent='✅ App install हो गया।';toast('App install हो गया');});
-async function installApp(){if(deferredInstallPrompt){deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;return;}toast('Chrome ⋮ → Add to Home screen / Install app चुनें');}
-if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
-
-resetForm();updateHeader();render();checkNotifications();
-// Keep the existing V9 PIN when upgrading in the same browser.
-if(!localStorage.getItem(PINKEY)){
- const oldPin=localStorage.getItem('jagesh_electronic_pin_hash_v1');
- if(oldPin)localStorage.setItem(PINKEY,oldPin);
-}
-if(localStorage.getItem(PINKEY))showPin('unlock');else showPin('setup');
-</script>
-</body>
-</html>
+ if(!rem){toast('Reminder date चुनें');return}
+ let x={id,name:$('name').value.trim(),phone:$('phone').value.trim(),appliance:$('appliance').value,workType:$('workType').value,address:$('address').value.trim(),serviceDate:$('serviceDate').value,reminderDate:rem,note:$('note').value.trim(),payment:$('payment').value||'0',paymentStatus:$('paymentStatus').value,paymentMethod:$('paymentMethod').value,lat:$('lat').value||'',lng:$('lng').value||'',done:old?old.done:false,updatedAt:new Date().toISOString()};
+ let i=state.cu

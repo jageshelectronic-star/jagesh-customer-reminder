@@ -213,6 +213,7 @@ const KEY='jagesh_electronic_pro_v2';
 let state=JSON.parse(localStorage.getItem(KEY)||'null')||{customers:[],recycleBin:[],settings:{address:'',phone:'',waPhone:'',backupEmail:'jageshelectronic@gmail.com',template:'नमस्ते {name} जी 🙏\\nJAGESH ELECTRONIC की तरफ से याद दिलाना है कि आपके {appliance} की सर्विस का समय हो गया है।\\nकृपया सुविधानुसार समय बताएं।\\nधन्यवाद।\\n- JAGESH ELECTRONIC'}};
 if(!Array.isArray(state.recycleBin))state.recycleBin=[];
 state.settings=Object.assign({address:'',phone:'',waPhone:'',backupEmail:'jageshelectronic@gmail.com',template:''},state.settings);
+state.customers=(Array.isArray(state.customers)?state.customers:[]).map(c=>{c.history=Array.isArray(c.history)?c.history:[];c.workType=c.workType||'';c.paymentMethod=c.paymentMethod||'';c.paymentStatus=c.paymentStatus||'';c.amount=c.amount||'';return c;});
 const $=id=>document.getElementById(id);
 const today=()=>new Date().toISOString().slice(0,10);
 function persist(){localStorage.setItem(KEY,JSON.stringify(state));render();updateHeader()}
@@ -238,9 +239,29 @@ $('customerForm').onsubmit=e=>{
  let rem=$('interval').value==='custom'?$('customDate').value:addMonths($('serviceDate').value,$('interval').value);
  if($('interval').value==='custom' && !$('customDate').value){toast('Custom Reminder के लिए पहले तारीख चुनें');$('customDate').focus();return}
  if(!rem){toast('Reminder date चुनें');return}
- let x={id,name:$('name').value.trim(),phone:$('phone').value.trim(),appliance:$('appliance').value,address:$('address').value.trim(),serviceDate:$('serviceDate').value,reminderDate:rem,note:$('note').value.trim(),lat:$('lat').value||'',lng:$('lng').value||'',done:old?old.done:false};
+ let history=Array.isArray(old?.history)?old.history:[];
+ let entry={
+   date:$('serviceDate').value,
+   reminderDate:rem,
+   workType:$('workType')?.value||'',
+   note:$('note').value.trim(),
+   paymentMethod:$('paymentMethod')?.value||'',
+   paymentStatus:$('paymentStatus')?.value||'',
+   amount:$('amount')?.value||'',
+   updatedAt:new Date().toISOString()
+ };
+ if(!old || JSON.stringify(history[history.length-1]||{})!==JSON.stringify(entry)) history.push(entry);
+ let x={
+   id,name:$('name').value.trim(),phone:$('phone').value.trim(),appliance:$('appliance').value,
+   workType:$('workType')?.value||'',address:$('address').value.trim(),
+   serviceDate:$('serviceDate').value,reminderDate:rem,note:$('note').value.trim(),
+   lat:$('lat').value||'',lng:$('lng').value||'',done:old?old.done:false,
+   paymentMethod:$('paymentMethod')?.value||'',paymentStatus:$('paymentStatus')?.value||'',
+   amount:$('amount')?.value||'',customReminderDate:$('customDate')?.value||'',
+   history
+ };
  let i=state.customers.findIndex(a=>a.id===id);if(i>=0)state.customers[i]=x;else state.customers.push(x);
- persist();resetForm();openTab('customers');toast('Customer और Reminder सेव हो गया');
+ persist();resetForm();openTab('customers');toast('Customer, Work और Reminder सेव हो गया');
 };
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function waDigits(p){let d=String(p||'').replace(/\D/g,'');return d.length===10?'91'+d:d}
@@ -253,9 +274,15 @@ function markDone(id){let x=state.customers.find(x=>x.id===id);if(x){x.done=true
 function markPending(id){let x=state.customers.find(x=>x.id===id);if(x){x.done=false;persist();}}
 function editCustomer(id){
  let x=state.customers.find(x=>x.id===id);if(!x)return;openTab('add');
- $('editId').value=x.id;$('name').value=x.name;$('phone').value=x.phone;$('appliance').value=x.appliance;$('address').value=x.address;$('serviceDate').value=x.serviceDate;$('note').value=x.note;$('lat').value=x.lat||'';$('lng').value=x.lng||'';
- let custom=['1','2','3','6','12'].find(n=>addMonths(x.serviceDate,n)===x.reminderDate);
- $('interval').value=custom||'custom';$('customBox').classList.toggle('hidden',!!custom);if(!custom)$('customDate').value=x.reminderDate;
+ $('editId').value=x.id;$('name').value=x.name||'';$('phone').value=x.phone||'';$('appliance').value=x.appliance||'AC';
+ if(window.JageshWorkTypes)JageshWorkTypes.update(x.workType||'');
+ $('workType').value=x.workType||'';$('address').value=x.address||'';$('serviceDate').value=x.serviceDate||today();
+ $('note').value=x.note||'';$('lat').value=x.lat||'';$('lng').value=x.lng||'';
+ if($('paymentMethod'))$('paymentMethod').value=x.paymentMethod||'';
+ if($('paymentStatus'))$('paymentStatus').value=x.paymentStatus||'';
+ if($('amount'))$('amount').value=x.amount||'';
+ let custom=['1','2','3','6','12'].find(n=>addMonths($('serviceDate').value,n)===x.reminderDate);
+ $('interval').value=custom||'custom';$('customBox').classList.toggle('hidden',!!custom);if(!custom)$('customDate').value=x.reminderDate||'';
  $('coords').textContent=x.lat&&x.lng?'✅ Saved: '+x.lat+', '+x.lng:'Location अभी सेव नहीं है';$('navPreview').classList.toggle('hidden',!(x.lat&&x.lng));$('formTitle').textContent='✏️ Customer Edit';
 }
 function removeCustomer(id){
@@ -272,10 +299,12 @@ function removeCustomer(id){
 }
 function item(x){
  let s=status(x),label=s==='overdue'?'🔴 Overdue':s==='today'?'🟠 आज':s==='done'?'✅ Done':'🟢 Upcoming';
+ let hist=Array.isArray(x.history)?x.history:[];
  return `<div class="item ${s}">
- <div class="itemtop"><div><div class="name">${esc(x.name)}</div><div class="meta">📱 ${esc(x.phone)} · 🔧 ${esc(x.appliance)}</div></div><div class="date">${fmt(x.reminderDate)}</div></div>
+ <div class="itemtop"><div><div class="name">${esc(x.name)}</div><div class="meta">📱 ${esc(x.phone)} · 🔧 ${esc(x.appliance)}${x.workType?' · '+esc(x.workType):''}</div></div><div class="date">${fmt(x.reminderDate)}</div></div>
  <span class="pill">${label}</span>
  ${x.note?'<div class="meta">📝 '+esc(x.note)+'</div>':''}
+ ${x.paymentStatus?'<div class="meta">💳 '+esc(x.paymentMethod||'')+' · '+esc(x.paymentStatus)+(x.amount?' · ₹'+esc(x.amount):'')+'</div>':''}
  ${x.address?'<div class="meta">🏠 '+esc(x.address)+'</div>':''}
  ${x.lat&&x.lng?'<div class="meta">📍 GPS Saved</div>':'<div class="meta">📍 GPS Not Saved</div>'}
  <div class="actions">
@@ -283,6 +312,7 @@ function item(x){
   <button class="btn greenbtn small" onclick='whatsapp(${JSON.stringify(x)})'>💬 WhatsApp</button>
   <button class="btn bluebtn small" onclick='sms(${JSON.stringify(x)})'>✉️ SMS</button>
   <button class="btn bluebtn small" onclick='navigate(${JSON.stringify(x)})'>🗺️ Navigate</button>
+  <button class="btn secondary small" onclick="showHistory('${x.id}')">📜 History (${hist.length})</button>
   ${s==='done'?'<button class="btn secondary small" onclick="markPending(\''+x.id+'\')">↩️ Pending</button>':'<button class="btn secondary small" onclick="markDone(\''+x.id+'\')">✅ Done</button>'}
   <button class="btn secondary small" onclick="editCustomer('${x.id}')">✏️ Edit</button>
   <button class="btn danger small" onclick="removeCustomer('${x.id}')">🗑️</button>
@@ -294,6 +324,23 @@ function renderCustomers(){
  $('customerList').innerHTML=arr.length?arr.map(item).join(''):'<div class="empty">कोई Customer नहीं मिला।</div>';
 }
 $('search').oninput=renderCustomers;$('filter').onchange=renderCustomers;
+function showHistory(id){
+ let x=state.customers.find(c=>c.id===id);if(!x)return;
+ let h=Array.isArray(x.history)?x.history:[];
+ let m=document.getElementById('historyModal');if(m)m.remove();
+ m=document.createElement('div');m.id='historyModal';
+ m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:99998;overflow:auto;padding:18px';
+ m.innerHTML='<div style="max-width:650px;margin:35px auto;background:#111827;color:#fff;border:1px solid #334155;border-radius:20px;padding:20px">'+
+ '<div style="display:flex;justify-content:space-between;align-items:center"><h2>📜 '+esc(x.name)+' की Customer History</h2><button onclick="document.getElementById(\'historyModal\').remove()">✕</button></div>'+
+ (h.length?h.slice().reverse().map((v,i)=>'<div style="padding:12px;border:1px solid #334155;border-radius:12px;margin:9px 0">'+
+ '📅 Service: <b>'+esc(fmt(v.date||''))+'</b><br>'+
+ (v.workType?'🔧 Work: '+esc(v.workType)+'<br>':'')+
+ (v.reminderDate?'🔔 Next Reminder: '+esc(fmt(v.reminderDate))+'<br>':'')+
+ (v.paymentStatus?'💳 Payment: '+esc(v.paymentMethod||'')+' · '+esc(v.paymentStatus)+(v.amount?' · ₹'+esc(v.amount):'')+'<br>':'')+
+ (v.note?'📝 '+esc(v.note):'')+'</div>').join(''):'<p>इस Customer की अभी कोई History नहीं है।</p>')+
+ '<button onclick="document.getElementById(\'historyModal\').remove()" style="width:100%;padding:12px;margin-top:8px">Close</button></div>';
+ document.body.appendChild(m);
+}
 function renderDashboard(){
  let t=state.customers.filter(x=>!x.done&&x.reminderDate===today()).length,o=state.customers.filter(x=>!x.done&&x.reminderDate<today()).length,u=state.customers.filter(x=>!x.done&&x.reminderDate>today()).length;
  $('todayN').textContent=t;$('overdueN').textContent=o;$('upcomingN').textContent=u;$('totalN').textContent=state.customers.length;
@@ -304,20 +351,75 @@ function render(){renderDashboard();renderCustomers();checkDueNotifications()}
 function saveSettings(){state.settings.address=$('bizAddress').value.trim();state.settings.phone=$('bizPhone').value.trim();state.settings.waPhone=$('waPhone').value.trim();state.settings.backupEmail=$('backupEmail').value.trim();state.settings.template=$('msgTemplate').value;persist();toast('Settings सेव हो गई');}
 async function requestNotifications(){if(!('Notification'in window)){toast('इस browser में notification उपलब्ध नहीं है');return}let p=await Notification.requestPermission();toast(p==='granted'?'Browser Notification ON हो गई':'Notification permission नहीं मिली');}
 function checkDueNotifications(){if(!('Notification'in window)||Notification.permission!=='granted')return;let due=state.customers.filter(x=>!x.done&&x.reminderDate<=today());if(due.length)new Notification('JAGESH ELECTRONIC',{body:'आज/Overdue Reminder: '+due.length+' Customer'});}
-function makeBackupFile(){return new File([JSON.stringify(state,null,2)],'JAGESH_ELECTRONIC_backup.json',{type:'application/json'})}
-function exportData(){let f=makeBackupFile(),a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);toast('Backup file सेव हो गई');}
+function makeBackupObject(){
+ return {
+   format:'JAGESH-ELECTRONIC-BACKUP',
+   version:9,
+   exportedAt:new Date().toISOString(),
+   customers:state.customers||[],
+   recycleBin:state.recycleBin||[],
+   settings:state.settings||{}
+ };
+}
+function makeBackupFile(){
+ return new File([JSON.stringify(makeBackupObject(),null,2)],'JAGESH_ELECTRONIC_backup.json',{type:'application/json'});
+}
+function exportData(){
+ let f=makeBackupFile(),a=document.createElement('a');
+ a.href=URL.createObjectURL(f);a.download=f.name;a.click();
+ setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+ toast('Backup file सेव हो गई — Customer History भी शामिल है');
+}
 async function emailBackup(){
  let email=state.settings.backupEmail||'jageshelectronic@gmail.com',f=makeBackupFile();
  if(navigator.canShare && navigator.canShare({files:[f]})){
-   try{await navigator.share({title:'JAGESH ELECTRONIC Backup',text:'Customer Reminder Backup',files:[f]});toast('Share खुल गया — Gmail चुनकर भेज दें');return}catch(e){}
+   try{await navigator.share({title:'JAGESH ELECTRONIC Backup',text:'Customer Reminder Backup — History सहित',files:[f]});toast('Share खुल गया — Gmail चुनकर भेज दें');return}catch(e){}
  }
  exportData();
  let subject=encodeURIComponent('JAGESH ELECTRONIC Customer Backup');
- let body=encodeURIComponent('नमस्ते,\n\nJAGESH ELECTRONIC Customer Reminder का backup file attach करके भेज रहा हूँ।\n\nBackup Email: '+email);
+ let body=encodeURIComponent('Customer Reminder backup — file download हुई है, Gmail में attach करके भेजें।');
  window.location.href='mailto:'+encodeURIComponent(email)+'?subject='+subject+'&body='+body;
- toast('Backup download हो गया। Gmail में file attach करके भेजें।');
 }
-$('importFile').onchange=e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{state=JSON.parse(r.result);persist();toast('Backup Import हो गया')}catch{toast('Backup file गलत है')}};r.readAsText(f)};
+function normalizeCustomer(c){
+ c=c||{};
+ c.id=String(c.id||Date.now()+Math.random());
+ c.history=Array.isArray(c.history)?c.history:(Array.isArray(c.serviceHistory)?c.serviceHistory:(Array.isArray(c.historyList)?c.historyList:[]));
+ c.workType=c.workType||c.work||'';
+ c.paymentMethod=c.paymentMethod||'';
+ c.paymentStatus=c.paymentStatus||'';
+ c.amount=c.amount||'';
+ return c;
+}
+function importBackupObject(raw){
+ let incoming=raw;
+ if(raw && raw.data && (raw.data.customers||raw.data.state)) incoming=raw.data;
+ if(raw && raw.state) incoming=raw.state;
+ let customers=Array.isArray(incoming?.customers)?incoming.customers:[];
+ if(!customers.length && Array.isArray(incoming)) customers=incoming;
+ if(!customers.length) throw new Error('Backup में Customer data नहीं मिला');
+ customers=customers.map(normalizeCustomer);
+ let oldSettings=state.settings||{};
+ state={
+   customers,
+   recycleBin:Array.isArray(incoming.recycleBin)?incoming.recycleBin:[],
+   settings:Object.assign({address:'',phone:'',waPhone:'',backupEmail:'jageshelectronic@gmail.com',template:''},oldSettings,incoming.settings||{})
+ };
+ state.customers.forEach(normalizeCustomer);
+ persist();
+}
+$('importFile').onchange=e=>{
+ let f=e.target.files[0];if(!f)return;
+ let r=new FileReader();
+ r.onload=()=>{
+  try{
+    let raw=JSON.parse(r.result);
+    importBackupObject(raw);
+    toast('Backup Restore हो गया — Customer History सहित');
+    setTimeout(()=>openTab('customers'),200);
+  }catch(err){toast('Backup restore नहीं हुआ: '+(err.message||'File गलत है'))}
+ };
+ r.readAsText(f);
+};
 
 let deferredInstallPrompt=null;
 window.addEventListener('beforeinstallprompt',e=>{
@@ -436,85 +538,77 @@ window.addEventListener('load',()=>show(localStorage.getItem(K)?'unlock':'setup'
 
 
 
-<script id="jagesh-final-v8-recycle">
+
+
+<script id="jagesh-final-v9-recycle">
 (function(){
- const PIN='jagesh_recycle_pin_v8';
- const getBin=()=>Array.isArray(state.recycleBin)?state.recycleBin:[];
- const save=()=>{if(typeof persist==='function')persist();else localStorage.setItem(KEY,JSON.stringify(state));};
- const hash=p=>{let h=2166136261;for(const c of p){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return (h>>>0).toString(16)};
- function pinDialog(mode,done){
-   let m=document.getElementById('recyclePinModal');
-   if(m)m.remove();
+ const PINKEY='jagesh_electronic_pin_hash_v1';
+ const PIN_SALT='JAGESH-ELECTRONIC-PIN-V1';
+ const hash=async p=>{
+   const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(PIN_SALT+'|'+p));
+   return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
+ };
+ function askPin(done){
+   if(!localStorage.getItem(PINKEY)){toast('पहले App का 6-digit PIN सेट करें');return;}
+   let m=document.getElementById('recyclePinModal');if(m)m.remove();
    m=document.createElement('div');m.id='recyclePinModal';
-   m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:100000;display:flex;align-items:center;justify-content:center;padding:20px';
-   m.innerHTML='<div style="background:#111827;color:#fff;border:1px solid #374151;border-radius:20px;padding:24px;width:min(360px,100%);text-align:center">'+
-   '<h2>🔐 Recycle Bin PIN</h2><p>'+(mode==='setup'?'नया 6-digit PIN बनाएं':'अपना 6-digit PIN डालें')+'</p>'+
-   '<input id="rp1" inputmode="numeric" maxlength="6" type="password" placeholder="6-digit PIN" style="width:100%;box-sizing:border-box;padding:14px;font-size:22px;letter-spacing:7px;text-align:center;border-radius:12px">'+
-   '<input id="rp2" inputmode="numeric" maxlength="6" type="password" placeholder="PIN दोबारा" style="'+(mode==='setup'?'':'display:none;')+';width:100%;box-sizing:border-box;padding:14px;font-size:22px;letter-spacing:7px;text-align:center;border-radius:12px;margin-top:10px">'+
-   '<div id="rpe" style="color:#fca5a5;min-height:22px;margin-top:8px"></div>'+
-   '<button id="rpo" style="width:100%;padding:13px;border-radius:12px;margin-top:8px">✓ OK</button>'+
-   '<button id="rpc" style="width:100%;padding:11px;border-radius:12px;margin-top:8px">Cancel</button></div>';
+   m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:100000;display:flex;align-items:center;justify-content:center;padding:20px';
+   m.innerHTML='<div style="width:min(360px,100%);background:#111827;color:#fff;border:1px solid #334155;border-radius:20px;padding:22px;text-align:center">'+
+   '<h2>🔐 Recycle Bin</h2><p>अपना App वाला 6-digit PIN डालें</p>'+
+   '<input id="rbpin" inputmode="numeric" maxlength="6" type="password" style="width:100%;box-sizing:border-box;padding:14px;font-size:24px;letter-spacing:8px;text-align:center;border-radius:12px">'+
+   '<div id="rbpinerr" style="min-height:24px;color:#fca5a5;margin:8px"></div>'+
+   '<button id="rbok" style="width:100%;padding:13px;border-radius:12px">✓ Unlock</button>'+
+   '<button id="rbcancel" style="width:100%;padding:11px;margin-top:8px;border-radius:12px">Cancel</button></div>';
    document.body.appendChild(m);
-   const p1=m.querySelector('#rp1'),p2=m.querySelector('#rp2'),err=m.querySelector('#rpe');
-   m.querySelector('#rpc').onclick=()=>m.remove();
-   m.querySelector('#rpo').onclick=()=>{
-     const p=p1.value;
-     if(!/^\d{6}$/.test(p)){err.textContent='ठीक 6 digits का PIN डालें';return}
-     if(mode==='setup'&&p2.value!==p){err.textContent='दोनों PIN समान नहीं हैं';return}
-     if(mode==='unlock'&&hash(p)!==localStorage.getItem(PIN)){err.textContent='गलत PIN';p1.value='';return}
-     localStorage.setItem(PIN,hash(p));m.remove();done(true);
+   const inp=m.querySelector('#rbpin'),err=m.querySelector('#rbpinerr');
+   m.querySelector('#rbcancel').onclick=()=>m.remove();
+   m.querySelector('#rbok').onclick=async()=>{
+     if(!/^\d{6}$/.test(inp.value)){err.textContent='ठीक 6 digits का PIN डालें';return}
+     if(await hash(inp.value)!==localStorage.getItem(PINKEY)){err.textContent='गलत PIN';inp.value='';return}
+     m.remove();done();
    };
-   setTimeout(()=>p1.focus(),50);
+   setTimeout(()=>inp.focus(),60);
  }
- function auth(done){
-   if(localStorage.getItem(PIN))pinDialog('unlock',done);
-   else pinDialog('setup',done);
- }
- window.openRecycleBin=function(){auth(render)};
- window.setRecyclePin=function(){auth(()=>alert('Recycle Bin PIN सेव हो गया।'))};
+ window.openRecycleBin=function(){askPin(render)};
  window.renderRecycleBin=render;
- function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
- function render(){
-   if(!Array.isArray(state.recycleBin))state.recycleBin=[];
-   let box=document.getElementById('recycleBinView');
-   if(!box){box=document.createElement('div');box.id='recycleBinView';document.body.appendChild(box)}
-   box.style.cssText='position:fixed;inset:0;background:#080b10;color:#fff;z-index:99999;overflow:auto;padding:18px';
-   const a=state.recycleBin;
-   box.innerHTML='<div style="max-width:700px;margin:auto">'+
-   '<h2>🗑️ Recycle Bin</h2><p>Deleted Customers: <b>'+a.length+'</b></p>'+
-   '<button onclick="setRecyclePin()">🔐 Change PIN</button> '+
-   '<button onclick="emptyRecycle()" style="background:#b91c1c;color:#fff">🗑️ Empty</button> '+
-   '<button onclick="this.parentElement.parentElement.remove()">✕ Close</button><hr>'+
-   (a.length?a.map((r,i)=>{const d=r.data||r;return '<div style="padding:14px;border:1px solid #334155;border-radius:14px;margin:10px 0;background:#111827">'+
-   '<b style="font-size:18px">'+esc(d.name||'Customer')+'</b><br>📱 '+esc(d.phone||'')+
-   '<br>🔧 '+esc(d.appliance||'')+'<br><small>Deleted: '+esc(r.deletedAt||'')+'</small><br><br>'+
-   '<button onclick="restoreRecycle('+i+')">↩️ Restore</button> '+
-   '<button onclick="permanentDeleteRecycle('+i+')" style="background:#b91c1c;color:#fff">🗑️ Permanently Delete</button></div>'}).join(''):'<p style="opacity:.8">Recycle Bin अभी खाली है।</p>')+
-   '</div>';
- }
  window.restoreRecycle=function(i){
-   auth(()=>{
+   askPin(()=>{
      const r=state.recycleBin[i];if(!r)return;
      const d=JSON.parse(JSON.stringify(r.data||r));
+     normalizeCustomer(d);
      if(!state.customers.some(c=>c.id===d.id))state.customers.push(d);
-     state.recycleBin.splice(i,1);save();render();alert('Customer वापस restore हो गया।');
+     state.recycleBin.splice(i,1);persist();render();toast('Customer Restore हो गया');
    });
  };
  window.permanentDeleteRecycle=function(i){
-   auth(()=>{
-     if(!state.recycleBin[i])return;
+   askPin(()=>{
      if(confirm('यह Customer हमेशा के लिए delete हो जाएगा। Continue?')){
-       state.recycleBin.splice(i,1);save();render();
+       state.recycleBin.splice(i,1);persist();render();toast('Permanently deleted');
      }
    });
  };
  window.emptyRecycle=function(){
-   auth(()=>{
+   askPin(()=>{
      if(confirm('Recycle Bin के सभी Customers permanently delete करें?')){
-       state.recycleBin=[];save();render();
+       state.recycleBin=[];persist();render();toast('Recycle Bin खाली हो गया');
      }
    });
  };
+ function render(){
+   if(!Array.isArray(state.recycleBin))state.recycleBin=[];
+   let box=document.getElementById('recycleBinView');if(box)box.remove();
+   box=document.createElement('div');box.id='recycleBinView';
+   box.style.cssText='position:fixed;inset:0;background:#080b10;color:#fff;z-index:99999;overflow:auto;padding:18px';
+   const a=state.recycleBin;
+   box.innerHTML='<div style="max-width:700px;margin:auto"><div style="display:flex;justify-content:space-between;align-items:center"><h2>🗑️ Recycle Bin</h2><button onclick="document.getElementById(\'recycleBinView\').remove()">✕ Close</button></div>'+
+   '<p>Deleted Customers: <b>'+a.length+'</b></p><hr>'+
+   (a.length?a.map((r,i)=>{const d=r.data||r;return '<div style="padding:14px;border:1px solid #334155;border-radius:14px;margin:10px 0;background:#111827">'+
+   '<b style="font-size:18px">'+esc(d.name||'Customer')+'</b><br>📱 '+esc(d.phone||'')+'<br>🔧 '+esc(d.appliance||'')+(d.workType?' · '+esc(d.workType):'')+
+   '<br><small>Deleted: '+esc(r.deletedAt||'')+'</small><br><br>'+
+   '<button onclick="restoreRecycle('+i+')">↩️ Restore</button> <button onclick="permanentDeleteRecycle('+i+')" style="background:#b91c1c;color:#fff">🗑️ Permanently Delete</button></div>'}).join(''):'<p style="opacity:.8">Recycle Bin अभी खाली है।</p>')+
+   '<button onclick="emptyRecycle()" style="background:#b91c1c;color:#fff;width:100%;padding:12px;margin-top:12px">🧹 Empty Recycle Bin</button></div>';
+   document.body.appendChild(box);
+ }
 })();
 </script>
 </body>

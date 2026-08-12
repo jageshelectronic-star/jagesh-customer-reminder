@@ -1,8 +1,0 @@
-FINAL V6 — Recycle Bin Fix
-- Separate 6-digit Recycle Bin PIN: first use asks to create it, later use asks for it.
-- Recycle Bin storage is persistent in localStorage.
-- Restore / Permanent Delete / Empty require the Recycle Bin PIN where appropriate.
-- Added explicit moveCustomerToRecycleBin / JageshMoveToRecycleBin helpers.
-- Cache bumped to v6.
-
-IMPORTANT: Replace index.html and sw.js in GitHub Pages. Clear site data/remove old PWA if old version remains.

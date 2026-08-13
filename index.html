@@ -1,1294 +1,581 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="hi">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0f172a">
-<title>JAGESH ELECTRONIC – Customer Reminder</title>
-
-<style>
-*{box-sizing:border-box}
-
-html,body{
-    margin:0;
-    min-height:100%;
-    font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-    background:#f1f5f9;
-    color:#0f172a;
-}
-
-body{
-    overflow-x:hidden;
-}
-
-.app{
-    width:100%;
-    max-width:900px;
-    margin:auto;
-    padding:10px;
-}
-
-.card{
-    background:#fff;
-    border-radius:18px;
-    padding:16px;
-    margin:10px 0;
-    box-shadow:0 3px 15px rgba(15,23,42,.10);
-}
-
-.logo{
-    display:flex;
-    align-items:center;
-    gap:12px;
-}
-
-.logo img{
-    width:55px;
-    height:55px;
-    object-fit:contain;
-    border-radius:12px;
-    background:#fff;
-}
-
-.logo h2{
-    margin:0;
-    font-size:21px;
-}
-
-input,select,button{
-    width:100%;
-    min-height:46px;
-    border:1px solid #cbd5e1;
-    border-radius:11px;
-    padding:10px 12px;
-    font-size:16px;
-    margin-top:9px;
-    outline:none;
-}
-
-input:focus,select:focus{
-    border-color:#2563eb;
-    box-shadow:0 0 0 3px rgba(37,99,235,.10);
-}
-
-button{
-    background:#0f172a;
-    color:#fff;
-    border:0;
-    cursor:pointer;
-    font-weight:600;
-}
-
-button:active{
-    transform:scale(.98);
-}
-
-.secondary{
-    background:#e2e8f0;
-    color:#0f172a;
-}
-
-.successBtn{
-    background:#15803d;
-}
-
-.danger{
-    background:#b91c1c;
-}
-
-.warning{
-    background:#d97706;
-}
-
-.blue{
-    background:#2563eb;
-}
-
-.green{
-    background:#16a34a;
-}
-
-.grid{
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:8px;
-}
-
-.hidden{
-    display:none!important;
-}
-
-.muted{
-    color:#64748b;
-    font-size:14px;
-}
-
-.error{
-    color:#b91c1c;
-    margin-top:9px;
-    font-size:14px;
-    font-weight:600;
-}
-
-.success{
-    color:#15803d;
-    margin-top:9px;
-    font-size:14px;
-    font-weight:600;
-}
-
-.otp{
-    letter-spacing:8px;
-    text-align:center;
-    font-size:24px;
-}
-
-.tabs{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:7px;
-    margin:10px 0;
-}
-
-.tabs button{
-    margin:0;
-    min-height:44px;
-    font-size:14px;
-}
-
-.list{
-    border:1px solid #e2e8f0;
-    border-radius:13px;
-    padding:13px;
-    margin:9px 0;
-    background:#fff;
-}
-
-.row{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:8px;
-}
-
-.small{
-    width:auto;
-    min-height:38px;
-    padding:7px 12px;
-    font-size:14px;
-    margin:4px 2px 0 0;
-}
-
-.statGrid{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:8px;
-    margin:10px 0;
-}
-
-.stat{
-    background:#f8fafc;
-    border:1px solid #e2e8f0;
-    border-radius:13px;
-    padding:12px;
-    text-align:center;
-}
-
-.stat strong{
-    display:block;
-    font-size:24px;
-    margin-bottom:3px;
-}
-
-.badge{
-    display:inline-block;
-    padding:4px 8px;
-    border-radius:20px;
-    font-size:12px;
-    font-weight:700;
-    background:#e2e8f0;
-}
-
-.badge.today{
-    background:#fee2e2;
-    color:#b91c1c;
-}
-
-.badge.soon{
-    background:#fef3c7;
-    color:#92400e;
-}
-
-.badge.ok{
-    background:#dcfce7;
-    color:#166534;
-}
-
-.customerTitle{
-    font-size:18px;
-    font-weight:700;
-    margin-bottom:3px;
-}
-
-.info{
-    line-height:1.65;
-    font-size:14px;
-}
-
-.actions{
-    display:flex;
-    flex-wrap:wrap;
-    gap:5px;
-    margin-top:8px;
-}
-
-.actions button{
-    flex:1;
-    min-width:100px;
-}
-
-.empty{
-    text-align:center;
-    padding:25px 10px;
-    color:#64748b;
-}
-
-hr{
-    border:0;
-    border-top:1px solid #e2e8f0;
-    margin:14px 0;
-}
-
-@media(max-width:600px){
-    .app{
-        padding:7px;
-    }
-
-    .card{
-        padding:12px;
-        border-radius:15px;
-    }
-
-    .grid{
-        grid-template-columns:1fr;
-    }
-
-    .statGrid{
-        grid-template-columns:repeat(3,1fr);
-    }
-
-    .stat{
-        padding:9px 5px;
-    }
-
-    .stat strong{
-        font-size:20px;
-    }
-
-    .logo h2{
-        font-size:18px;
-    }
-
-    .actions button{
-        min-width:90px;
-    }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jagesh Electronic Dashboard PRO</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
+    </style>
 </head>
+<body class="bg-gray-100 min-h-screen">
 
-<body>
-
-<div class="app">
-
-<!-- LOGIN -->
-<div id="login" class="card">
-
-    <div class="logo">
-        <img src="logo.jpg" onerror="this.style.display='none'">
-        <div>
-            <h2>JAGESH ELECTRONIC</h2>
-            <div class="muted">Customer Reminder</div>
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="flex flex-col items-center justify-center min-h-screen px-4">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm text-center">
+            <div class="flex justify-center mb-4 text-blue-600"><i data-lucide="zap" class="w-16 h-16"></i></div>
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">JAGESH ELECTRONIC</h1>
+            <p class="text-gray-500 mb-6 text-sm">आगे बढ़ने के लिए 6-अंकों का पिन दर्ज करें</p>
+            <input type="password" id="pinInput" maxlength="6" placeholder="••••••" class="w-full text-center text-3xl tracking-widest border-2 border-gray-300 rounded-xl p-3 mb-4 focus:outline-none focus:border-blue-500">
+            <button onclick="checkPin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold p-3 rounded-xl transition">लॉगिन करें</button>
+            <p id="loginError" class="text-red-500 text-sm mt-3 hidden">गलत पिन! कृपया दोबारा प्रयास करें।</p>
         </div>
     </div>
 
-    <div id="pinBox">
+    <!-- MAIN APP SCREEN -->
+    <div id="appScreen" class="hidden">
+        <nav class="bg-blue-600 text-white p-4 shadow-md sticky top-0 z-50">
+            <div class="max-w-6xl mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-2 font-bold text-xl"><i data-lucide="zap"></i> JAGESH ELECTRONIC</div>
+                <div class="flex items-center gap-3">
+                    <button onclick="openRecycleBinSecure()" class="hover:bg-blue-700 p-2 rounded-lg transition relative">
+                        <i data-lucide="trash-2"></i>
+                        <span id="binCountBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+                    </button>
+                    <button onclick="openSettings()" class="hover:bg-blue-700 p-2 rounded-lg transition"><i data-lucide="settings"></i></button>
+                    <button onclick="logout()" class="hover:bg-blue-700 p-2 rounded-lg transition"><i data-lucide="log-out"></i></button>
+                </div>
+            </div>
+        </nav>
 
-        <input
-            id="pin"
-            inputmode="numeric"
-            maxlength="6"
-            type="password"
-            placeholder="6-digit PIN"
-            autocomplete="off"
-        >
-
-        <button onclick="loginPin()">🔐 Login</button>
-
-        <button class="secondary" onclick="forgot()">
-            PIN भूल गए?
-        </button>
-
-    </div>
-
-    <div id="forgotBox" class="hidden">
-
-        <h3>🔐 PIN Recovery</h3>
-
-        <div class="muted">
-            Registered Email पर 6-digit OTP भेजें।
-        </div>
-
-        <input
-            id="email"
-            type="email"
-            value="jageshelectronic@gmail.com"
-            readonly
-            style="background:#f1f5f9;color:#64748b;font-weight:bold;"
-        >
-
-        <button onclick="sendOtp()">📩 Send OTP</button>
-
-        <div id="otpArea" class="hidden">
-
-            <input
-                id="otp"
-                class="otp"
-                inputmode="numeric"
-                maxlength="6"
-                placeholder="6-digit OTP"
-            >
-
-            <button onclick="verifyOtp()">Verify OTP</button>
-
-            <button
-                id="resend"
-                class="secondary"
-                onclick="sendOtp()"
-                disabled
-            >
-                Resend OTP (60)
-            </button>
-
-            <div id="otpMsg"></div>
-
-        </div>
-
-        <div id="newPin" class="hidden">
-
-            <input
-                id="np1"
-                type="password"
-                inputmode="numeric"
-                maxlength="6"
-                placeholder="नया 6-digit PIN"
-            >
-
-            <input
-                id="np2"
-                type="password"
-                inputmode="numeric"
-                maxlength="6"
-                placeholder="PIN दोबारा डालें"
-            >
-
-            <button onclick="savePin()">
-                नया PIN सेव करें
-            </button>
-
-        </div>
-
-        <button class="secondary" onclick="backLogin()">
-            ← वापस Login
-        </button>
-
-    </div>
-
-    <div id="loginMsg" class="error"></div>
-
-</div>
-
-
-<!-- MAIN APP -->
-<div id="mainApp" class="hidden">
-
-    <!-- HEADER -->
-    <div class="card">
-
-        <div class="logo">
-
-            <img src="logo.jpg" onerror="this.style.display='none'">
-
-            <div>
-                <h2>JAGESH ELECTRONIC</h2>
-                <div class="muted">
-                    Customer Reminder Dashboard
+        <main class="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
+            <!-- COUNTERS -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div onclick="filterCustomers('all')" class="bg-white p-4 rounded-xl shadow cursor-pointer border-l-4 border-blue-500 hover:shadow-md transition">
+                    <div class="flex justify-between items-center text-blue-500 mb-2"><i data-lucide="users"></i><span class="text-xs font-bold text-gray-400">कुल ग्राहक</span></div>
+                    <div id="countAll" class="text-2xl font-bold text-gray-800">0</div>
+                </div>
+                <div onclick="filterCustomers('today')" class="bg-white p-4 rounded-xl shadow cursor-pointer border-l-4 border-green-500 hover:shadow-md transition">
+                    <div class="flex justify-between items-center text-green-500 mb-2"><i data-lucide="bell"></i><span class="text-xs font-bold text-gray-400">आज के रिमाइंडर्स</span></div>
+                    <div id="countToday" class="text-2xl font-bold text-gray-800">0</div>
+                </div>
+                <div onclick="filterCustomers('overdue')" class="bg-white p-4 rounded-xl shadow cursor-pointer border-l-4 border-red-500 hover:shadow-md transition">
+                    <div class="flex justify-between items-center text-red-500 mb-2"><i data-lucide="alert-triangle"></i><span class="text-xs font-bold text-gray-400">ओवरड्यू</span></div>
+                    <div id="countOverdue" class="text-2xl font-bold text-gray-800">0</div>
+                </div>
+                <div onclick="filterCustomers('upcoming')" class="bg-white p-4 rounded-xl shadow cursor-pointer border-l-4 border-yellow-500 hover:shadow-md transition">
+                    <div class="flex justify-between items-center text-yellow-500 mb-2"><i data-lucide="calendar"></i><span class="text-xs font-bold text-gray-400">आने वाले ग्राहक</span></div>
+                    <div id="countUpcoming" class="text-2xl font-bold text-gray-800">0</div>
                 </div>
             </div>
 
-        </div>
+            <div class="flex justify-between items-center">
+                <h2 id="listTitle" class="text-xl font-bold text-gray-800">सभी ग्राहकों की सूची</h2>
+                <button onclick="toggleForm()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-xl flex items-center gap-2 transition">
+                    <i data-lucide="user-plus" class="w-5 h-5"></i> नया ग्राहक जोड़ें
+                </button>
+            </div>
 
-        <button class="small secondary" onclick="logout()">
-            Logout
-        </button>
+            <!-- CUSTOMER FORM -->
+            <div id="customerFormContainer" class="hidden bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                <h3 id="formHeader" class="text-lg font-bold text-gray-800 mb-4">नया ग्राहक जोड़ें</h3>
+                <form id="customerForm" onsubmit="saveCustomer(event)" class="space-y-4">
+                    <input type="hidden" id="editIndex">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">ग्राहक का नाम *</label>
+                            <input type="text" id="custName" required class="w-full border border-gray-300 rounded-lg p-2.5">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">मोबाइल नंबर *</label>
+                            <input type="tel" id="custPhone" required class="w-full border border-gray-300 rounded-lg p-2.5">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">अप्लायंस (Appliance) *</label>
+                            <select id="applianceSelect" onchange="updateWorkTypes()" required class="w-full border border-gray-300 rounded-lg p-2.5 bg-white">
+                                <option value="">चुनें...</option>
+                                <option value="AC">AC</option>
+                                <option value="LED TV">LED TV</option>
+                                <option value="Refrigerator">Refrigerator</option>
+                                <option value="Microwave">Microwave</option>
+                                <option value="Washing Machine">Washing Machine</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">कार्य का प्रकार (Work Type) *</label>
+                            <select id="workTypeSelect" required class="w-full border border-gray-300 rounded-lg p-2.5 bg-white">
+                                <option value="">पहले अप्लायंस चुनें...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">कार्य की तिथि *</label>
+                            <input type="date" id="workDate" required class="w-full border border-gray-300 rounded-lg p-2.5">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">रिमाइंडर अवधि *</label>
+                            <select id="reminderInterval" onchange="handleCustomDate()" required class="w-full border border-gray-300 rounded-lg p-2.5 bg-white">
+                                <option value="2">2 महीने बाद</option>
+                                <option value="3" selected>3 महीने बाद</option>
+                                <option value="6">6 महीने बाद</option>
+                                <option value="12">12 महीने बाद</option>
+                                <option value="custom">Custom Date</option>
+                            </select>
+                        </div>
+                        <div id="customDateContainer" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">कस्टम रिमाइंडर डेट *</label>
+                            <input type="date" id="customReminderDate" class="w-full border border-gray-300 rounded-lg p-2.5">
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-blue-100 text-blue-600 p-2 rounded-lg"><i data-lucide="map-pin"></i></div>
+                            <div>
+                                <h4 class="font-medium text-sm text-gray-700">GPS लोकेशन कोर्डिनेट</h4>
+                                <p id="gpsStatus" class="text-xs text-gray-500">कोई लोकेशन सेव नहीं है</p>
+                            </div>
+                        </div>
+                        <input type="hidden" id="lat"><input type="hidden" id="lng">
+                        <button type="button" onclick="getLocation()" class="bg-gray-800 text-white text-sm font-medium px-4 py-2 rounded-lg flex items-center gap-2"><i data-lucide="crosshair" class="w-4 h-4"></i> वर्तमान लोकेशन लें</button>
+                    </div>
+                    <div class="flex justify-end gap-3">
+                        <button type="button" onclick="toggleForm()" class="px-4 py-2.5 border rounded-lg">रद्द करें</button>
+                        <button type="submit" class="px-6 py-2.5 bg-blue-600 text-white rounded-lg">डेटा सुरक्षित करें</button>
+                    </div>
+                </form>
+            </div>
 
+            <div class="bg-white rounded-2xl shadow overflow-hidden border">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="bg-gray-50 border-b text-gray-600 text-xs font-semibold uppercase tracking-wider">
+                                <th class="p-4">ग्राहक / संपर्क</th>
+                                <th class="p-4">डिवाइस / कार्य</th>
+                                <th class="p-4">रिमाइंडर अलर्ट</th>
+                                <th class="p-4 text-center">एक्शन्स</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customerTableBody" class="divide-y text-sm"></tbody>
+                    </table>
+                </div>
+                <div id="emptyState" class="p-8 text-center text-gray-500 hidden"><i data-lucide="folder-open" class="mx-auto w-12 h-12 mb-2 text-gray-300"></i>कोई रिकॉर्ड नहीं मिला।</div>
+            </div>
+        </main>
     </div>
 
-
-    <!-- TABS -->
-    <div class="tabs">
-
-        <button id="btnDash" onclick="tab('dash')">
-            📊 Dashboard
-        </button>
-
-        <button id="btnAdd" onclick="tab('add')">
-            ➕ Add Customer
-        </button>
-
-        <button id="btnBin" onclick="tab('bin')">
-            🗑️ Recycle Bin
-        </button>
-
+    <div id="recycleBinModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 space-y-4">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2"><i data-lucide="trash-2" class="text-red-500"></i> रीसायकल बिन (डिलीट किया डेटा)</h3>
+                <button onclick="closeRecycleBin()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x"></i></button>
+            </div>
+            <div class="overflow-y-auto max-h-60">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-600 text-xs font-semibold uppercase">
+                            <th class="p-2">ग्राहक</th>
+                            <th class="p-2">डिवाइस</th>
+                            <th class="p-2 text-center">कार्रवाई</th>
+                        </tr>
+                    </thead>
+                    <tbody id="binTableBody" class="divide-y"></tbody>
+                </table>
+                <div id="binEmptyState" class="text-center p-6 text-gray-400 hidden">बिन पूरी तरह खाली है।</div>
+            </div>
+            <div class="flex justify-between items-center pt-2 border-t">
+                <button onclick="emptyTrashConfirm()" class="bg-red-100 text-red-700 font-semibold px-3 py-1.5 rounded-lg text-xs hover:bg-red-200 transition">बिन पूरी तरह खाली करें</button>
+                <button onclick="closeRecycleBin()" class="bg-gray-800 text-white px-4 py-1.5 rounded-lg text-xs">बंद करें</button>
+            </div>
+        </div>
     </div>
 
+    <div id="settingsModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-6">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2"><i data-lucide="settings"></i> सेटिंग्स और बैकअप</h3>
+                <button onclick="closeSettings()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x"></i></button>
+            </div>
+            
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">डैशबोर्ड पिन (6-Digit) बदलें</label>
+                <div class="flex gap-2">
+                    <input type="password" id="newPin" maxlength="6" placeholder="नया पिन" class="border rounded-lg p-2 w-full text-center tracking-widest text-lg">
+                    <button onclick="updatePin('app')" class="bg-blue-600 text-white px-4 rounded-lg text-sm">बदलें</button>
+                </div>
+            </div>
 
-    <!-- DASHBOARD -->
-    <section id="dash" class="card">
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">रीसायकल बिन का स्पेशल पिन बदलें</label>
+                <p class="text-[11px] text-gray-400">डिफ़ॉल्ट रूप से यह मुख्य लॉगिन पिन के समान ही काम करता है।</p>
+                <div class="flex gap-2">
+                    <input type="password" id="newBinPin" maxlength="6" placeholder="बिन के लिए नया पिन" class="border rounded-lg p-2 w-full text-center tracking-widest text-lg">
+                    <button onclick="updatePin('bin')" class="bg-red-600 text-white px-4 rounded-lg text-sm">बदलें</button>
+                </div>
+            </div>
 
-        <h3>📊 Dashboard</h3>
-
-        <div id="stats"></div>
-
-        <hr>
-
-        <div class="row">
-            <h3 style="margin:0;">Customers</h3>
-
-            <button
-                class="small secondary"
-                onclick="renderCustomers()"
-            >
-                🔄 Refresh
-            </button>
+            <div class="space-y-3 pt-3 border-t">
+                <h4 class="font-medium text-sm text-gray-800 flex items-center gap-1"><i data-lucide="mail"></i> ईमेल डेटा बैकअप</h4>
+                <div class="space-y-2">
+                    <input type="email" id="backupEmail" placeholder="अपना बैकअप ईमेल एड्रेस डालें" class="w-full border rounded-lg p-2 text-sm">
+                    <button onclick="sendEmailBackup()" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium p-2 rounded-lg text-xs flex items-center justify-center gap-2 transition">
+                        <i data-lucide="send" class="w-4 h-4"></i> ईमेल पर पूरा बैकअप भेजें
+                    </button>
+                </div>
+            </div>
         </div>
-
-        <div id="customers"></div>
-
-    </section>
-
-
-    <!-- ADD CUSTOMER -->
-    <section id="add" class="card hidden">
-
-        <h3>👤 Customer / Appliance</h3>
-
-        <div class="grid">
-
-            <input
-                id="name"
-                placeholder="Customer name"
-            >
-
-            <input
-                id="phone"
-                inputmode="tel"
-                maxlength="10"
-                placeholder="Mobile number"
-            >
-
-            <select id="appliance" onchange="types()">
-
-                <option value="">
-                    Appliance चुनें
-                </option>
-
-                <option>AC</option>
-                <option>LED TV</option>
-                <option>Refrigerator</option>
-                <option>Microwave</option>
-
-            </select>
-
-            <select id="work">
-
-                <option value="">
-                    Work Type चुनें
-                </option>
-
-            </select>
-
-            <input
-                id="date"
-                type="date"
-            >
-
-            <select id="rem" onchange="reminderChange()">
-
-                <option value="">
-                    Reminder चुनें
-                </option>
-
-                <option value="30">
-                    1 Month
-                </option>
-
-                <option value="60">
-                    2 Months
-                </option>
-
-                <option value="90">
-                    3 Months
-                </option>
-
-                <option value="365">
-                    1 Year
-                </option>
-
-                <option value="custom">
-                    Custom Date
-                </option>
-
-            </select>
-
-            <input
-                id="custom"
-                class="hidden"
-                type="date"
-            >
-
-            <input
-                id="amount"
-                inputmode="decimal"
-                placeholder="Amount"
-            >
-
-            <select id="payment">
-
-                <option value="">
-                    Payment Method
-                </option>
-
-                <option>Cash</option>
-                <option>UPI</option>
-                <option>Card</option>
-                <option>Bank Transfer</option>
-                <option>Pending</option>
-
-            </select>
-
-            <input
-                id="loc"
-                readonly
-                placeholder="Current location"
-            >
-
-        </div>
-
-        <button onclick="gps()">
-            📍 Current GPS Location
-        </button>
-
-        <button onclick="save()">
-            💾 Save Customer
-        </button>
-
-        <div id="saveMsg"></div>
-
-    </section>
-
-
-    <!-- RECYCLE BIN -->
-    <section id="bin" class="card hidden">
-
-        <h3>🗑️ Recycle Bin</h3>
-
-        <div class="muted">
-            Deleted customers यहां से वापस Restore किए जा सकते हैं।
-        </div>
-
-        <div id="binList"></div>
-
-    </section>
-
-</div>
-
-</div>
-
-
-<!-- SUPABASE -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-
-const SUPABASE_URL =
-"https://ihrktiuoyvjoornpaknb.supabase.co";
-
-const SUPABASE_KEY =
-"sb_publishable_mOi55EghYQ9yyQ4EWPQckA_p2NpSnjT";
-
-let sb = null;
-
-try{
-
-    sb = supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
-
-}catch(e){
-
-    console.log("Supabase Error:",e);
-
-}
-
-
-/* STORAGE */
-
-const DK = "jagesh_v14_data";
-const PK = "jagesh_v14_pin";
-const SK = "jagesh_v14_session";
-
-let d = {
-    customers:[],
-    bin:[]
-};
-
-try{
-
-    const raw =
-        localStorage.getItem(DK);
-
-    if(raw){
-
-        const parsed =
-            JSON.parse(raw);
-
-        if(
-            parsed &&
-            Array.isArray(parsed.customers) &&
-            Array.isArray(parsed.bin)
-        ){
-
-            d = parsed;
-
-        }
-
-    }
-
-}catch(e){
-
-    localStorage.setItem(
-        DK,
-        JSON.stringify(d)
-    );
-
-}
-
-
-const $ = id =>
-    document.getElementById(id);
-
-
-/* SAVE DATA */
-
-function saveData(){
-
-    localStorage.setItem(
-        DK,
-        JSON.stringify(d)
-    );
-
-}
-
-
-/* MESSAGE */
-
-function note(id,msg,type="error"){
-
-    const el = $(id);
-
-    if(!el) return;
-
-    el.className =
-        type === "success"
-        ? "success"
-        : "error";
-
-    el.textContent = msg;
-
-}
-
-
-/* DEFAULT PIN */
-
-function initPin(){
-
-    if(!localStorage.getItem(PK)){
-
-        localStorage.setItem(
-            PK,
-            "972103"
-        );
-
-    }
-
-}
-
-
-/* LOGIN */
-
-function loginPin(){
-
-    initPin();
-
-    const p =
-        $("pin").value.trim();
-
-    if(!/^\d{6}$/.test(p)){
-
-        return note(
-            "loginMsg",
-            "6-digit PIN डालें"
-        );
-
-    }
-
-    if(
-        p ===
-        localStorage.getItem(PK)
-    ){
-
-        localStorage.setItem(
-            SK,
-            "1"
-        );
-
-        openApp();
-
-    }else{
-
-        note(
-            "loginMsg",
-            "Incorrect PIN. कृपया सही PIN डालें।"
-        );
-
-    }
-
-}
-
-
-/* OPEN APP */
-
-function openApp(){
-
-    $("login")
-        .classList
-        .add("hidden");
-
-    $("mainApp")
-        .classList
-        .remove("hidden");
-
-    tab("dash");
-
-}
-
-
-/* LOGOUT */
-
-function logout(){
-
-    localStorage.removeItem(SK);
-
-    location.reload();
-
-}
-
-
-/* FORGOT */
-
-function forgot(){
-
-    $("pinBox")
-        .classList
-        .add("hidden");
-
-    $("forgotBox")
-        .classList
-        .remove("hidden");
-
-    $("loginMsg").textContent="";
-
-}
-
-
-/* BACK LOGIN */
-
-function backLogin(){
-
-    $("forgotBox")
-        .classList
-        .add("hidden");
-
-    $("pinBox")
-        .classList
-        .remove("hidden");
-
-    $("otpMsg").textContent="";
-
-}
-
-
-/* OTP */
-
-let timerInterval = null;
-
-async function sendOtp(){
-
-    if(!sb){
-
-        return note(
-            "otpMsg",
-            "Supabase Configuration Error."
-        );
-
-    }
-
-    const email =
-        $("email").value.trim();
-
-    const r =
-        await sb.auth.signInWithOtp({
-
-            email:email,
-
-            options:{
-                shouldCreateUser:false
-            }
-
+    </div>
+
+    <script>
+        const applianceMapping = {
+            "AC": ["Service", "Repair", "Installation", "Uninstallation", "Gas Charging", "Other"],
+            "LED TV": ["Repair", "Installation", "Uninstallation", "Board/Panel Work", "Other"],
+            "Refrigerator": ["Repair", "Installation", "Uninstallation", "Gas Charging", "Compressor Work", "Other"],
+            "Microwave": ["Repair", "Installation", "Uninstallation", "Parts/Component Work", "Other"],
+            "Washing Machine": ["Service", "Repair", "Installation", "Uninstallation", "Parts Work", "Other"],
+            "Other": ["Service", "Repair", "Installation", "Other"]
+        };
+
+        let customers = [];
+        let recycleBin = [];
+        let currentFilter = 'all';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if(!localStorage.getItem('jagesh_pin_secure')) localStorage.setItem('jagesh_pin_secure', btoa('123456'));
+            if(!localStorage.getItem('jagesh_bin_pin_secure')) localStorage.setItem('jagesh_bin_pin_secure', btoa('123456'));
+            if(localStorage.getItem('jagesh_backup_email')) document.getElementById('backupEmail').value = localStorage.getItem('jagesh_backup_email');
+            
+            loadCustomers();
+            loadBin();
+            lucide.createIcons();
         });
 
-    if(r.error){
-
-        return note(
-            "otpMsg",
-            r.error.message
-        );
-
-    }
-
-    $("otpArea")
-        .classList
-        .remove("hidden");
-
-    note(
-        "otpMsg",
-        "OTP registered email पर भेज दिया गया है।",
-        "success"
-    );
-
-    startTimer();
-
-}
-
-
-function startTimer(){
-
-    let seconds = 60;
-
-    const btn =
-        $("resend");
-
-    btn.disabled = true;
-
-    btn.textContent =
-        "Resend OTP (" +
-        seconds +
-        ")";
-
-    clearInterval(timerInterval);
-
-    timerInterval =
-        setInterval(()=>{
-
-            seconds--;
-
-            btn.textContent =
-                "Resend OTP (" +
-                seconds +
-                ")";
-
-            if(seconds <= 0){
-
-                clearInterval(timerInterval);
-
-                btn.disabled = false;
-
-                btn.textContent =
-                    "Resend OTP";
-
+        function checkPin() {
+            const input = document.getElementById('pinInput').value;
+            if(btoa(input) === localStorage.getItem('jagesh_pin_secure')) {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('appScreen').classList.remove('hidden');
+                updateDashboard();
+                filterCustomers('all');
+            } else {
+                alert('गलत पिन! कृपया दोबारा प्रयास करें।');
             }
-
-        },1000);
-
-}
-
-
-async function verifyOtp(){
-
-    if(!sb) return;
-
-    const email =
-        $("email").value.trim();
-
-    const token =
-        $("otp").value.trim();
-
-    if(!/^\d{6}$/.test(token)){
-
-        return note(
-            "otpMsg",
-            "6-digit OTP डालें"
-        );
-
-    }
-
-    const r =
-        await sb.auth.verifyOtp({
-
-            email:email,
-            token:token,
-            type:"email"
-
-        });
-
-    if(r.error){
-
-        return note(
-            "otpMsg",
-            r.error.message
-        );
-
-    }
-
-    $("newPin")
-        .classList
-        .remove("hidden");
-
-    note(
-        "otpMsg",
-        "OTP Verified! अब नया PIN बनाएं।",
-        "success"
-    );
-
-}
-
-
-async function savePin(){
-
-    const a =
-        $("np1").value;
-
-    const b =
-        $("np2").value;
-
-    if(
-        !/^\d{6}$/.test(a) ||
-        a !== b
-    ){
-
-        return note(
-            "otpMsg",
-            "समान 6-digit PIN दोनों जगह डालें"
-        );
-
-    }
-
-    localStorage.setItem(
-        PK,
-        a
-    );
-
-    if(sb){
-
-        await sb.auth.signOut();
-
-    }
-
-    note(
-        "otpMsg",
-        "नया PIN सेव हो गया। अब Login करें।",
-        "success"
-    );
-
-    setTimeout(
-        backLogin,
-        1200
-    );
-
-}
-
-
-/* TABS */
-
-function tab(name){
-
-    ["dash","add","bin"].forEach(id=>{
-
-        $(id)
-            .classList
-            .add("hidden");
-
-    });
-
-    $(name)
-        .classList
-        .remove("hidden");
-
-    if(name === "dash"){
-
-        renderCustomers();
-
-    }
-
-    if(name === "bin"){
-
-        renderBin();
-
-    }
-
-}
-
-
-/* APPLIANCE TYPES */
-
-function types(){
-
-    const appliance =
-        $("appliance").value;
-
-    const work =
-        $("work");
-
-    work.innerHTML =
-        '<option value="">Work Type चुनें</option>';
-
-    const list = {
-
-        "AC":[
-            "AC Service",
-            "AC Repair",
-            "AC Installation",
-            "AC Uninstallation",
-            "AC Jet Pump Service",
-            "AC Gas Charging",
-            "AC No Power",
-            "AC Cooling Problem"
-        ],
-
-        "LED TV":[
-            "LED TV Repair",
-            "Backlight Repair",
-            "Power Supply Repair",
-            "Panel Repair",
-            "Main Board Repair",
-            "LED TV Installation"
-        ],
-
-        "Refrigerator":[
-            "Refrigerator Repair",
-            "Gas Charging",
-            "Cooling Problem",
-            "Compressor Work",
-            "No Cooling"
-        ],
-
-        "Microwave":[
-            "Microwave Repair",
-            "Heating Problem",
-            "Panel Repair",
-            "Power Problem"
-        ]
-
-    };
-
-    (list[appliance] || [])
-    .forEach(item=>{
-
-        const option =
-            document.createElement("option");
-
-        option.value = item;
-        option.textContent = item;
-
-        work.appendChild(option);
-
-    });
-
-}
-
-
-/* REMINDER */
-
-function reminderChange(){
-
-    const value =
-        $("rem").value;
-
-    $("custom")
-        .classList
-        .toggle(
-            "hidden",
-            value !== "custom"
-        );
-
-}
-
-
-/* GPS */
-
-function gps(){
-
-    if(!navigator.geolocation){
-
-        return note(
-            "saveMsg",
-            "आपके browser में GPS support नहीं है।"
-        );
-
-    }
-
-    note(
-        "saveMsg",
-        "Location प्राप्त की जा रही है...",
-        "success"
-    );
-
-    navigator.geolocation.getCurrentPosition(
-
-        position=>{
-
-            const lat =
-                position.coords.latitude;
-
-            const lng =
-                position.coords.longitude;
-
-            $("loc").value =
-                lat.toFixed(6) +
-                ", " +
-                lng.toFixed(6);
-
-            note(
-                "saveMsg",
-                "📍 Current location मिल गई।",
-                "success"
-            );
-
-        },
-
-        error=>{
-
-            note(
-                "saveMsg",
-                "Location permission allow करें।"
-            );
-
-        },
-
-        {
-            enableHighAccuracy:true,
-            timeout:15000,
-            maximumAge:0
         }
 
-    );
+        function updatePin(type) {
+            if(type === 'app') {
+                const p = document.getElementById('newPin').value;
+                if(p.length !== 6 || isNaN(p)) return alert('6 अंकों का संख्यात्मक पिन डालें');
+                localStorage.setItem('jagesh_pin_secure', btoa(p));
+                alert('मुख्य लॉगिन पिन बदल गया!');
+                document.getElementById('newPin').value = '';
+            } else {
+                const p = document.getElementById('newBinPin').value;
+                if(p.length !== 6 || isNaN(p)) return alert('6 अंकों का संख्यात्मक पिन डालें');
+                localStorage.setItem('jagesh_bin_pin_secure', btoa(p));
+                alert('रीसायकल बिन सिक्योरिटी पिन बदल गया!');
+                document.getElementById('newBinPin').value = '';
+            }
+            closeSettings();
+        }
 
-}
+        function openRecycleBinSecure() {
+            const askPin = prompt('रीसायकल बिन खोलने के लिए 6-Digit PIN दर्ज करें:');
+            if(!askPin) return;
+            const savedBinPin = localStorage.getItem('jagesh_bin_pin_secure');
+            if(btoa(askPin) === savedBinPin || btoa(askPin) === localStorage.getItem('jagesh_pin_secure')) {
+                renderBin();
+                document.getElementById('recycleBinModal').classList.remove('hidden');
+            } else {
+                alert('गलत सुरक्षा पिन! एक्सेस अस्वीकार।');
+            }
+        }
 
+        function logout() {
+            document.getElementById('pinInput').value = '';
+            document.getElementById('appScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
 
-/* REMINDER DATE */
+        function updateWorkTypes() {
+            const app = document.getElementById('applianceSelect').value;
+            const wSelect = document.getElementById('workTypeSelect');
+            wSelect.innerHTML = '<option value="">चुनें...</option>';
+            if(app && applianceMapping[app]) {
+                applianceMapping[app].forEach(t => {
+                    const opt = document.createElement('option');
+                    opt.value = t; opt.textContent = t;
+                    wSelect.appendChild(opt);
+                });
+            }
+        }
 
-function getReminderDate(){
+        function handleCustomDate() {
+            const v = document.getElementById('reminderInterval').value;
+            const container = document.getElementById('customDateContainer');
+            if(v === 'custom') {
+                container.classList.remove('hidden');
+                document.getElementById('customReminderDate').setAttribute('required', 'true');
+            } else {
+                container.classList.add('hidden');
+                document.getElementById('customReminderDate').removeAttribute('required');
+            }
+        }
 
-    const rem =
-        $("rem").value;
+        function toggleForm() {
+            const c = document.getElementById('customerFormContainer');
+            c.classList.toggle('hidden');
+            if(!c.classList.contains('hidden')) {
+                document.getElementById('customerForm').reset();
+                document.getElementById('editIndex').value = '';
+                document.getElementById('formHeader').textContent = 'नया ग्राहक जोड़ें';
+                document.getElementById('gpsStatus').textContent = 'कोई लोकेशन सेव नहीं है';
+                document.getElementById('lat').value = ''; document.getElementById('lng').value = '';
+                document.getElementById('customDateContainer').classList.add('hidden');
+                document.getElementById('workDate').value = new Date().toISOString().split('T');
+                updateWorkTypes();
+            }
+        }
 
-    if(!rem) return "";
+        function getLocation() {
+            const s = document.getElementById('gpsStatus');
+            if (navigator.geolocation) {
+                s.textContent = "लोकेशन खोजी जा रही है...";
+                navigator.geolocation.getCurrentPosition((pos) => {
+                    document.getElementById('lat').value = pos.coords.latitude;
+                    document.getElementById('lng').value = pos.coords.longitude;
+                    s.textContent = `सफलतापूर्वक सेव: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
+                }, () => { s.textContent = "त्रुटि: अनुमति नहीं मिली।"; });
+            }
+        }
 
-    if(rem === "custom"){
+        function saveCustomer(e) {
+            e.preventDefault();
+            const idx = document.getElementById('editIndex').value;
+            const name = document.getElementById('custName').value;
+            const phone = document.getElementById('custPhone').value;
+            const appliance = document.getElementById('applianceSelect').value;
+            const workType = document.getElementById('workTypeSelect').value;
+            const wDate = document.getElementById('workDate').value;
+            const interval = document.getElementById('reminderInterval').value;
+            
+            let rDate = '';
+            if(interval === 'custom') {
+                rDate = document.getElementById('customReminderDate').value;
+            } else {
+                let d = new Date(wDate);
+                d.setMonth(d.getMonth() + parseInt(interval));
+                rDate = d.toISOString().split('T');
+            }
 
-        return $("custom").value;
+            let emoji = '⚙️';
+            if(appliance === 'AC') emoji = '❄️';
+            if(appliance === 'LED TV') emoji = '📺';
+            if(appliance === 'Refrigerator') emoji = '🧊';
+            
+            let rMsg = `${emoji} ${appliance} ${workType} Reminder: ग्राहक के ${appliance} ${workType.toLowerCase()} को निर्धारित समय हो गया है।`;
+            if(workType === 'Service') rMsg = `${emoji} ${appliance} Service Reminder: ${appliance} service का समय हो गया है।`;
 
-    }
+            const data = { name, phone, appliance, workType, workDate: wDate, reminderDate: rDate, reminderInterval: interval, reminderMessage: rMsg, lat: document.getElementById('lat').value, lng: document.getElementById('lng').value };
 
-    const base =
-        $("date").value
-        ? new Date($("date").value)
-        : new Date();
+            if(idx === '') customers.push(data);
+            else customers[parseInt(idx)] = data;
 
-    base.setDate(
-        base.getDate() +
-        Number(rem)
-    );
+            localStorage.setItem('jagesh_customers', JSON.stringify(customers));
+            toggleForm();
+            updateDashboard();
+            filterCustomers(currentFilter);
+        }
 
-    return formatDate(base);
+        function loadCustomers() {
+            customers = JSON.parse(localStorage.getItem('jagesh_customers')) || [];
+        }
+        function loadBin() {
+            recycleBin = JSON.parse(localStorage.getItem('jagesh_recycle_bin')) || [];
+            updateBinBadge();
+        }
+        function updateBinBadge() {
+            const b = document.getElementById('binCountBadge');
+            if(recycleBin.length > 0) { b.textContent = recycleBin.length; b.classList.remove('hidden'); }
+            else b.classList.add('hidden');
+        }
 
-}
+        function updateDashboard() {
+            loadCustomers();
+            loadBin();
+            const todayStr = new Date().toISOString().split('T');
+            const todayTime = new Date(todayStr).getTime();
+            let today = 0, overdue = 0, upcoming = 0;
 
+            customers.forEach(c => {
+                const remTime = new Date(c.reminderDate).getTime();
+                if(c.reminderDate === todayStr) today++;
+                else if (remTime < todayTime) overdue++;
+                else if (remTime > todayTime) upcoming++;
+            });
 
-/* DATE FORMAT */
+            document.getElementById('countAll').textContent = customers.length;
+            document.getElementById('countToday').textContent = today;
+            document.getElementById('countOverdue').textContent = overdue;
+            document.getElementById('countUpcoming').textContent = upcoming;
+        }
 
-function formatDate(date){
+        function filterCustomers(type) {
+            currentFilter = type;
+            const tbody = document.getElementById('customerTableBody');
+            const state = document.getElementById('emptyState');
+            tbody.innerHTML = '';
+            const todayStr = new Date().toISOString().split('T');
+            const todayTime = new Date(todayStr).getTime();
 
-    const y =
-        date.getFullYear();
+            let filtered = [];
+            customers.forEach((c, idx) => {
+                const remTime = new Date(c.reminderDate).getTime();
+                let m = false;
+                if(type === 'all') m = true;
+                else if(type === 'today' && c.reminderDate === todayStr) m = true;
+                else if(type === 'overdue' && remTime < todayTime && c.reminderDate !== todayStr) m = true;
+                else if(type === 'upcoming' && remTime > todayTime) m = true;
+                if(m) filtered.push({...c, originalIndex: idx});
+            });
 
-    const m =
-        String(
-            date.getMonth()+1
-        ).padStart(2,"0");
+            if(filtered.length === 0) state.classList.remove('hidden');
+            else {
+                state.classList.add('hidden');
+                filtered.forEach(c => {
+                    let badge = '<span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs">शेड्यूल</span>';
+                    if(c.reminderDate === todayStr) badge = '<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold animate-pulse">आज अलर्ट</span>';
+                    else if (new Date(c.reminderDate).getTime() < todayTime) badge = '<span class="bg-red-100 text-red-700 px-2 py-0.5 rounded text-xs font-bold">ओवरड्यू</span>';
 
-    const day =
-        String(
-            date.getDate()
-        ).padStart(2,"0");
+                    const row = document.createElement('tr');
+                    row.className = "hover:bg-gray-50 border-b";
+                    row.innerHTML = `
+                        <td class="p-4">
+                            <div class="font-bold text-gray-800">${c.name}</div>
+                            <div class="text-xs text-gray-500 mt-0.5">📞 ${c.phone}</div>
+                        </td>
+                        <td class="p-4">
+                            <span class="bg-blue-50 text-blue-800 px-2 py-0.5 rounded text-xs">${c.appliance}</span>
+                            <div class="text-xs text-gray-600 mt-1">${c.workType} (${c.workDate})</div>
+                        </td>
+                        <td class="p-4">
+                            <div class="text-xs font-semibold">${c.reminderDate} ${badge}</div>
+                            <div class="text-xs text-gray-500 italic mt-1 max-w-xs truncate">${c.reminderMessage}</div>
+                        </td>
+                        <td class="p-4 text-center">
+                            <div class="flex items-center justify-center gap-2">
+                                <a href="tel:${c.phone}" class="p-2 bg-blue-50 text-blue-600 rounded-lg"><i data-lucide="phone-call" class="w-4 h-4"></i></a>
+                                <a href="https://wa.me/91${c.phone}?text=${encodeURIComponent(c.reminderMessage)}" target="_blank" class="p-2 bg-green-50 text-green-600 rounded-lg"><i data-lucide="message-square" class="w-4 h-4"></i></a>
+                                ${c.lat ? `<a href="https://www.google.com/maps/search/?api=1&query=${c.lat},${c.lng}" target="_blank" class="p-2 bg-yellow-50 text-yellow-600 rounded-lg">🗺️</a>` : `<button disabled class="p-2 bg-gray-100 text-gray-300 rounded-lg">🗺️</button>`}
+                                <button onclick="editCustomer(${c.originalIndex})" class="p-2 bg-gray-50 text-gray-600 rounded-lg"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                                <button onclick="moveCustomerToBin(${c.originalIndex})" class="p-2 bg-red-50 text-red-600 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+            lucide.createIcons();
+        }
 
-    return `${y}-${m}-${day}`;
+        function editCustomer(idx) {
+            toggleForm();
+            const c = customers[idx];
+            document.getElementById('editIndex').value = idx;
+            document.getElementById('formHeader').textContent = 'ग्राहक विवरण बदलें';
+            document.getElementById('custName').value = c.name;
+            document.getElementById('custPhone').value = c.phone;
+            document.getElementById('applianceSelect').value = c.appliance;
+            updateWorkTypes();
+            document.getElementById('workTypeSelect').value = c.workType;
+            document.getElementById('workDate').value = c.workDate;
+            document.getElementById('reminderInterval').value = c.reminderInterval;
+            handleCustomDate();
+            if(c.reminderInterval === 'custom') document.getElementById('customReminderDate').value = c.reminderDate;
+            if(c.lat) {
+                document.getElementById('lat').value = c.lat; document.getElementById('lng').value = c.lng;
+                document.getElementById('gpsStatus').textContent = `मौजूद: ${parseFloat(c.lat).toFixed(4)}, ${parseFloat(c.lng).toFixed(4)}`;
+            }
+        }
 
-}
+        // 🗑️ RECYCLE BIN OPERATION
+        function moveCustomerToBin(idx) {
+            if(confirm('क्या आप इस ग्राहक को रीसायकल बिन में भेजना चाहते हैं?')) {
+                const deleted = customers.splice(idx, 1)[0];
+                deleted.deletedAt = new Date().toLocaleString();
+                recycleBin.push(deleted);
+                localStorage.setItem('jagesh_customers', JSON.stringify(customers));
+                localStorage.setItem('jagesh_recycle_bin', JSON.stringify(recycleBin));
+                updateDashboard();
+                filterCustomers(currentFilter);
+            }
+        }
 
+        function renderBin() {
+            const tbody = document.getElementById('binTableBody');
+            const state = document.getElementById('binEmptyState');
+            tbody.innerHTML = '';
+            if(recycleBin.length === 0) state.classList.remove('hidden');
+            else {
+                state.classList.add('hidden');
+                recycleBin.forEach((c, idx) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="p-2 font-medium">${c.name}<br><span class="text-xs text-gray-400">हटाया गया: ${c.deletedAt || ''}</span></td>
+                        <td class="p-2">${c.appliance} - ${c.workType}</td>
+                        <td class="p-2 text-center flex justify-center gap-1">
+                            <button onclick="restoreCustomer(${idx})" class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">रीस्टोर</button>
+                            <button onclick="permanentDelete(${idx})" class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs">हमेशा के लिए हटाएँ</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+        }
 
-/* SAVE CUSTOMER */
+        function restoreCustomer(idx) {
+            const restored = recycleBin.splice(idx, 1)[0];
+            delete restored.deletedAt;
+            customers.push(restored);
+            localStorage.setItem('jagesh_customers', JSON.stringify(customers));
+            localStorage.setItem('jagesh_recycle_bin', JSON.stringify(recycleBin));
+            renderBin();
+            updateDashboard();
+            filterCustomers(currentFilter);
+            alert('ग्राहक को मुख्य सूची में रीस्टोर कर दिया गया है!');
+        }
 
-function save(){
+        function permanentDelete(idx) {
+            if(confirm('चेतावनी! यह रिकॉर्ड हमेशा के लिए मिट जाएगा और दोबारा नहीं मिलेगा। क्या आप जारी रखना चाहते हैं?')) {
+                recycleBin.splice(idx, 1);
+                localStorage.setItem('jagesh_recycle_bin', JSON.stringify(recycleBin));
+                renderBin();
+                updateDashboard();
+            }
+        }
 
-    const name =
-        $("name").value.trim();
+        function emptyTrashConfirm() {
+            if(confirm('क्या आप रीसायकल बिन का पूरा डेटा हमेशा के लिए साफ करना चाहते हैं?')) {
+                recycleBin = [];
+                localStorage.setItem('jagesh_recycle_bin', JSON.stringify(recycleBin));
+                renderBin();
+                updateDashboard();
+            }
+        }
 
-    const phone =
-        $("phone").value.trim();
+        // 📧 EMAIL BACKUP via Mailto Client
+        function sendEmailBackup() {
+            const email = document.getElementById('backupEmail').value;
+            if(!email) return alert('कृपया पहले ईमेल आईडी दर्ज करें!');
+            localStorage.setItem('jagesh_backup_email', email);
 
-    const appliance =
-        $("appliance").value;
+            const subject = encodeURIComponent("Jagesh Electronic - Customer Database Backup");
+            const bodyText = "नमस्ते JAGESH ELECTRONIC,\n\nआपके ग्राहकों का बैकअप नीचे दिए गए डेटा ब्लॉक में सुरक्षित है। किसी भी नए फोन या कंप्यूटर पर रीस्टोर करने के लिए इस पूरे टेक्स्ट को कॉपी करके .json फाइल बना लें या ऐप में लोड करें:\n:\n" + JSON.stringify(customers, null, 2);
+            
+            const mailtoUrl = `mailto:${email}?subject=${subject}&body=${encodeURIComponent(bodyText)}`;
+            window.location.href = mailtoUrl;
+            alert('डेटा बैकअप का ईमेल ड्राफ्ट आपके ईमेल ऐप में खोल दिया गया है। कृपया सेंड (Send) बटन दबाएं।');
+        }
 
-    const work =
-        $("work").value;
-
-    const date =
-        $("date").value ||
-        formatDate(new Date());
-
-    const reminder =
-        getReminderDate();
-
-    const amount =
-        $("amount").value.trim();
-
-    const payment =
-        $("payment").value;
-
-    const loc =
-        $("loc").value;
-
-    if(!name
+        function openSettings() { document.getElementById('settingsModal').classList.remove('hidden'); }
+        function closeSettings() { document.getElementById('settingsModal').classList.add('hidden'); }
+        function closeRecycleBin() { document.getElementById('recycleBinModal').classList.add('hidden'); }
+    </script>
+</body>
+</html>

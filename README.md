@@ -1,14 +1,18 @@
-JAGESH ELECTRONIC Customer Reminder — V12 OTP Recovery
+# JAGESH ELECTRONIC Android App
 
-Replace these files in the existing jagesh-customer-reminder repository:
-index.html, sw.js, manifest.json, logo.jpg, icon-192.png, icon-512.png, icon-512-maskable.png
+यह Android Studio project आपके मौजूदा JAGESH ELECTRONIC customer reminder website को native Android shell में चलाता है और phone-level features जोड़ता है:
 
-V12 fixes:
-- Mobile-friendly PIN/OTP screen; no vertical overflow problem.
-- After OTP is successfully sent, the 6-digit OTP input appears immediately.
-- OTP verification uses Supabase Auth REST API.
-- create_user:false prevents the recovery flow from creating a new account.
-- Clear error messages are shown when Supabase SMS is not configured.
-- 60-second resend timer.
+- 6-digit numeric PIN lock
+- Android Fingerprint/Biometric unlock
+- Customer records और local storage
+- Work/service history: date, appliance, work type, location/GPS, job amount
+- Payment history: हर payment की राशि, date, mode/note, total paid और बाकी
+- UPI, Call, SMS, WhatsApp और Google Maps links
+- Customer reminders + Android notifications
+- आपके JE Crown logo को app में embed किया गया है
+- Settings और mobile responsive UI
 
-IMPORTANT: Real SMS OTP requires Email Authentication enabled in Supabase and an SMS provider configured. Supabase currently supports providers including Twilio, Vonage and MessageBird. Do NOT put a service_role/secret key in this website.
+## APK बनाना
+Android Studio में इस folder को खोलें → Gradle Sync → Build > Generate App Bundles or APKs > Generate APKs.
+
+Package: `com.jageshelectronic.app`

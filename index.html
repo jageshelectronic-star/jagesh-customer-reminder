@@ -171,11 +171,11 @@
             <button onclick="checkPin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-xl transition">
                 लॉगिन करें
             </button>
-            <button id="fingerprintLoginBtn" onclick="loginWithFingerprint()" class="hidden w-full mt-2 bg-gray-900 hover:bg-black text-white font-semibold p-3 rounded-xl transition flex items-center justify-center gap-2">
+            <button id="fingerprintLoginBtn" onclick="loginWithFingerprint()" class="w-full mt-2 bg-gray-900 hover:bg-black text-white font-semibold p-3 rounded-xl transition flex items-center justify-center gap-2">
                 <i data-lucide="fingerprint"></i> Fingerprint से खोलें
             </button>
             <p id="loginError" class="text-red-500 text-sm mt-3 hidden">गलत पिन! कृपया दोबारा प्रयास करें।</p>
-            <p id="bioHint" class="text-gray-400 text-[11px] mt-3">Fingerprint सुविधा आपके फोन/ब्राउज़र की biometric security पर निर्भर है।</p>
+            <p id="bioHint" class="text-gray-400 text-[11px] mt-3">Fingerprint / Biometric से सुरक्षित लॉगिन।</p>
         </div>
     </div>
 
@@ -277,6 +277,32 @@
                             <input type="date" id="customReminderDate" class="w-full border border-gray-300 rounded-lg p-2.5">
                         </div>
                     </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">काम की जगह / पता</label>
+                            <input type="text" id="workLocation" placeholder="जैसे: राजाजीपुरम, लखनऊ" class="w-full border border-gray-300 rounded-lg p-2.5">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">कुल काम की रकम (₹)</label>
+                            <input type="number" id="jobAmount" min="0" step="1" placeholder="0" class="w-full border border-gray-300 rounded-lg p-2.5">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">अभी लिया भुगतान (₹)</label>
+                            <input type="number" id="paymentAmount" min="0" step="1" placeholder="0" class="w-full border border-gray-300 rounded-lg p-2.5">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">भुगतान स्थिति</label>
+                            <select id="paymentStatus" class="w-full border border-gray-300 rounded-lg p-2.5 bg-white">
+                                <option value="Unpaid">Unpaid</option><option value="Partial">Partial</option><option value="Paid">Paid</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">भुगतान तरीका / नोट</label>
+                            <input type="text" id="paymentNote" placeholder="Cash / UPI / बाकी..." class="w-full border border-gray-300 rounded-lg p-2.5">
+                        </div>
+                    </div>
                     <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 flex justify-between items-center">
                         <div class="flex items-center gap-3">
                             <div class="bg-blue-100 text-blue-600 p-2 rounded-lg"><i data-lucide="map-pin"></i></div>
@@ -312,6 +338,16 @@
                 <div id="emptyState" class="p-8 text-center text-gray-500 hidden"><i data-lucide="folder-open" class="mx-auto w-12 h-12 mb-2 text-gray-300"></i>कोई रिकॉर्ड नहीं मिला।</div>
             </div>
         </main>
+    </div>
+
+    <div id="customerDetailsModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-3">
+        <div class="bg-white rounded-2xl max-w-lg w-full max-h-[92dvh] overflow-y-auto p-5 space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-gray-800">ग्राहक पूरा हिसाब</h3>
+                <button onclick="closeCustomerDetails()" class="text-gray-400"><i data-lucide="x"></i></button>
+            </div>
+            <div id="customerDetailsContent"></div>
+        </div>
     </div>
 
     <div id="paymentModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -513,6 +549,7 @@
         }
 
         async function loginWithFingerprint() {
+            if(window.AndroidBridge && AndroidBridge.authenticateBiometric) { AndroidBridge.authenticateBiometric(); return; }
             if(!fingerprintCredentialId) return alert('पहले Settings में Fingerprint Login चालू करें।');
             try {
                 const challenge = crypto.getRandomValues(new Uint8Array(32));
@@ -532,6 +569,8 @@
                 alert('Biometric verification सफल नहीं हुई। PIN से लॉगिन करें।');
             }
         }
+
+        window.onNativeBiometricSuccess = function(){ loginSuccess(); };
 
         function checkPin() {
             const input = document.getElementById('pinInput').value;
@@ -615,6 +654,8 @@
                 document.getElementById('paymentAmount').value = '';
                 document.getElementById('paymentStatus').value = 'Unpaid';
                 document.getElementById('paymentNote').value = '';
+                document.getElementById('workLocation').value = '';
+                document.getElementById('jobAmount').value = '';
                 document.getElementById('workDate').value = new Date().toISOString().split('T');
                 updateWorkTypes();
             }
@@ -659,16 +700,38 @@
             let rMsg = `${emoji} ${appliance} ${workType} Reminder: ग्राहक के ${appliance} ${workType.toLowerCase()} को निर्धारित समय हो गया है।`;
             if(workType === 'Service') rMsg = `${emoji} ${appliance} Service Reminder: ${appliance} service का समय हो गया है।`;
 
+            const workLocation = document.getElementById('workLocation').value.trim();
+            const jobAmount = parseFloat(document.getElementById('jobAmount').value || 0);
+            const paymentAmount = parseFloat(document.getElementById('paymentAmount').value || 0);
+            const paymentStatus = document.getElementById('paymentStatus').value || 'Unpaid';
+            const paymentNote = document.getElementById('paymentNote').value || '';
+            const now = new Date().toISOString();
             const data = { name, phone, appliance, workType, workDate: wDate, reminderDate: rDate, reminderInterval: interval, reminderMessage: rMsg, lat: document.getElementById('lat').value, lng: document.getElementById('lng').value,
-                paymentAmount: document.getElementById('paymentAmount').value || '0',
-                paymentStatus: document.getElementById('paymentStatus').value || 'Unpaid',
-                paymentNote: document.getElementById('paymentNote').value || ''
+                workLocation, jobAmount, paymentAmount, paymentStatus, paymentNote,
+                workHistory: [], paymentHistory: []
             };
+            if(idx !== '') {
+                const old = customers[parseInt(idx)] || {};
+                data.workHistory = Array.isArray(old.workHistory) ? old.workHistory : [];
+                data.paymentHistory = Array.isArray(old.paymentHistory) ? old.paymentHistory : [];
+                data.createdAt = old.createdAt || now;
+                const changed = old.appliance !== appliance || old.workType !== workType || old.workDate !== wDate || old.workLocation !== workLocation || Number(old.jobAmount||0) !== jobAmount;
+                if(changed) data.workHistory.push({date:wDate, appliance, workType, location:workLocation, jobAmount, lat:data.lat, lng:data.lng, note:'Work record'});
+                if(paymentAmount > 0) data.paymentHistory.push({date:now, amount:paymentAmount, mode:paymentNote || paymentStatus, note:paymentNote});
+            } else {
+                data.createdAt = now;
+                data.workHistory.push({date:wDate, appliance, workType, location:workLocation, jobAmount, lat:data.lat, lng:data.lng, note:'Initial work'});
+                if(paymentAmount > 0) data.paymentHistory.push({date:now, amount:paymentAmount, mode:paymentNote || paymentStatus, note:paymentNote});
+            }
 
             if(idx === '') customers.push(data);
             else customers[parseInt(idx)] = data;
 
             localStorage.setItem('jagesh_customers', JSON.stringify(customers));
+            if(window.AndroidBridge && AndroidBridge.scheduleReminder && rDate){
+                const rd = new Date(rDate + 'T09:00:00').getTime();
+                if(rd > Date.now()) AndroidBridge.scheduleReminder(rd, name);
+            }
             toggleForm();
             updateDashboard();
             filterCustomers(currentFilter);
@@ -725,12 +788,32 @@
             c.paymentAmount = amount;
             c.paymentStatus = 'Paid';
             c.paymentNote = 'UPI / Payment marked paid';
+            if(!Array.isArray(c.paymentHistory)) c.paymentHistory = [];
+            c.paymentHistory.push({date:new Date().toISOString(), amount:parseFloat(amount), mode:'UPI', note:'Payment marked paid'});
             customers[paymentCustomerIndex] = c;
             localStorage.setItem('jagesh_customers', JSON.stringify(customers));
             closePayment();
             updateDashboard();
             filterCustomers(currentFilter);
         }
+
+        function openCustomerDetails(idx) {
+            const c = customers[idx];
+            const works = Array.isArray(c.workHistory) ? c.workHistory : [];
+            const pays = Array.isArray(c.paymentHistory) ? c.paymentHistory : [];
+            const totalPaid = pays.reduce((s,p)=>s+Number(p.amount||0),0);
+            const due = Math.max(0, Number(c.jobAmount||0) - totalPaid);
+            const workRows = works.length ? works.slice().reverse().map(w => `<div class="border rounded-xl p-3 mb-2"><div class="font-semibold">${w.appliance||''} — ${w.workType||''}</div><div class="text-sm text-gray-600">📅 ${w.date||''}</div><div class="text-sm text-gray-600">📍 ${w.location||'GPS saved'}</div><div class="text-sm font-semibold mt-1">काम की रकम: ₹${Number(w.jobAmount||0)}</div>${w.lat ? `<a class="text-blue-600 text-xs" target="_blank" href="https://www.google.com/maps/search/?api=1&query=${w.lat},${w.lng}">Map पर खोलें</a>`:''}</div>`).join('') : '<p class="text-gray-400 text-sm">अभी कोई काम का इतिहास नहीं है।</p>';
+            const payRows = pays.length ? pays.slice().reverse().map(p => `<div class="flex justify-between gap-3 border-b py-2 text-sm"><span>₹${Number(p.amount||0)}<br><span class="text-xs text-gray-400">${new Date(p.date).toLocaleString()}</span></span><span class="text-right">${p.mode||''}<br><span class="text-xs text-gray-500">${p.note||''}</span></span></div>`).join('') : '<p class="text-gray-400 text-sm">अभी कोई भुगतान दर्ज नहीं है।</p>';
+            document.getElementById('customerDetailsContent').innerHTML = `
+                <div class="bg-blue-50 rounded-xl p-3"><div class="font-bold text-lg">${c.name}</div><div class="text-sm">📞 ${c.phone}</div><div class="text-sm">📍 ${c.workLocation||'लोकेशन नहीं लिखी गई'}</div></div>
+                <div class="grid grid-cols-3 gap-2 text-center"><div class="bg-gray-50 rounded-xl p-3"><div class="text-xs text-gray-500">काम की कुल रकम</div><div class="font-bold">₹${Number(c.jobAmount||0)}</div></div><div class="bg-green-50 rounded-xl p-3"><div class="text-xs text-gray-500">कुल लिया</div><div class="font-bold text-green-700">₹${totalPaid}</div></div><div class="bg-red-50 rounded-xl p-3"><div class="text-xs text-gray-500">बाकी</div><div class="font-bold text-red-700">₹${due}</div></div></div>
+                <h4 class="font-bold">काम का इतिहास</h4>${workRows}
+                <h4 class="font-bold pt-2">Payment History</h4>${payRows}`;
+            document.getElementById('customerDetailsModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+        function closeCustomerDetails(){ document.getElementById('customerDetailsModal').classList.add('hidden'); }
 
         function updateDashboard() {
             loadCustomers();
@@ -803,6 +886,7 @@
                                 <a href="sms:${c.phone}?body=${encodeURIComponent(c.reminderMessage)}" title="SMS" class="p-2 bg-purple-50 text-purple-600 rounded-lg"><i data-lucide="message-circle" class="w-5 h-5"></i></a>
                                 <a href="https://wa.me/91${c.phone}?text=${encodeURIComponent(c.reminderMessage)}" target="_blank" title="WhatsApp" class="p-2 bg-green-50 text-green-600 rounded-lg"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" class="jagesh-wa-icon" alt="WhatsApp"></a>
                                 <button onclick="openPayment(${c.originalIndex})" title="Payment" class="p-2 bg-amber-50 text-amber-600 rounded-lg"><i data-lucide="indian-rupee" class="w-4 h-4"></i></button>
+                                <button onclick="openCustomerDetails(${c.originalIndex})" title="Customer Details" class="p-2 bg-indigo-50 text-indigo-600 rounded-lg"><i data-lucide="clipboard-list" class="w-4 h-4"></i></button>
                                 ${c.lat ? `<a href="https://www.google.com/maps/search/?api=1&query=${c.lat},${c.lng}" target="_blank" class="p-2 bg-yellow-50 text-yellow-600 rounded-lg">🗺️</a>` : `<button disabled class="p-2 bg-gray-100 text-gray-300 rounded-lg">🗺️</button>`}
                                 <button onclick="editCustomer(${c.originalIndex})" class="p-2 bg-gray-50 text-gray-600 rounded-lg"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
                                 <button onclick="moveCustomerToBin(${c.originalIndex})" class="p-2 bg-red-50 text-red-600 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
@@ -830,6 +914,8 @@
             document.getElementById('paymentAmount').value = c.paymentAmount || '';
             document.getElementById('paymentStatus').value = c.paymentStatus || 'Unpaid';
             document.getElementById('paymentNote').value = c.paymentNote || '';
+            document.getElementById('workLocation').value = c.workLocation || '';
+            document.getElementById('jobAmount').value = c.jobAmount || '';
             handleCustomDate();
             if(c.reminderInterval === 'custom') document.getElementById('customReminderDate').value = c.reminderDate;
             if(c.lat) {

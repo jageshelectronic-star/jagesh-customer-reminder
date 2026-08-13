@@ -8,19 +8,116 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         body { font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
+        .logo-mark { width: 54px; height: 54px; border-radius: 16px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#2563eb,#06b6d4); color:#fff; box-shadow:0 8px 22px rgba(37,99,235,.28); }
+        .keypad { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; max-width:280px; margin:0 auto; }
+        .keypad button { height:56px; border-radius:14px; background:#f3f4f6; font-size:22px; font-weight:700; color:#1f2937; border:1px solid #e5e7eb; }
+        .keypad button:active { transform:scale(.97); background:#e5e7eb; }
+        .pin-dots { letter-spacing:10px; font-weight:800; }
+        /* Mobile responsive fixes */
+        @media (max-width: 640px) {
+            .mobile-toolbar { flex-direction: column; align-items: stretch !important; gap: 12px !important; }
+            .mobile-toolbar h2 { text-align: left; }
+            .mobile-toolbar .add-customer-btn { width: 100%; justify-content: center; }
+            .customer-table-wrap { overflow-x: visible !important; }
+            #customerTable { display: block; width: 100%; }
+            #customerTable thead { display: none; }
+            #customerTable tbody, #customerTable tr, #customerTable td { display: block; width: 100%; box-sizing: border-box; }
+            #customerTable tr { margin: 0 0 14px; border: 1px solid #e5e7eb; border-radius: 18px; background: #fff; overflow: hidden; box-shadow: 0 3px 12px rgba(0,0,0,.06); }
+            #customerTable td { padding: 12px 14px !important; border-bottom: 1px solid #f1f5f9; }
+            #customerTable td:last-child { border-bottom: 0; }
+            #customerTable td[data-label]::before { content: attr(data-label); display: block; font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 4px; }
+            #customerTable td.actions-cell::before { content: 'एक्शन्स'; }
+            #customerTable td.actions-cell > div { display: grid !important; grid-template-columns: repeat(4, 1fr); gap: 8px !important; }
+            #customerTable td.actions-cell a, #customerTable td.actions-cell button { width: 100%; min-height: 44px; display:flex; align-items:center; justify-content:center; }
+        }
+        .home-logo { width: 42px; height: 42px; flex: 0 0 42px; border-radius: 12px; display:flex; align-items:center; justify-content:center; background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,.15); }
+        .home-logo svg { width: 28px; height: 28px; }
+
     </style>
+
+<style>
+.jagesh-real-logo{
+  width:42px;height:42px;object-fit:contain;border-radius:10px;
+  display:block;background:#0b0f14;
+}
+.jagesh-wa-icon{
+  width:22px;height:22px;display:block;object-fit:contain;
+}
+</style>
+
+
+<style id="jagesh-final-fixes">
+.jagesh-real-logo{
+  width:42px;height:42px;object-fit:contain;border-radius:10px;
+  display:block;background:#0b0f14;
+}
+.login-real-logo{
+  width:76px;height:76px;object-fit:contain;border-radius:18px;
+  display:block;background:#0b0f14;
+}
+.jagesh-wa-icon{
+  width:22px;height:22px;display:block;object-fit:contain;
+}
+.settings-overlay{
+  overflow-y:auto !important;
+  align-items:flex-start !important;
+}
+.settings-panel{
+  max-height:calc(100dvh - 32px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+@media (max-width:640px){
+  .settings-overlay{padding:10px !important;}
+  .settings-panel{
+    max-height:calc(100dvh - 20px);
+    padding:18px !important;
+    margin:0;
+  }
+}
+</style>
+
 </head>
 <body class="bg-gray-100 min-h-screen">
 
     <!-- LOGIN SCREEN -->
-    <div id="loginScreen" class="flex flex-col items-center justify-center min-h-screen px-4">
-        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm text-center">
-            <div class="flex justify-center mb-4 text-blue-600"><i data-lucide="zap" class="w-16 h-16"></i></div>
-            <h1 class="text-2xl font-bold text-gray-800 mb-2">JAGESH ELECTRONIC</h1>
-            <p class="text-gray-500 mb-6 text-sm">आगे बढ़ने के लिए 6-अंकों का पिन दर्ज करें</p>
-            <input type="password" id="pinInput" maxlength="6" placeholder="••••••" class="w-full text-center text-3xl tracking-widest border-2 border-gray-300 rounded-xl p-3 mb-4 focus:outline-none focus:border-blue-500">
-            <button onclick="checkPin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold p-3 rounded-xl transition">लॉगिन करें</button>
+    <div id="loginScreen" class="flex flex-col items-center justify-center min-h-screen px-4 bg-gradient-to-br from-blue-50 to-white">
+        <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-xl w-full max-w-sm text-center border border-gray-100">
+            <div class="flex justify-center mb-3">
+                <img src="assets/jagesh-logo.png" class="login-real-logo" alt="JAGESH ELECTRONIC Logo">
+            </div>
+            <h1 class="text-2xl font-black text-gray-800">JAGESH ELECTRONIC</h1>
+            <p class="text-gray-500 mt-1 mb-4 text-sm">6-अंकों का PIN दर्ज करें</p>
+
+            <input id="pinInput" type="text" inputmode="numeric" autocomplete="one-time-code"
+                   maxlength="6" readonly
+                   class="w-full text-center text-3xl pin-dots border-2 border-blue-200 rounded-xl p-3 mb-4 bg-blue-50 focus:outline-none"
+                   placeholder="••••••">
+
+            <div class="keypad mb-4">
+                <button type="button" onclick="pinKey('1')">1</button>
+                <button type="button" onclick="pinKey('2')">2</button>
+                <button type="button" onclick="pinKey('3')">3</button>
+                <button type="button" onclick="pinKey('4')">4</button>
+                <button type="button" onclick="pinKey('5')">5</button>
+                <button type="button" onclick="pinKey('6')">6</button>
+                <button type="button" onclick="pinKey('7')">7</button>
+                <button type="button" onclick="pinKey('8')">8</button>
+                <button type="button" onclick="pinKey('9')">9</button>
+                <button type="button" onclick="pinClear()">C</button>
+                <button type="button" onclick="pinKey('0')">0</button>
+                <button type="button" onclick="pinBackspace()">⌫</button>
+            </div>
+
+            <button onclick="checkPin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-xl transition">
+                लॉगिन करें
+            </button>
+            <button id="fingerprintLoginBtn" onclick="loginWithFingerprint()" class="hidden w-full mt-2 bg-gray-900 hover:bg-black text-white font-semibold p-3 rounded-xl transition flex items-center justify-center gap-2">
+                <i data-lucide="fingerprint"></i> Fingerprint से खोलें
+            </button>
             <p id="loginError" class="text-red-500 text-sm mt-3 hidden">गलत पिन! कृपया दोबारा प्रयास करें।</p>
+            <p id="bioHint" class="text-gray-400 text-[11px] mt-3">Fingerprint सुविधा आपके फोन/ब्राउज़र की biometric security पर निर्भर है।</p>
         </div>
     </div>
 
@@ -28,7 +125,7 @@
     <div id="appScreen" class="hidden">
         <nav class="bg-blue-600 text-white p-4 shadow-md sticky top-0 z-50">
             <div class="max-w-6xl mx-auto flex justify-between items-center">
-                <div class="flex items-center gap-2 font-bold text-xl"><i data-lucide="zap"></i> JAGESH ELECTRONIC</div>
+                <div class="flex items-center gap-2 font-bold text-xl"><img src="assets/jagesh-logo.png" class="jagesh-real-logo" alt="JAGESH ELECTRONIC Logo"><span class="leading-tight">JAGESH ELECTRONIC</span></div>
                 <div class="flex items-center gap-3">
                     <button onclick="openRecycleBinSecure()" class="hover:bg-blue-700 p-2 rounded-lg transition relative">
                         <i data-lucide="trash-2"></i>
@@ -61,9 +158,9 @@
                 </div>
             </div>
 
-            <div class="flex justify-between items-center">
+            <div class="mobile-toolbar flex justify-between items-center">
                 <h2 id="listTitle" class="text-xl font-bold text-gray-800">सभी ग्राहकों की सूची</h2>
-                <button onclick="toggleForm()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-xl flex items-center gap-2 transition">
+                <button onclick="toggleForm()" class="add-customer-btn bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-xl flex items-center gap-2 transition">
                     <i data-lucide="user-plus" class="w-5 h-5"></i> नया ग्राहक जोड़ें
                 </button>
             </div>
@@ -92,7 +189,6 @@
                                 <option value="LED TV">LED TV</option>
                                 <option value="Refrigerator">Refrigerator</option>
                                 <option value="Microwave">Microwave</option>
-                                <option value="Washing Machine">Washing Machine</option>
                                 <option value="Other">Other</option>
                             </select>
                         </div>
@@ -142,8 +238,8 @@
             </div>
 
             <div class="bg-white rounded-2xl shadow overflow-hidden border">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
+                <div class="customer-table-wrap overflow-x-auto">
+                    <table id="customerTable" class="w-full text-left">
                         <thead>
                             <tr class="bg-gray-50 border-b text-gray-600 text-xs font-semibold uppercase tracking-wider">
                                 <th class="p-4">ग्राहक / संपर्क</th>
@@ -158,6 +254,25 @@
                 <div id="emptyState" class="p-8 text-center text-gray-500 hidden"><i data-lucide="folder-open" class="mx-auto w-12 h-12 mb-2 text-gray-300"></i>कोई रिकॉर्ड नहीं मिला।</div>
             </div>
         </main>
+    </div>
+
+    <div id="paymentModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-gray-800">₹ Payment</h3>
+                <button onclick="closePayment()" class="text-gray-400"><i data-lucide="x"></i></button>
+            </div>
+            <div id="paymentCustomerInfo" class="text-sm text-gray-600"></div>
+            <input id="payAmount" type="number" min="1" step="1" placeholder="Payment amount ₹"
+                   class="w-full border rounded-lg p-3">
+            <button onclick="payByUPI()" class="w-full bg-green-600 text-white font-bold p-3 rounded-xl flex items-center justify-center gap-2">
+                <i data-lucide="smartphone"></i> UPI Payment खोलें
+            </button>
+            <button onclick="markPaymentPaid()" class="w-full bg-blue-600 text-white font-bold p-3 rounded-xl">
+                Paid Mark करें
+            </button>
+            <p id="paymentHint" class="text-[11px] text-gray-400"></p>
+        </div>
     </div>
 
     <div id="recycleBinModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -186,8 +301,8 @@
         </div>
     </div>
 
-    <div id="settingsModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-6">
+    <div id="settingsModal" class="settings-overlay hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="settings-panel bg-white rounded-2xl max-w-md w-full p-6 space-y-6">
             <div class="flex justify-between items-center border-b pb-3">
                 <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2"><i data-lucide="settings"></i> सेटिंग्स और बैकअप</h3>
                 <button onclick="closeSettings()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x"></i></button>
@@ -208,6 +323,26 @@
                     <input type="password" id="newBinPin" maxlength="6" placeholder="बिन के लिए नया पिन" class="border rounded-lg p-2 w-full text-center tracking-widest text-lg">
                     <button onclick="updatePin('bin')" class="bg-red-600 text-white px-4 rounded-lg text-sm">बदलें</button>
                 </div>
+            </div>
+
+
+            <div class="space-y-3 pt-3 border-t">
+                <h4 class="font-medium text-sm text-gray-800 flex items-center gap-1"><i data-lucide="indian-rupee"></i> Payment / UPI</h4>
+                <input type="text" id="upiId" placeholder="अपना UPI ID (जैसे name@upi)" class="w-full border rounded-lg p-2 text-sm">
+                <button onclick="saveUPI()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-medium p-2 rounded-lg text-xs">
+                    UPI ID सेव करें
+                </button>
+            </div>
+
+            <div class="space-y-3 pt-3 border-t">
+                <h4 class="font-medium text-sm text-gray-800 flex items-center gap-1"><i data-lucide="fingerprint"></i> Fingerprint / Biometric Login</h4>
+                <p class="text-[11px] text-gray-500">यह फोन के supported biometric scanner (fingerprint/face/device unlock) से WebAuthn credential बनाएगा।</p>
+                <button onclick="enableFingerprint()" class="w-full bg-gray-900 hover:bg-black text-white font-medium p-2 rounded-lg text-xs flex items-center justify-center gap-2">
+                    <i data-lucide="fingerprint" class="w-4 h-4"></i> Fingerprint Login चालू करें
+                </button>
+                <button onclick="disableFingerprint()" class="w-full border border-red-200 text-red-600 font-medium p-2 rounded-lg text-xs">
+                    Fingerprint Login बंद करें
+                </button>
             </div>
 
             <div class="space-y-3 pt-3 border-t">
@@ -235,24 +370,115 @@
         let customers = [];
         let recycleBin = [];
         let currentFilter = 'all';
+        let paymentCustomerIndex = null;
+        let fingerprintCredentialId = localStorage.getItem('jagesh_fingerprint_credential') || '';
+
 
         window.addEventListener('DOMContentLoaded', () => {
             if(!localStorage.getItem('jagesh_pin_secure')) localStorage.setItem('jagesh_pin_secure', btoa('123456'));
             if(!localStorage.getItem('jagesh_bin_pin_secure')) localStorage.setItem('jagesh_bin_pin_secure', btoa('123456'));
             if(localStorage.getItem('jagesh_backup_email')) document.getElementById('backupEmail').value = localStorage.getItem('jagesh_backup_email');
+            if(localStorage.getItem('jagesh_upi_id')) document.getElementById('upiId').value = localStorage.getItem('jagesh_upi_id');
+            updateFingerprintButton();
             
             loadCustomers();
             loadBin();
             lucide.createIcons();
         });
 
+        function pinKey(n) {
+            const el = document.getElementById('pinInput');
+            if(el.value.length < 6) el.value += n;
+            if(el.value.length === 6) document.getElementById('loginError').classList.add('hidden');
+        }
+        function pinBackspace() {
+            const el = document.getElementById('pinInput');
+            el.value = el.value.slice(0, -1);
+        }
+        function pinClear() {
+            document.getElementById('pinInput').value = '';
+            document.getElementById('loginError').classList.add('hidden');
+        }
+
+        function loginSuccess() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appScreen').classList.remove('hidden');
+            updateDashboard();
+            filterCustomers('all');
+        }
+
+        function updateFingerprintButton() {
+            const btn = document.getElementById('fingerprintLoginBtn');
+            if (btn && window.PublicKeyCredential && fingerprintCredentialId) btn.classList.remove('hidden');
+        }
+
+        function bufferToBase64(buf) {
+            return btoa(String.fromCharCode(...new Uint8Array(buf)));
+        }
+        function base64ToBuffer(str) {
+            const bin = atob(str);
+            return Uint8Array.from(bin, c => c.charCodeAt(0)).buffer;
+        }
+
+        async function enableFingerprint() {
+            if(!window.isSecureContext || !window.PublicKeyCredential) {
+                return alert('Fingerprint/biometric login इस browser में उपलब्ध नहीं है। इसे HTTPS पर Chrome/Android में खोलकर देखें।');
+            }
+            try {
+                const challenge = crypto.getRandomValues(new Uint8Array(32));
+                const credential = await navigator.credentials.create({
+                    publicKey: {
+                        challenge,
+                        rp: { name: 'JAGESH ELECTRONIC' },
+                        user: {
+                            id: crypto.getRandomValues(new Uint8Array(16)),
+                            name: 'jagesh-electronic',
+                            displayName: 'JAGESH ELECTRONIC'
+                        },
+                        pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }],
+                        authenticatorSelection: {
+                            authenticatorAttachment: 'platform',
+                            userVerification: 'required'
+                        },
+                        timeout: 60000,
+                        attestation: 'none'
+                    }
+                });
+                fingerprintCredentialId = bufferToBase64(credential.rawId);
+                localStorage.setItem('jagesh_fingerprint_credential', fingerprintCredentialId);
+                updateFingerprintButton();
+                closeSettings();
+                alert('Fingerprint/Biometric Login चालू हो गया। अब lock screen पर Fingerprint से खोल सकते हैं।');
+            } catch(e) {
+                alert('Fingerprint setup पूरा नहीं हुआ: ' + (e.message || 'biometric अनुमति रद्द हुई'));
+            }
+        }
+
+        async function loginWithFingerprint() {
+            if(!fingerprintCredentialId) return alert('पहले Settings में Fingerprint Login चालू करें।');
+            try {
+                const challenge = crypto.getRandomValues(new Uint8Array(32));
+                await navigator.credentials.get({
+                    publicKey: {
+                        challenge,
+                        allowCredentials: [{
+                            type: 'public-key',
+                            id: base64ToBuffer(fingerprintCredentialId)
+                        }],
+                        userVerification: 'required',
+                        timeout: 60000
+                    }
+                });
+                loginSuccess();
+            } catch(e) {
+                alert('Biometric verification सफल नहीं हुई। PIN से लॉगिन करें।');
+            }
+        }
+
         function checkPin() {
             const input = document.getElementById('pinInput').value;
             if(btoa(input) === localStorage.getItem('jagesh_pin_secure')) {
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('appScreen').classList.remove('hidden');
-                updateDashboard();
-                filterCustomers('all');
+                loginSuccess();
             } else {
                 alert('गलत पिन! कृपया दोबारा प्रयास करें।');
             }
@@ -328,6 +554,9 @@
                 document.getElementById('gpsStatus').textContent = 'कोई लोकेशन सेव नहीं है';
                 document.getElementById('lat').value = ''; document.getElementById('lng').value = '';
                 document.getElementById('customDateContainer').classList.add('hidden');
+                document.getElementById('paymentAmount').value = '';
+                document.getElementById('paymentStatus').value = 'Unpaid';
+                document.getElementById('paymentNote').value = '';
                 document.getElementById('workDate').value = new Date().toISOString().split('T');
                 updateWorkTypes();
             }
@@ -372,7 +601,11 @@
             let rMsg = `${emoji} ${appliance} ${workType} Reminder: ग्राहक के ${appliance} ${workType.toLowerCase()} को निर्धारित समय हो गया है।`;
             if(workType === 'Service') rMsg = `${emoji} ${appliance} Service Reminder: ${appliance} service का समय हो गया है।`;
 
-            const data = { name, phone, appliance, workType, workDate: wDate, reminderDate: rDate, reminderInterval: interval, reminderMessage: rMsg, lat: document.getElementById('lat').value, lng: document.getElementById('lng').value };
+            const data = { name, phone, appliance, workType, workDate: wDate, reminderDate: rDate, reminderInterval: interval, reminderMessage: rMsg, lat: document.getElementById('lat').value, lng: document.getElementById('lng').value,
+                paymentAmount: document.getElementById('paymentAmount').value || '0',
+                paymentStatus: document.getElementById('paymentStatus').value || 'Unpaid',
+                paymentNote: document.getElementById('paymentNote').value || ''
+            };
 
             if(idx === '') customers.push(data);
             else customers[parseInt(idx)] = data;
@@ -394,6 +627,51 @@
             const b = document.getElementById('binCountBadge');
             if(recycleBin.length > 0) { b.textContent = recycleBin.length; b.classList.remove('hidden'); }
             else b.classList.add('hidden');
+        }
+
+        function openPayment(idx) {
+            paymentCustomerIndex = idx;
+            const c = customers[idx];
+            document.getElementById('paymentCustomerInfo').innerHTML =
+                `<b>${c.name}</b><br>Mobile: ${c.phone}<br>Current: ₹${c.paymentAmount || 0} — ${c.paymentStatus || 'Unpaid'}`;
+            document.getElementById('payAmount').value = c.paymentAmount || '';
+            const upi = localStorage.getItem('jagesh_upi_id') || '';
+            document.getElementById('paymentHint').textContent = upi ? `UPI: ${upi}` : 'Settings में अपना UPI ID सेव करें।';
+            document.getElementById('paymentModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+        function closePayment() {
+            document.getElementById('paymentModal').classList.add('hidden');
+            paymentCustomerIndex = null;
+        }
+        function saveUPI() {
+            const upi = document.getElementById('upiId').value.trim();
+            if(upi && !/^[^\\s@]+@[^\\s@]+$/.test(upi)) return alert('कृपया सही UPI ID डालें।');
+            localStorage.setItem('jagesh_upi_id', upi);
+            alert('UPI ID सेव हो गई।');
+        }
+        function payByUPI() {
+            if(paymentCustomerIndex === null) return;
+            const c = customers[paymentCustomerIndex];
+            const amount = parseFloat(document.getElementById('payAmount').value || c.paymentAmount || 0);
+            const upi = localStorage.getItem('jagesh_upi_id') || '';
+            if(!upi) return alert('पहले Settings → Payment / UPI में अपना UPI ID सेव करें।');
+            if(!amount || amount <= 0) return alert('Payment amount डालें।');
+            const url = `upi://pay?pa=${encodeURIComponent(upi)}&pn=${encodeURIComponent('JAGESH ELECTRONIC')}&am=${encodeURIComponent(amount.toFixed(2))}&cu=INR&tn=${encodeURIComponent('JAGESH ELECTRONIC Payment - ' + c.name)}`;
+            window.location.href = url;
+        }
+        function markPaymentPaid() {
+            if(paymentCustomerIndex === null) return;
+            const c = customers[paymentCustomerIndex];
+            const amount = document.getElementById('payAmount').value || c.paymentAmount || '0';
+            c.paymentAmount = amount;
+            c.paymentStatus = 'Paid';
+            c.paymentNote = 'UPI / Payment marked paid';
+            customers[paymentCustomerIndex] = c;
+            localStorage.setItem('jagesh_customers', JSON.stringify(customers));
+            closePayment();
+            updateDashboard();
+            filterCustomers(currentFilter);
         }
 
         function updateDashboard() {
@@ -446,22 +724,27 @@
                     const row = document.createElement('tr');
                     row.className = "hover:bg-gray-50 border-b";
                     row.innerHTML = `
-                        <td class="p-4">
+                        <td class="p-4" data-label="ग्राहक / संपर्क">
                             <div class="font-bold text-gray-800">${c.name}</div>
                             <div class="text-xs text-gray-500 mt-0.5">📞 ${c.phone}</div>
                         </td>
-                        <td class="p-4">
+                        <td class="p-4" data-label="डिवाइस / कार्य">
                             <span class="bg-blue-50 text-blue-800 px-2 py-0.5 rounded text-xs">${c.appliance}</span>
                             <div class="text-xs text-gray-600 mt-1">${c.workType} (${c.workDate})</div>
                         </td>
-                        <td class="p-4">
+                        <td class="p-4" data-label="रिमाइंडर अलर्ट">
                             <div class="text-xs font-semibold">${c.reminderDate} ${badge}</div>
                             <div class="text-xs text-gray-500 italic mt-1 max-w-xs truncate">${c.reminderMessage}</div>
+                            <div class="text-[11px] mt-1 font-semibold ${c.paymentStatus === 'Paid' ? 'text-green-600' : 'text-red-600'}">
+                                ₹${c.paymentAmount || 0} • ${c.paymentStatus || 'Unpaid'}
+                            </div>
                         </td>
-                        <td class="p-4 text-center">
+                        <td class="p-4 text-center actions-cell">
                             <div class="flex items-center justify-center gap-2">
-                                <a href="tel:${c.phone}" class="p-2 bg-blue-50 text-blue-600 rounded-lg"><i data-lucide="phone-call" class="w-4 h-4"></i></a>
-                                <a href="https://wa.me/91${c.phone}?text=${encodeURIComponent(c.reminderMessage)}" target="_blank" class="p-2 bg-green-50 text-green-600 rounded-lg"><i data-lucide="message-square" class="w-4 h-4"></i></a>
+                                <a href="tel:${c.phone}" title="Call" class="p-2 bg-blue-50 text-blue-600 rounded-lg"><i data-lucide="phone-call" class="w-4 h-4"></i></a>
+                                <a href="sms:${c.phone}?body=${encodeURIComponent(c.reminderMessage)}" title="SMS" class="p-2 bg-purple-50 text-purple-600 rounded-lg"><i data-lucide="message-circle" class="w-5 h-5"></i></a>
+                                <a href="https://wa.me/91${c.phone}?text=${encodeURIComponent(c.reminderMessage)}" target="_blank" title="WhatsApp" class="p-2 bg-green-50 text-green-600 rounded-lg"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" class="jagesh-wa-icon" alt="WhatsApp"></a>
+                                <button onclick="openPayment(${c.originalIndex})" title="Payment" class="p-2 bg-amber-50 text-amber-600 rounded-lg"><i data-lucide="indian-rupee" class="w-4 h-4"></i></button>
                                 ${c.lat ? `<a href="https://www.google.com/maps/search/?api=1&query=${c.lat},${c.lng}" target="_blank" class="p-2 bg-yellow-50 text-yellow-600 rounded-lg">🗺️</a>` : `<button disabled class="p-2 bg-gray-100 text-gray-300 rounded-lg">🗺️</button>`}
                                 <button onclick="editCustomer(${c.originalIndex})" class="p-2 bg-gray-50 text-gray-600 rounded-lg"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
                                 <button onclick="moveCustomerToBin(${c.originalIndex})" class="p-2 bg-red-50 text-red-600 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
@@ -486,6 +769,9 @@
             document.getElementById('workTypeSelect').value = c.workType;
             document.getElementById('workDate').value = c.workDate;
             document.getElementById('reminderInterval').value = c.reminderInterval;
+            document.getElementById('paymentAmount').value = c.paymentAmount || '';
+            document.getElementById('paymentStatus').value = c.paymentStatus || 'Unpaid';
+            document.getElementById('paymentNote').value = c.paymentNote || '';
             handleCustomDate();
             if(c.reminderInterval === 'custom') document.getElementById('customReminderDate').value = c.reminderDate;
             if(c.lat) {

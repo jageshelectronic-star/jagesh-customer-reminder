@@ -15,7 +15,7 @@
         .logo img{width:48px;height:48px;object-fit:contain;border-radius:9px}
         input,select,button{width:100%;min-height:46px;border:1px solid #cbd5e1;border-radius:10px;padding:10px;font-size:16px;margin-top:8px}
         button{background:#0f172a;color:#fff;border:0;cursor:pointer}
-        .secondary{background:#e2e8f0;color:#0f172a}
+        .secondary{background:#e2e8f0;color:#0f172a;margin-top:8px}
         .danger{background:#b91c1c;color:#fff}
         .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
         @media(max-width:600px){
@@ -25,8 +25,8 @@
         }
         .hidden{display:none!important}
         .muted{color:#64748b;font-size:14px}
-        .error{color:#b91c1c;margin-top:8px;font-size:14px}
-        .success{color:#15803d;margin-top:8px;font-size:14px}
+        .error{color:#b91c1c;margin-top:8px;font-size:14px;font-weight:bold}
+        .success{color:#15803d;margin-top:8px;font-size:14px;font-weight:bold}
         .otp{letter-spacing:8px;text-align:center;font-size:24px}
         .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
         .tabs button{margin:0;font-size:14px}
@@ -46,17 +46,19 @@
                 <div class="muted">Customer Reminder</div>
             </div>
         </div>
+        
+        <!-- PIN ENTER BOX -->
         <div id="pinBox">
             <input id="pin" inputmode="numeric" maxlength="6" type="password" placeholder="6-digit PIN">
             <button onclick="loginPin()">Login</button>
             <button class="secondary" onclick="forgot()">PIN भूल गए?</button>
         </div>
         
-        <!-- PIN RECOVERY (SUPABASE) -->
+        <!-- PIN RECOVERY BOX (SUPABASE FIXED VISIBILITY) -->
         <div id="forgotBox" class="hidden">
-            <h3>PIN Recovery</h3>
-            <div class="muted">Registered email पर 6-digit OTP भेजें।</div>
-            <input id="email" type="email" autocomplete="email" placeholder="Email address">
+            <h3>🔐 PIN Recovery Gate</h3>
+            <div class="muted">Registered Email पर 6-digit OTP भेजें।</div>
+            <input id="email" type="email" autocomplete="email" value="jageshelectronic@gmail.com" readonly style="background:#f1f5f9;color:#64748b;font-weight:bold;">
             <button onclick="sendOtp()">Send OTP</button>
             
             <div id="otpArea" class="hidden">
@@ -108,7 +110,7 @@
             <h3>Customer / Appliance</h3>
             <div class="grid">
                 <input id="name" placeholder="Customer name">
-                <input id="phone" inputmode="tel" placeholder="Mobile number">
+                <input id="phone" inputmode="tel" placeholder="Mobile number" value="7007373771">
                 <select id="appliance" onchange="types()">
                     <option value="">Appliance चुनें</option>
                     <option>AC</option>
@@ -161,15 +163,27 @@ let sb=null;
 try{if(!SUPABASE_URL.includes("REPLACE"))sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}catch(e){}
 
 const DK="jagesh_v14_data",PK="jagesh_v14_pin",SK="jagesh_v14_session";
-let d=JSON.parse(localStorage.getItem(DK)||'{"customers":[],"bin":[]}');
-if(!Array.isArray(d.customers)) d.customers=[];
-if(!Array.isArray(d.bin)) d.bin=[];
+
+// Corrupted Storage Cleaner logic to prevent home screen freeze
+let rawData = localStorage.getItem(DK);
+let d = {"customers":[],"bin":[]};
+try {
+    if(rawData) {
+        let parsed = JSON.parse(rawData);
+        if(parsed && Array.isArray(parsed.customers) && Array.isArray(parsed.bin)) {
+            d = parsed;
+        }
+    }
+} catch(err) {
+    localStorage.setItem(DK, JSON.stringify(d));
+}
 
 const $=id=>document.getElementById(id);
 
 function saveData(){localStorage.setItem(DK,JSON.stringify(d))}
 
-function initPin(){if(!localStorage.getItem(PK))localStorage.setItem(PK,"123456")}
+// Updated primary default PIN to 972103 as requested
+function initPin(){if(!localStorage.getItem(PK))localStorage.setItem(PK,"972103")}
 
 function loginPin(){
     initPin();
@@ -178,7 +192,7 @@ function loginPin(){
     if(p===localStorage.getItem(PK)){
         localStorage.setItem(SK,"1");
         openApp();
-    }else note("loginMsg","Incorrect PIN");
+    }else note("loginMsg","Incorrect PIN. कृपया सही पिन दर्ज करें।");
 }
 
 function openApp(){
@@ -201,16 +215,16 @@ function forgot(){
 function backLogin(){
     $("forgotBox").classList.add("hidden");
     $("pinBox").classList.remove("hidden");
+    $("otpMsg").textContent="";
 }
 
 async function sendOtp(){
     if(!sb)return note("otpMsg","Supabase Configuration Error.");
     let email=$("email").value.trim();
-    if(!email)return note("otpMsg","Email डालें");
     let r=await sb.auth.signInWithOtp({email,options:{shouldCreateUser:false}});
     if(r.error)return note("otpMsg",r.error.message);
     $("otpArea").classList.remove("hidden");
-    note("otpMsg","OTP email पर भेज दिया गया है।","success");
+    note("otpMsg","OTP आपके ईमेल jageshelectronic@gmail.com पर भेज दिया गया है।","success");
     timer();
 }
 
@@ -221,22 +235,8 @@ async function verifyOtp(){
     let r=await sb.auth.verifyOtp({email,token,type:"email"});
     if(r.error)return note("otpMsg",r.error.message);
     $("newPin").classList.remove("hidden");
-    note("otpMsg","OTP verified. नया PIN बनाएं।","success");
+    note("otpMsg","OTP Verified! अब आप नीचे नया पिन बना सकते हैं।","success");
 }
 
 async function savePin(){
-    let a=$("np1").value,b=$("np2").value;
-    if(!/^\d{6}$/.test(a)||a!==b)return note("otpMsg","समान 6-digit PIN दोनों जगह डालें");
-    localStorage.setItem(PK,a);
-    if(sb)await sb.auth.signOut();
-    note("otpMsg","नया PIN सेव हो गया। अब Login करें।","success");
-    setTimeout(backLogin,800);
-}
-
-function timer(){
-    let n=60,b=$("resend");
-    b.disabled=true;
-    b.textContent="Resend OTP ("+n+")";
-    let t=setInterval(()=>{
-        n--;
-        b.textContent=n?"Resend OTP ("+n+")":"Resend OTP";
+    

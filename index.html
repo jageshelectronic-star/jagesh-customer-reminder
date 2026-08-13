@@ -1,244 +1,1294 @@
 <!doctype html>
 <html lang="hi">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-    <meta name="theme-color" content="#0f172a">
-    <title>JAGESH ELECTRONIC – Customer Reminder</title>
-    <style>
-        *{box-sizing:border-box}
-        html,body{margin:0;min-height:100%;font-family:system-ui,sans-serif;background:#f1f5f9;color:#0f172a}
-        body{overflow-x:hidden}
-        .app{max-width:900px;margin:auto;padding:10px}
-        .card{background:#fff;border-radius:16px;padding:15px;margin:9px 0;box-shadow:0 2px 12px #0001}
-        .logo{display:flex;align-items:center;gap:10px}
-        .logo img{width:48px;height:48px;object-fit:contain;border-radius:9px}
-        input,select,button{width:100%;min-height:46px;border:1px solid #cbd5e1;border-radius:10px;padding:10px;font-size:16px;margin-top:8px}
-        button{background:#0f172a;color:#fff;border:0;cursor:pointer}
-        .secondary{background:#e2e8f0;color:#0f172a;margin-top:8px}
-        .danger{background:#b91c1c;color:#fff}
-        .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
-        @media(max-width:600px){
-            .grid{grid-template-columns:1fr}
-            .app{padding:7px}
-            .card{padding:12px}
-        }
-        .hidden{display:none!important}
-        .muted{color:#64748b;font-size:14px}
-        .error{color:#b91c1c;margin-top:8px;font-size:14px;font-weight:bold}
-        .success{color:#15803d;margin-top:8px;font-size:14px;font-weight:bold}
-        .otp{letter-spacing:8px;text-align:center;font-size:24px}
-        .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-        .tabs button{margin:0;font-size:14px}
-        .list{border:1px solid #e2e8f0;border-radius:10px;padding:11px;margin:8px 0;background:#fff}
-        .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
-        .small{width:auto;min-height:38px;padding:7px 12px;font-size:14px;margin:4px 2px 0 0}
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<title>JAGESH ELECTRONIC – Customer Reminder</title>
+
+<style>
+*{box-sizing:border-box}
+
+html,body{
+    margin:0;
+    min-height:100%;
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:#f1f5f9;
+    color:#0f172a;
+}
+
+body{
+    overflow-x:hidden;
+}
+
+.app{
+    width:100%;
+    max-width:900px;
+    margin:auto;
+    padding:10px;
+}
+
+.card{
+    background:#fff;
+    border-radius:18px;
+    padding:16px;
+    margin:10px 0;
+    box-shadow:0 3px 15px rgba(15,23,42,.10);
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.logo img{
+    width:55px;
+    height:55px;
+    object-fit:contain;
+    border-radius:12px;
+    background:#fff;
+}
+
+.logo h2{
+    margin:0;
+    font-size:21px;
+}
+
+input,select,button{
+    width:100%;
+    min-height:46px;
+    border:1px solid #cbd5e1;
+    border-radius:11px;
+    padding:10px 12px;
+    font-size:16px;
+    margin-top:9px;
+    outline:none;
+}
+
+input:focus,select:focus{
+    border-color:#2563eb;
+    box-shadow:0 0 0 3px rgba(37,99,235,.10);
+}
+
+button{
+    background:#0f172a;
+    color:#fff;
+    border:0;
+    cursor:pointer;
+    font-weight:600;
+}
+
+button:active{
+    transform:scale(.98);
+}
+
+.secondary{
+    background:#e2e8f0;
+    color:#0f172a;
+}
+
+.successBtn{
+    background:#15803d;
+}
+
+.danger{
+    background:#b91c1c;
+}
+
+.warning{
+    background:#d97706;
+}
+
+.blue{
+    background:#2563eb;
+}
+
+.green{
+    background:#16a34a;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+}
+
+.hidden{
+    display:none!important;
+}
+
+.muted{
+    color:#64748b;
+    font-size:14px;
+}
+
+.error{
+    color:#b91c1c;
+    margin-top:9px;
+    font-size:14px;
+    font-weight:600;
+}
+
+.success{
+    color:#15803d;
+    margin-top:9px;
+    font-size:14px;
+    font-weight:600;
+}
+
+.otp{
+    letter-spacing:8px;
+    text-align:center;
+    font-size:24px;
+}
+
+.tabs{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:7px;
+    margin:10px 0;
+}
+
+.tabs button{
+    margin:0;
+    min-height:44px;
+    font-size:14px;
+}
+
+.list{
+    border:1px solid #e2e8f0;
+    border-radius:13px;
+    padding:13px;
+    margin:9px 0;
+    background:#fff;
+}
+
+.row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:8px;
+}
+
+.small{
+    width:auto;
+    min-height:38px;
+    padding:7px 12px;
+    font-size:14px;
+    margin:4px 2px 0 0;
+}
+
+.statGrid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin:10px 0;
+}
+
+.stat{
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-radius:13px;
+    padding:12px;
+    text-align:center;
+}
+
+.stat strong{
+    display:block;
+    font-size:24px;
+    margin-bottom:3px;
+}
+
+.badge{
+    display:inline-block;
+    padding:4px 8px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:700;
+    background:#e2e8f0;
+}
+
+.badge.today{
+    background:#fee2e2;
+    color:#b91c1c;
+}
+
+.badge.soon{
+    background:#fef3c7;
+    color:#92400e;
+}
+
+.badge.ok{
+    background:#dcfce7;
+    color:#166534;
+}
+
+.customerTitle{
+    font-size:18px;
+    font-weight:700;
+    margin-bottom:3px;
+}
+
+.info{
+    line-height:1.65;
+    font-size:14px;
+}
+
+.actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
+    margin-top:8px;
+}
+
+.actions button{
+    flex:1;
+    min-width:100px;
+}
+
+.empty{
+    text-align:center;
+    padding:25px 10px;
+    color:#64748b;
+}
+
+hr{
+    border:0;
+    border-top:1px solid #e2e8f0;
+    margin:14px 0;
+}
+
+@media(max-width:600px){
+    .app{
+        padding:7px;
+    }
+
+    .card{
+        padding:12px;
+        border-radius:15px;
+    }
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    .statGrid{
+        grid-template-columns:repeat(3,1fr);
+    }
+
+    .stat{
+        padding:9px 5px;
+    }
+
+    .stat strong{
+        font-size:20px;
+    }
+
+    .logo h2{
+        font-size:18px;
+    }
+
+    .actions button{
+        min-width:90px;
+    }
+}
+</style>
 </head>
+
 <body>
+
 <div class="app">
-    <!-- LOGIN SCREEN -->
-    <div id="login" class="card">
-        <div class="logo">
-            <img src="logo.jpg" onerror="this.style.display='none'">
-            <div>
-                <h2>JAGESH ELECTRONIC</h2>
-                <div class="muted">Customer Reminder</div>
-            </div>
+
+<!-- LOGIN -->
+<div id="login" class="card">
+
+    <div class="logo">
+        <img src="logo.jpg" onerror="this.style.display='none'">
+        <div>
+            <h2>JAGESH ELECTRONIC</h2>
+            <div class="muted">Customer Reminder</div>
         </div>
-        
-        <div id="pinBox">
-            <input id="pin" inputmode="numeric" maxlength="6" type="password" placeholder="6-digit PIN">
-            <button onclick="loginPin()">Login</button>
-            <button class="secondary" onclick="forgot()">PIN भूल गए?</button>
-        </div>
-        
-        <div id="forgotBox" class="hidden">
-            <h3>🔐 PIN Recovery Gate</h3>
-            <div class="muted">Registered Email पर 6-digit OTP भेजें।</div>
-            <input id="email" type="email" autocomplete="email" value="jageshelectronic@gmail.com" readonly style="background:#f1f5f9;color:#64748b;font-weight:bold;">
-            <button onclick="sendOtp()">Send OTP</button>
-            
-            <div id="otpArea" class="hidden">
-                <input id="otp" class="otp" inputmode="numeric" maxlength="6" placeholder="6-digit OTP">
-                <button onclick="verifyOtp()">Verify OTP</button>
-                <button id="resend" class="secondary" onclick="sendOtp()" disabled>Resend OTP (60)</button>
-                <div id="otpMsg"></div>
-            </div>
-            
-            <div id="newPin" class="hidden">
-                <input id="np1" type="password" inputmode="numeric" maxlength="6" placeholder="नया 6-digit PIN">
-                <input id="np2" type="password" inputmode="numeric" maxlength="6" placeholder="PIN दोबारा डालें">
-                <button onclick="savePin()">नया PIN सेव करें</button>
-            </div>
-            <button class="secondary" onclick="backLogin()">← वापस Login</button>
-        </div>
-        <div id="loginMsg" class="error"></div>
     </div>
 
-    <!-- MAIN APP DASHBOARD -->
-    <div id="app" class="hidden">
-        <div class="card">
-            <div class="logo">
-                <img src="logo.jpg" onerror="this.style.display='none'">
-                <div>
-                    <h2>JAGESH ELECTRONIC</h2>
-                    <div class="muted">Customer Reminder Dashboard</div>
-                </div>
-            </div>
-            <button class="small secondary" onclick="logout()">Logout</button>
-        </div>
-        
-        <div class="tabs">
-            <button id="btn-dash" onclick="tab('dash')">Dashboard</button>
-            <button id="btn-add" onclick="tab('add')">Add Customer</button>
-            <button id="btn-bin" onclick="tab('bin')">Recycle Bin</button>
-        </div>
-        
-        <section id="dash" class="card">
-            <h3>Dashboard</h3>
-            <div id="stats"></div>
-            <div id="customers"></div>
-        </section>
-        
-        <section id="add" class="card hidden">
-            <h3>Customer / Appliance</h3>
-            <div class="grid">
-                <input id="name" placeholder="Customer name">
-                <input id="phone" inputmode="tel" placeholder="Mobile number" value="7007373771">
-                <select id="appliance" onchange="types()">
-                    <option value="">Appliance चुनें</option>
-                    <option>AC</option>
-                    <option>LED TV</option>
-                    <option>Refrigerator</option>
-                    <option>Microwave</option>
-                </select>
-                <select id="work">
-                    <option value="">Work Type चुनें</option>
-                </select>
-                <input id="date" type="date">
-                <select id="rem">
-                    <option value="">Reminder</option>
-                    <option value="30">1 Month</option>
-                    <option value="60">2 Months</option>
-                    <option value="90">3 Months</option>
-                    <option value="365">1 Year</option>
-                    <option value="custom">Custom Date</option>
-                </select>
-                <input id="custom" class="hidden" type="date">
-                <input id="amount" inputmode="decimal" placeholder="Amount">
-                <select id="payment">
-                    <option value="">Payment Method</option>
-                    <option>Cash</option>
-                    <option>UPI</option>
-                    <option>Card</option>
-                    <option>Bank Transfer</option>
-                    <option>Pending</option>
-                </select>
-                <input id="loc" readonly placeholder="Current location">
-            </div>
-            <button onclick="gps()">📍 Current GPS Location</button>
-            <button onclick="save()">Save Customer</button>
-            <div id="saveMsg"></div>
-        </section>
-        
-        <section id="bin" class="card hidden">
-            <h3>🔐 Recycle Bin</h3>
-            <div id="binList"></div>
-        </section>
+    <div id="pinBox">
+
+        <input
+            id="pin"
+            inputmode="numeric"
+            maxlength="6"
+            type="password"
+            placeholder="6-digit PIN"
+            autocomplete="off"
+        >
+
+        <button onclick="loginPin()">🔐 Login</button>
+
+        <button class="secondary" onclick="forgot()">
+            PIN भूल गए?
+        </button>
+
     </div>
+
+    <div id="forgotBox" class="hidden">
+
+        <h3>🔐 PIN Recovery</h3>
+
+        <div class="muted">
+            Registered Email पर 6-digit OTP भेजें।
+        </div>
+
+        <input
+            id="email"
+            type="email"
+            value="jageshelectronic@gmail.com"
+            readonly
+            style="background:#f1f5f9;color:#64748b;font-weight:bold;"
+        >
+
+        <button onclick="sendOtp()">📩 Send OTP</button>
+
+        <div id="otpArea" class="hidden">
+
+            <input
+                id="otp"
+                class="otp"
+                inputmode="numeric"
+                maxlength="6"
+                placeholder="6-digit OTP"
+            >
+
+            <button onclick="verifyOtp()">Verify OTP</button>
+
+            <button
+                id="resend"
+                class="secondary"
+                onclick="sendOtp()"
+                disabled
+            >
+                Resend OTP (60)
+            </button>
+
+            <div id="otpMsg"></div>
+
+        </div>
+
+        <div id="newPin" class="hidden">
+
+            <input
+                id="np1"
+                type="password"
+                inputmode="numeric"
+                maxlength="6"
+                placeholder="नया 6-digit PIN"
+            >
+
+            <input
+                id="np2"
+                type="password"
+                inputmode="numeric"
+                maxlength="6"
+                placeholder="PIN दोबारा डालें"
+            >
+
+            <button onclick="savePin()">
+                नया PIN सेव करें
+            </button>
+
+        </div>
+
+        <button class="secondary" onclick="backLogin()">
+            ← वापस Login
+        </button>
+
+    </div>
+
+    <div id="loginMsg" class="error"></div>
+
 </div>
 
-<script src="https://jsdelivr.net"></script>
+
+<!-- MAIN APP -->
+<div id="mainApp" class="hidden">
+
+    <!-- HEADER -->
+    <div class="card">
+
+        <div class="logo">
+
+            <img src="logo.jpg" onerror="this.style.display='none'">
+
+            <div>
+                <h2>JAGESH ELECTRONIC</h2>
+                <div class="muted">
+                    Customer Reminder Dashboard
+                </div>
+            </div>
+
+        </div>
+
+        <button class="small secondary" onclick="logout()">
+            Logout
+        </button>
+
+    </div>
+
+
+    <!-- TABS -->
+    <div class="tabs">
+
+        <button id="btnDash" onclick="tab('dash')">
+            📊 Dashboard
+        </button>
+
+        <button id="btnAdd" onclick="tab('add')">
+            ➕ Add Customer
+        </button>
+
+        <button id="btnBin" onclick="tab('bin')">
+            🗑️ Recycle Bin
+        </button>
+
+    </div>
+
+
+    <!-- DASHBOARD -->
+    <section id="dash" class="card">
+
+        <h3>📊 Dashboard</h3>
+
+        <div id="stats"></div>
+
+        <hr>
+
+        <div class="row">
+            <h3 style="margin:0;">Customers</h3>
+
+            <button
+                class="small secondary"
+                onclick="renderCustomers()"
+            >
+                🔄 Refresh
+            </button>
+        </div>
+
+        <div id="customers"></div>
+
+    </section>
+
+
+    <!-- ADD CUSTOMER -->
+    <section id="add" class="card hidden">
+
+        <h3>👤 Customer / Appliance</h3>
+
+        <div class="grid">
+
+            <input
+                id="name"
+                placeholder="Customer name"
+            >
+
+            <input
+                id="phone"
+                inputmode="tel"
+                maxlength="10"
+                placeholder="Mobile number"
+            >
+
+            <select id="appliance" onchange="types()">
+
+                <option value="">
+                    Appliance चुनें
+                </option>
+
+                <option>AC</option>
+                <option>LED TV</option>
+                <option>Refrigerator</option>
+                <option>Microwave</option>
+
+            </select>
+
+            <select id="work">
+
+                <option value="">
+                    Work Type चुनें
+                </option>
+
+            </select>
+
+            <input
+                id="date"
+                type="date"
+            >
+
+            <select id="rem" onchange="reminderChange()">
+
+                <option value="">
+                    Reminder चुनें
+                </option>
+
+                <option value="30">
+                    1 Month
+                </option>
+
+                <option value="60">
+                    2 Months
+                </option>
+
+                <option value="90">
+                    3 Months
+                </option>
+
+                <option value="365">
+                    1 Year
+                </option>
+
+                <option value="custom">
+                    Custom Date
+                </option>
+
+            </select>
+
+            <input
+                id="custom"
+                class="hidden"
+                type="date"
+            >
+
+            <input
+                id="amount"
+                inputmode="decimal"
+                placeholder="Amount"
+            >
+
+            <select id="payment">
+
+                <option value="">
+                    Payment Method
+                </option>
+
+                <option>Cash</option>
+                <option>UPI</option>
+                <option>Card</option>
+                <option>Bank Transfer</option>
+                <option>Pending</option>
+
+            </select>
+
+            <input
+                id="loc"
+                readonly
+                placeholder="Current location"
+            >
+
+        </div>
+
+        <button onclick="gps()">
+            📍 Current GPS Location
+        </button>
+
+        <button onclick="save()">
+            💾 Save Customer
+        </button>
+
+        <div id="saveMsg"></div>
+
+    </section>
+
+
+    <!-- RECYCLE BIN -->
+    <section id="bin" class="card hidden">
+
+        <h3>🗑️ Recycle Bin</h3>
+
+        <div class="muted">
+            Deleted customers यहां से वापस Restore किए जा सकते हैं।
+        </div>
+
+        <div id="binList"></div>
+
+    </section>
+
+</div>
+
+</div>
+
+
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
-const SUPABASE_URL="https://supabase.co",
-      SUPABASE_KEY="sb_publishable_mOi55EghYQ9yyQ4EWPQckA_p2NpSnjT";
-let sb=null;
-try{if(!SUPABASE_URL.includes("REPLACE"))sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}catch(e){}
 
-const DK="jagesh_v14_data",PK="jagesh_v14_pin",SK="jagesh_v14_session";
+const SUPABASE_URL =
+"https://ihrktiuoyvjoornpaknb.supabase.co";
 
-// Corrupted Storage Automatic Reset Gate
-let rawData = localStorage.getItem(DK);
-let d = {"customers":[],"bin":[]};
-try {
-    if(rawData) {
-        let parsed = JSON.parse(rawData);
-        if(parsed && Array.isArray(parsed.customers) && Array.isArray(parsed.bin)) {
-            d = parsed;
-        }
-    }
-} catch(err) {
-    localStorage.setItem(DK, JSON.stringify(d));
+const SUPABASE_KEY =
+"sb_publishable_mOi55EghYQ9yyQ4EWPQckA_p2NpSnjT";
+
+let sb = null;
+
+try{
+
+    sb = supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+}catch(e){
+
+    console.log("Supabase Error:",e);
+
 }
 
-const $=id=>document.getElementById(id);
 
-function saveData(){localStorage.setItem(DK,JSON.stringify(d))}
+/* STORAGE */
 
-function initPin(){if(!localStorage.getItem(PK))localStorage.setItem(PK,"972103")}
+const DK = "jagesh_v14_data";
+const PK = "jagesh_v14_pin";
+const SK = "jagesh_v14_session";
+
+let d = {
+    customers:[],
+    bin:[]
+};
+
+try{
+
+    const raw =
+        localStorage.getItem(DK);
+
+    if(raw){
+
+        const parsed =
+            JSON.parse(raw);
+
+        if(
+            parsed &&
+            Array.isArray(parsed.customers) &&
+            Array.isArray(parsed.bin)
+        ){
+
+            d = parsed;
+
+        }
+
+    }
+
+}catch(e){
+
+    localStorage.setItem(
+        DK,
+        JSON.stringify(d)
+    );
+
+}
+
+
+const $ = id =>
+    document.getElementById(id);
+
+
+/* SAVE DATA */
+
+function saveData(){
+
+    localStorage.setItem(
+        DK,
+        JSON.stringify(d)
+    );
+
+}
+
+
+/* MESSAGE */
+
+function note(id,msg,type="error"){
+
+    const el = $(id);
+
+    if(!el) return;
+
+    el.className =
+        type === "success"
+        ? "success"
+        : "error";
+
+    el.textContent = msg;
+
+}
+
+
+/* DEFAULT PIN */
+
+function initPin(){
+
+    if(!localStorage.getItem(PK)){
+
+        localStorage.setItem(
+            PK,
+            "972103"
+        );
+
+    }
+
+}
+
+
+/* LOGIN */
 
 function loginPin(){
+
     initPin();
-    let p=$("pin").value;
-    if(!/^\d{6}$/.test(p))return note("loginMsg","6-digit PIN डालें");
-    if(p===localStorage.getItem(PK)){
-        localStorage.setItem(SK,"1");
+
+    const p =
+        $("pin").value.trim();
+
+    if(!/^\d{6}$/.test(p)){
+
+        return note(
+            "loginMsg",
+            "6-digit PIN डालें"
+        );
+
+    }
+
+    if(
+        p ===
+        localStorage.getItem(PK)
+    ){
+
+        localStorage.setItem(
+            SK,
+            "1"
+        );
+
         openApp();
-    }else note("loginMsg","Incorrect PIN. कृपया सही पिन दर्ज करें।");
+
+    }else{
+
+        note(
+            "loginMsg",
+            "Incorrect PIN. कृपया सही PIN डालें।"
+        );
+
+    }
+
 }
+
+
+/* OPEN APP */
 
 function openApp(){
-    $("login").classList.add("hidden");
-    $("app").classList.remove("hidden");
-    tab('dash');
+
+    $("login")
+        .classList
+        .add("hidden");
+
+    $("mainApp")
+        .classList
+        .remove("hidden");
+
+    tab("dash");
+
 }
+
+
+/* LOGOUT */
 
 function logout(){
+
     localStorage.removeItem(SK);
+
     location.reload();
+
 }
+
+
+/* FORGOT */
 
 function forgot(){
-    $("pinBox").classList.add("hidden");
-    $("forgotBox").classList.remove("hidden");
+
+    $("pinBox")
+        .classList
+        .add("hidden");
+
+    $("forgotBox")
+        .classList
+        .remove("hidden");
+
     $("loginMsg").textContent="";
+
 }
+
+
+/* BACK LOGIN */
 
 function backLogin(){
-    $("forgotBox").classList.add("hidden");
-    $("pinBox").classList.remove("hidden");
+
+    $("forgotBox")
+        .classList
+        .add("hidden");
+
+    $("pinBox")
+        .classList
+        .remove("hidden");
+
     $("otpMsg").textContent="";
+
 }
+
+
+/* OTP */
+
+let timerInterval = null;
 
 async function sendOtp(){
-    if(!sb)return note("otpMsg","Supabase Configuration Error.");
-    let email=$("email").value.trim();
-    let r=await sb.auth.signInWithOtp({email,options:{shouldCreateUser:false}});
-    if(r.error)return note("otpMsg",r.error.message);
-    $("otpArea").classList.remove("hidden");
-    note("otpMsg","OTP ईमेल jageshelectronic@gmail.com पर भेज दिया गया है।","success");
-    timer();
+
+    if(!sb){
+
+        return note(
+            "otpMsg",
+            "Supabase Configuration Error."
+        );
+
+    }
+
+    const email =
+        $("email").value.trim();
+
+    const r =
+        await sb.auth.signInWithOtp({
+
+            email:email,
+
+            options:{
+                shouldCreateUser:false
+            }
+
+        });
+
+    if(r.error){
+
+        return note(
+            "otpMsg",
+            r.error.message
+        );
+
+    }
+
+    $("otpArea")
+        .classList
+        .remove("hidden");
+
+    note(
+        "otpMsg",
+        "OTP registered email पर भेज दिया गया है।",
+        "success"
+    );
+
+    startTimer();
+
 }
+
+
+function startTimer(){
+
+    let seconds = 60;
+
+    const btn =
+        $("resend");
+
+    btn.disabled = true;
+
+    btn.textContent =
+        "Resend OTP (" +
+        seconds +
+        ")";
+
+    clearInterval(timerInterval);
+
+    timerInterval =
+        setInterval(()=>{
+
+            seconds--;
+
+            btn.textContent =
+                "Resend OTP (" +
+                seconds +
+                ")";
+
+            if(seconds <= 0){
+
+                clearInterval(timerInterval);
+
+                btn.disabled = false;
+
+                btn.textContent =
+                    "Resend OTP";
+
+            }
+
+        },1000);
+
+}
+
 
 async function verifyOtp(){
-    if(!sb)return;
-    let email=$("email").value.trim(),token=$("otp").value.trim();
-    if(!/^\d{6}$/.test(token))return note("otpMsg","6-digit OTP डालें");
-    let r=await sb.auth.verifyOtp({email,token,type:"email"});
-    if(r.error)return note("otpMsg",r.error.message);
-    $("newPin").classList.remove("hidden");
-    note("otpMsg","OTP Verified! अब नीचे नया पिन बनाएं।","success");
+
+    if(!sb) return;
+
+    const email =
+        $("email").value.trim();
+
+    const token =
+        $("otp").value.trim();
+
+    if(!/^\d{6}$/.test(token)){
+
+        return note(
+            "otpMsg",
+            "6-digit OTP डालें"
+        );
+
+    }
+
+    const r =
+        await sb.auth.verifyOtp({
+
+            email:email,
+            token:token,
+            type:"email"
+
+        });
+
+    if(r.error){
+
+        return note(
+            "otpMsg",
+            r.error.message
+        );
+
+    }
+
+    $("newPin")
+        .classList
+        .remove("hidden");
+
+    note(
+        "otpMsg",
+        "OTP Verified! अब नया PIN बनाएं।",
+        "success"
+    );
+
 }
+
 
 async function savePin(){
-    let a=$("np1").value,b=$("np2").value;
-    if(!/^\d{6}$/.test(a)||a!==b)return note("otpMsg","समान 6-digit PIN दोनों जगह डालें");
-    localStorage.setItem(PK,a);
-    if(sb)await sb.auth.signOut();
-    note("otpMsg","नया PIN सेव हो गया। अब लॉगिन करें।","success");
-    setTimeout(backLogin,1200);
+
+    const a =
+        $("np1").value;
+
+    const b =
+        $("np2").value;
+
+    if(
+        !/^\d{6}$/.test(a) ||
+        a !== b
+    ){
+
+        return note(
+            "otpMsg",
+            "समान 6-digit PIN दोनों जगह डालें"
+        );
+
+    }
+
+    localStorage.setItem(
+        PK,
+        a
+    );
+
+    if(sb){
+
+        await sb.auth.signOut();
+
+    }
+
+    note(
+        "otpMsg",
+        "नया PIN सेव हो गया। अब Login करें।",
+        "success"
+    );
+
+    setTimeout(
+        backLogin,
+        1200
+    );
+
 }
 
-function timer(){
-    
+
+/* TABS */
+
+function tab(name){
+
+    ["dash","add","bin"].forEach(id=>{
+
+        $(id)
+            .classList
+            .add("hidden");
+
+    });
+
+    $(name)
+        .classList
+        .remove("hidden");
+
+    if(name === "dash"){
+
+        renderCustomers();
+
+    }
+
+    if(name === "bin"){
+
+        renderBin();
+
+    }
+
+}
+
+
+/* APPLIANCE TYPES */
+
+function types(){
+
+    const appliance =
+        $("appliance").value;
+
+    const work =
+        $("work");
+
+    work.innerHTML =
+        '<option value="">Work Type चुनें</option>';
+
+    const list = {
+
+        "AC":[
+            "AC Service",
+            "AC Repair",
+            "AC Installation",
+            "AC Uninstallation",
+            "AC Jet Pump Service",
+            "AC Gas Charging",
+            "AC No Power",
+            "AC Cooling Problem"
+        ],
+
+        "LED TV":[
+            "LED TV Repair",
+            "Backlight Repair",
+            "Power Supply Repair",
+            "Panel Repair",
+            "Main Board Repair",
+            "LED TV Installation"
+        ],
+
+        "Refrigerator":[
+            "Refrigerator Repair",
+            "Gas Charging",
+            "Cooling Problem",
+            "Compressor Work",
+            "No Cooling"
+        ],
+
+        "Microwave":[
+            "Microwave Repair",
+            "Heating Problem",
+            "Panel Repair",
+            "Power Problem"
+        ]
+
+    };
+
+    (list[appliance] || [])
+    .forEach(item=>{
+
+        const option =
+            document.createElement("option");
+
+        option.value = item;
+        option.textContent = item;
+
+        work.appendChild(option);
+
+    });
+
+}
+
+
+/* REMINDER */
+
+function reminderChange(){
+
+    const value =
+        $("rem").value;
+
+    $("custom")
+        .classList
+        .toggle(
+            "hidden",
+            value !== "custom"
+        );
+
+}
+
+
+/* GPS */
+
+function gps(){
+
+    if(!navigator.geolocation){
+
+        return note(
+            "saveMsg",
+            "आपके browser में GPS support नहीं है।"
+        );
+
+    }
+
+    note(
+        "saveMsg",
+        "Location प्राप्त की जा रही है...",
+        "success"
+    );
+
+    navigator.geolocation.getCurrentPosition(
+
+        position=>{
+
+            const lat =
+                position.coords.latitude;
+
+            const lng =
+                position.coords.longitude;
+
+            $("loc").value =
+                lat.toFixed(6) +
+                ", " +
+                lng.toFixed(6);
+
+            note(
+                "saveMsg",
+                "📍 Current location मिल गई।",
+                "success"
+            );
+
+        },
+
+        error=>{
+
+            note(
+                "saveMsg",
+                "Location permission allow करें।"
+            );
+
+        },
+
+        {
+            enableHighAccuracy:true,
+            timeout:15000,
+            maximumAge:0
+        }
+
+    );
+
+}
+
+
+/* REMINDER DATE */
+
+function getReminderDate(){
+
+    const rem =
+        $("rem").value;
+
+    if(!rem) return "";
+
+    if(rem === "custom"){
+
+        return $("custom").value;
+
+    }
+
+    const base =
+        $("date").value
+        ? new Date($("date").value)
+        : new Date();
+
+    base.setDate(
+        base.getDate() +
+        Number(rem)
+    );
+
+    return formatDate(base);
+
+}
+
+
+/* DATE FORMAT */
+
+function formatDate(date){
+
+    const y =
+        date.getFullYear();
+
+    const m =
+        String(
+            date.getMonth()+1
+        ).padStart(2,"0");
+
+    const day =
+        String(
+            date.getDate()
+        ).padStart(2,"0");
+
+    return `${y}-${m}-${day}`;
+
+}
+
+
+/* SAVE CUSTOMER */
+
+function save(){
+
+    const name =
+        $("name").value.trim();
+
+    const phone =
+        $("phone").value.trim();
+
+    const appliance =
+        $("appliance").value;
+
+    const work =
+        $("work").value;
+
+    const date =
+        $("date").value ||
+        formatDate(new Date());
+
+    const reminder =
+        getReminderDate();
+
+    const amount =
+        $("amount").value.trim();
+
+    const payment =
+        $("payment").value;
+
+    const loc =
+        $("loc").value;
+
+    if(!name

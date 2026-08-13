@@ -155,7 +155,8 @@
 
 <script src="https://jsdelivr.net"></script>
 <script>
-const SUPABASE_URL="REPLACE_WITH_YOUR_SUPABASE_URL",SUPABASE_KEY="REPLACE_WITH_YOUR_PUBLISHABLE_KEY";
+const SUPABASE_URL="https://ihrktiuoyvjoornpaknb.supabase.co",
+      SUPABASE_KEY="sb_publishable_mOi55EghYQ9yyQ4EWPQckA_p2NpSnjT";
 let sb=null;
 try{if(!SUPABASE_URL.includes("REPLACE"))sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}catch(e){}
 
@@ -164,12 +165,14 @@ let d=JSON.parse(localStorage.getItem(DK)||'{"customers":[],"bin":[]}');
 const $=id=>document.getElementById(id);
 
 function saveData(){localStorage.setItem(DK,JSON.stringify(d))}
-function initPin(){if(!localStorage.getItem(PK))localStorage.setItem(PK,"972103")}
+
+// Default PIN updated to 123456 as requested
+function initPin(){if(!localStorage.getItem(PK))localStorage.setItem(PK,"123456")}
 
 function loginPin(){
+    initPin();
     let p=$("pin").value;
     if(!/^\d{6}$/.test(p))return note("loginMsg","6-digit PIN डालें");
-    initPin();
     if(p===localStorage.getItem(PK)){
         localStorage.setItem(SK,"1");
         open();
@@ -199,7 +202,7 @@ function backLogin(){
 }
 
 async function sendOtp(){
-    if(!sb)return note("otpMsg","Supabase URL/Publishable Key अभी सेट नहीं है।");
+    if(!sb)return note("otpMsg","Supabase Configuration Error.");
     let email=$("email").value.trim();
     if(!email)return note("otpMsg","Email डालें");
     let r=await sb.auth.signInWithOtp({email,options:{shouldCreateUser:false}});
@@ -242,5 +245,4 @@ function timer(){
 function note(id,t,k="error"){$(id).textContent=t;$(id).className=k}
 
 function tab(x){
-    ["dash","add","bin"].forEach(i=>$(i).classList.toggle("hidden",i!==x));
- 
+    

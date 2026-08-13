@@ -155,7 +155,7 @@
 
 <script src="https://jsdelivr.net"></script>
 <script>
-const SUPABASE_URL="https://ihrktiuoyvjoornpaknb.supabase.co",
+const SUPABASE_URL="https://supabase.co",
       SUPABASE_KEY="sb_publishable_mOi55EghYQ9yyQ4EWPQckA_p2NpSnjT";
 let sb=null;
 try{if(!SUPABASE_URL.includes("REPLACE"))sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}catch(e){}
@@ -166,7 +166,6 @@ const $=id=>document.getElementById(id);
 
 function saveData(){localStorage.setItem(DK,JSON.stringify(d))}
 
-// Default PIN updated to 123456 as requested
 function initPin(){if(!localStorage.getItem(PK))localStorage.setItem(PK,"123456")}
 
 function loginPin(){

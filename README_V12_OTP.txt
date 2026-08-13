@@ -11,4 +11,4 @@ V12 fixes:
 - Clear error messages are shown when Supabase SMS is not configured.
 - 60-second resend timer.
 
-IMPORTANT: Real SMS OTP requires Phone Authentication enabled in Supabase and an SMS provider configured. Supabase currently supports providers including Twilio, Vonage and MessageBird. Do NOT put a service_role/secret key in this website.
+IMPORTANT: Real SMS OTP requires Email Authentication enabled in Supabase and an SMS provider configured. Supabase currently supports providers including Twilio, Vonage and MessageBird. Do NOT put a service_role/secret key in this website.

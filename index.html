@@ -47,14 +47,12 @@
             </div>
         </div>
         
-        <!-- PIN ENTER BOX -->
         <div id="pinBox">
             <input id="pin" inputmode="numeric" maxlength="6" type="password" placeholder="6-digit PIN">
             <button onclick="loginPin()">Login</button>
             <button class="secondary" onclick="forgot()">PIN भूल गए?</button>
         </div>
         
-        <!-- PIN RECOVERY BOX (SUPABASE FIXED VISIBILITY) -->
         <div id="forgotBox" class="hidden">
             <h3>🔐 PIN Recovery Gate</h3>
             <div class="muted">Registered Email पर 6-digit OTP भेजें।</div>
@@ -91,21 +89,18 @@
             <button class="small secondary" onclick="logout()">Logout</button>
         </div>
         
-        <!-- NAVIGATION TABS -->
         <div class="tabs">
             <button id="btn-dash" onclick="tab('dash')">Dashboard</button>
             <button id="btn-add" onclick="tab('add')">Add Customer</button>
             <button id="btn-bin" onclick="tab('bin')">Recycle Bin</button>
         </div>
         
-        <!-- DASHBOARD TAB -->
         <section id="dash" class="card">
             <h3>Dashboard</h3>
             <div id="stats"></div>
             <div id="customers"></div>
         </section>
         
-        <!-- ADD CUSTOMER TAB -->
         <section id="add" class="card hidden">
             <h3>Customer / Appliance</h3>
             <div class="grid">
@@ -147,7 +142,6 @@
             <div id="saveMsg"></div>
         </section>
         
-        <!-- RECYCLE BIN TAB -->
         <section id="bin" class="card hidden">
             <h3>🔐 Recycle Bin</h3>
             <div id="binList"></div>
@@ -164,7 +158,7 @@ try{if(!SUPABASE_URL.includes("REPLACE"))sb=supabase.createClient(SUPABASE_URL,S
 
 const DK="jagesh_v14_data",PK="jagesh_v14_pin",SK="jagesh_v14_session";
 
-// Corrupted Storage Cleaner logic to prevent home screen freeze
+// Corrupted Storage Automatic Reset Gate
 let rawData = localStorage.getItem(DK);
 let d = {"customers":[],"bin":[]};
 try {
@@ -182,7 +176,6 @@ const $=id=>document.getElementById(id);
 
 function saveData(){localStorage.setItem(DK,JSON.stringify(d))}
 
-// Updated primary default PIN to 972103 as requested
 function initPin(){if(!localStorage.getItem(PK))localStorage.setItem(PK,"972103")}
 
 function loginPin(){
@@ -224,7 +217,7 @@ async function sendOtp(){
     let r=await sb.auth.signInWithOtp({email,options:{shouldCreateUser:false}});
     if(r.error)return note("otpMsg",r.error.message);
     $("otpArea").classList.remove("hidden");
-    note("otpMsg","OTP आपके ईमेल jageshelectronic@gmail.com पर भेज दिया गया है।","success");
+    note("otpMsg","OTP ईमेल jageshelectronic@gmail.com पर भेज दिया गया है।","success");
     timer();
 }
 
@@ -235,8 +228,17 @@ async function verifyOtp(){
     let r=await sb.auth.verifyOtp({email,token,type:"email"});
     if(r.error)return note("otpMsg",r.error.message);
     $("newPin").classList.remove("hidden");
-    note("otpMsg","OTP Verified! अब आप नीचे नया पिन बना सकते हैं।","success");
+    note("otpMsg","OTP Verified! अब नीचे नया पिन बनाएं।","success");
 }
 
 async function savePin(){
+    let a=$("np1").value,b=$("np2").value;
+    if(!/^\d{6}$/.test(a)||a!==b)return note("otpMsg","समान 6-digit PIN दोनों जगह डालें");
+    localStorage.setItem(PK,a);
+    if(sb)await sb.auth.signOut();
+    note("otpMsg","नया PIN सेव हो गया। अब लॉगिन करें।","success");
+    setTimeout(backLogin,1200);
+}
+
+function timer(){
     

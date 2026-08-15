@@ -1,0 +1,1 @@
+V6: unique customers vs total work; clickable popup cards; direct Edit; reminder-based Upcoming/Overdue; appliance-specific work types; WhatsApp reminder templates/custom message.

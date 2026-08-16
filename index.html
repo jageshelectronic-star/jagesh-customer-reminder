@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>JAGESH ELECTRONIC</title>
+<title>JAGESH ELECTRONIC - V20 GPS NAVIGATION FIX</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f6f9;color:#18202d}
 header{height:78px;background:#0b4c91;color:#fff;display:flex;align-items:center;padding:8px 14px;gap:12px}
@@ -120,48 +120,91 @@ function show(html){$("sheet").innerHTML=html;$("overlay").style.display="flex"}
 function close(){$("overlay").style.display="none"}
 function toast(t){$("toast").textContent=t;$("toast").style.display="block";setTimeout(()=>$("toast").style.display="none",1600)}
 let locationWatchId=null;
-let locationTimeoutId=null;
-function saveCurrentLocation(prefix){
- if(!navigator.geolocation){toast("इस डिवाइस/ब्राउज़र में GPS उपलब्ध नहीं है");return}
+let gpsRequestId=0;
+function getFreshGPS(){
+ return new Promise((resolve,reject)=>{
+   if(!navigator.geolocation){reject({code:0,message:'Geolocation not supported'});return}
+   const requestId=++gpsRequestId;
+   let finished=false, best=null, timer=null;
+   const finish=(fn,v)=>{
+     if(finished||requestId!==gpsRequestId)return;
+     finished=true;
+     if(timer)clearTimeout(timer);
+     if(locationWatchId!==null){try{navigator.geolocation.clearWatch(locationWatchId)}catch(e){} locationWatchId=null;}
+     fn(v);
+   };
+   const success=p=>{
+     const lat=Number(p.coords.latitude), lon=Number(p.coords.longitude);
+     const accuracy=Math.round(Number(p.coords.accuracy)||999999);
+     if(!Number.isFinite(lat)||!Number.isFinite(lon))return;
+     const fix={lat:lat.toFixed(7),lon:lon.toFixed(7),accuracy,timestamp:Date.now()};
+     if(!best || accuracy<best.accuracy)best=fix;
+     // Accept a reasonably accurate fix immediately; otherwise keep watching briefly.
+     if(accuracy<=50) finish(resolve,fix);
+   };
+   const fail=e=>{
+     // Don't fail on a temporary GPS reading problem; timeout below gets a useful error.
+     if(e && e.code===1) finish(reject,e);
+   };
+   try{
+     locationWatchId=navigator.geolocation.watchPosition(success,fail,{
+       enableHighAccuracy:true, timeout:15000, maximumAge:0
+     });
+     timer=setTimeout(()=>{
+       if(best) finish(resolve,best);
+       else {
+         // One direct request as a fallback for browsers/WebViews that don't stream watch fixes.
+         navigator.geolocation.getCurrentPosition(
+           p=>success(p),
+           e=>finish(reject,e||{code:3}),
+           {enableHighAccuracy:true,timeout:12000,maximumAge:0}
+         );
+       }
+     },7000);
+   }catch(e){finish(reject,e)}
+ });
+}
+async function saveCurrentLocation(prefix){
  const field=$(prefix+"Location");
- toast("Device GPS location मांगी जा रही है…");
- const opts={enableHighAccuracy:true,maximumAge:0,timeout:20000};
- let best=null, done=false, samples=0;
- const finish=(message)=>{
-   if(done)return; done=true;
-   if(locationWatchId!==null){try{navigator.geolocation.clearWatch(locationWatchId)}catch(e){} locationWatchId=null}
-   if(locationTimeoutId){clearTimeout(locationTimeoutId);locationTimeoutId=null}
-   if(best){
-     const lat=Number(best.coords.latitude), lon=Number(best.coords.longitude), acc=Math.round(best.coords.accuracy||0);
-     pendingLocation={lat:lat.toFixed(6),lon:lon.toFixed(6),accuracy:acc,source:"device-gps",timestamp:Date.now()};
-     if(field) field.value=`${lat.toFixed(6)}, ${lon.toFixed(6)} (GPS ±${acc}m)`;
-     toast(`Current device GPS saved (±${acc}m)`);
-   }else toast(message||"GPS नहीं मिला। फोन की Location ON करके फिर कोशिश करें।");
- };
- const success=pos=>{
-   if(done)return;
-   samples++;
-   const acc=Number(pos.coords.accuracy)||99999;
-   if(!best || acc < Number(best.coords.accuracy||99999)) best=pos;
-   // Accept a good fresh fix quickly; otherwise keep listening for better GPS samples.
-   if(acc<=35 || samples>=6) finish();
- };
- const error=err=>{
-   if(done)return;
-   if(err && err.code===1){
-     finish("Location permission बंद है। Android में Location permission Allow करके फिर GPS बटन दबाएं।");
-   }else if(err && err.code===2){
-     toast("Device GPS location उपलब्ध नहीं है। Location/GPS ON करें और खुले स्थान में कोशिश करें।");
-   }
- };
+ if(!window.isSecureContext && location.protocol!=='https:'){
+   toast('⚠️ GPS के लिए HTTPS/PWA में ऐप खोलें');
+   return;
+ }
+ if(!navigator.geolocation){toast('इस browser में GPS उपलब्ध नहीं है');return}
+ toast('📡 आपकी वर्तमान GPS Location खोजी जा रही है…');
  try{
-   // Do NOT query navigator.permissions first: getCurrentPosition/watchPosition must be
-   // called directly from the user's button tap so Android/Chrome can show its permission prompt.
-   locationWatchId=navigator.geolocation.watchPosition(success,error,opts);
-   // Also request an immediate fresh fix; whichever gives the best reading wins.
-   navigator.geolocation.getCurrentPosition(success,error,opts);
-   locationTimeoutId=setTimeout(()=>finish("GPS fix नहीं मिला। Location ON करें, permission Allow करें और फिर कोशिश करें।"),25000);
- }catch(e){finish("GPS error: "+(e.message||"unknown"))}
+   const p=await getFreshGPS();
+   pendingLocation={lat:p.lat,lon:p.lon,accuracy:p.accuracy,source:'device-gps',timestamp:p.timestamp};
+   if(field) field.value=`${p.lat}, ${p.lon} (GPS ±${p.accuracy}m)`;
+   toast(`✅ Current Location Save हो गई (±${p.accuracy}m)`);
+ }catch(e){
+   let msg='Location नहीं मिली। Phone की Location ON करके फिर कोशिश करें।';
+   if(e&&e.code===1) msg='📍 Location Permission को Allow करें, फिर Current Location दबाएँ।';
+   else if(e&&e.code===3) msg='📡 GPS मिलने में समय लगा। खुले स्थान पर फिर कोशिश करें।';
+   toast(msg);
+ }
+}
+async function openNavigation(dest){
+ dest=String(dest||'').trim();
+ if(!dest){toast('Customer GPS location/address is not saved');return}
+ const fallback="https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(dest)+"&travelmode=driving";
+ if(!navigator.geolocation){location.href=fallback;return}
+ toast('📍 आपकी Current Location लेकर Navigation शुरू हो रही है…');
+ try{
+   const p=await getFreshGPS();
+   const url="https://www.google.com/maps/dir/?api=1&origin="+encodeURIComponent(p.lat+","+p.lon)+"&destination="+encodeURIComponent(dest)+"&travelmode=driving";
+   location.href=url;
+ }catch(e){location.href=fallback;}
+}
+function deleteCustomer(cid){
+ const idx=data.findIndex(v=>String(v.id)===String(cid));
+ if(idx<0)return;
+ const c=data[idx];
+ if(!confirm(`क्या आप ${c.name||'इस Customer'} को पूरी तरह Delete करना चाहते हैं?\n\nइस Customer का पूरा Work History भी Delete हो जाएगा।`))return;
+ data.splice(idx,1);
+ save();
+ close();
+ toast('🗑️ Customer Delete हो गया');
 }
 
 async function pickContactEdit(){
@@ -204,6 +247,16 @@ function render(){
  $("overdueBox").innerHTML=od.length?od.map(item).join(""):"No overdue reminders";
  $("completedBox").innerHTML=cp.length?cp.map(item).join(""):"No completed work";
 }
+function navTarget(c){
+ const lat=String(c?.lat||"").trim(), lon=String(c?.lon||"").trim();
+ if(lat && lon) return `${lat},${lon}`;
+ return String(c?.address||c?.location||"").trim();
+}
+function navUrl(c){
+ const dest=navTarget(c);
+ return dest ? "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(dest) : "";
+}
+
 function item(x){
  const addr=encodeURIComponent((x.c.lat&&x.c.lon)?`${x.c.lat},${x.c.lon}`:(x.c.address||""));
  const phone=String(x.c.phone||"").replace(/\D/g,"");
@@ -282,8 +335,8 @@ function openCustomer(cid){
  <button class="primary" id="sendReminder" data-phone="${esc(c.phone)}" data-name="${esc(c.name)}">💬 Send Reminder on WhatsApp</button>
  <div style="display:flex;gap:6px;margin-top:10px">
  <button class="primary" data-call="${esc(c.phone)}">☎ Call</button>
- <button class="primary" data-wa="${String(c.phone).replace(/\\D/g,"")}">◉ WhatsApp</button>
- <button class="primary" data-map="${encodeURIComponent(c.address||c.location||"")}">➤ Navigation</button>
+ <button class="primary" data-map="${encodeURIComponent(navTarget(c))}">➤ Navigation</button>
+ <button class="primary" data-delete-customer="${c.id}" style="background:#b91c1c">🗑️ Delete Customer</button>
  </div>`);
 }
 function list(type){
@@ -322,7 +375,7 @@ function list(type){
  }
  const cards=arr.map(x=>`<div class="work popup-card" data-open-customer="${x.c.id}" style="cursor:pointer">
  <div style="display:flex;justify-content:space-between;align-items:center"><div><b>${esc(x.c.name)}</b><br><small>${esc(x.c.phone)}</small></div>
- <div>${x.id?`<button class="mini edit" data-edit="${x.c.id}|${x.id}" title="Edit">✏️</button>`:""} <button class="mini phone" data-call="${esc(x.c.phone)}" title="Call">☎</button> <button class="mini wa" data-wa="${String(x.c.phone).replace(/\D/g,"")}" title="WhatsApp"><svg class="wa-svg" viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M19.11 17.21c-.28-.14-1.64-.81-1.89-.9-.25-.09-.44-.14-.63.14-.18.28-.72.9-.88 1.08-.16.19-.32.21-.6.07-.28-.14-1.18-.43-2.25-1.38-.83-.74-1.39-1.65-1.55-1.93-.16-.28-.02-.43.12-.57.12-.12.28-.32.42-.48.14-.16.18-.28.28-.46.09-.19.05-.35-.02-.49-.07-.14-.63-1.52-.86-2.08-.23-.56-.46-.48-.63-.49h-.54c-.19 0-.49.07-.74.35-.25.28-.97.95-.97 2.32s.99 2.69 1.13 2.88c.14.19 1.95 2.98 4.73 4.18.66.28 1.17.45 1.57.58.66.21 1.26.18 1.73.11.53-.08 1.64-.67 1.87-1.32.23-.65.23-1.21.16-1.32-.07-.12-.25-.19-.53-.32z"/><path fill="currentColor" d="M16 3a13 13 0 0 0-11.3 19.43L3 29l6.75-1.67A13 13 0 1 0 16 3zm0 23.65c-2.04 0-4.03-.55-5.77-1.59l-.41-.24-4.01.99 1.07-3.91-.27-.42A10.62 10.62 0 1 1 16 26.65z"/></svg></button> ›</div></div>
+ <div>${x.id?`<button class="mini edit" data-edit="${x.c.id}|${x.id}" title="Edit">✏️</button>`:""} ${type==="customers"?`<button class="mini" data-delete-customer="${x.c.id}" title="Delete Customer" style="background:#b91c1c">🗑️</button>`:""} <button class="mini phone" data-call="${esc(x.c.phone)}" title="Call">☎</button> <button class="mini wa" data-reminder="${x.c.id}|${x.id||""}" title="WhatsApp"><svg class="wa-svg" viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M19.11 17.21c-.28-.14-1.64-.81-1.89-.9-.25-.09-.44-.14-.63.14-.18.28-.72.9-.88 1.08-.16.19-.32.21-.6.07-.28-.14-1.18-.43-2.25-1.38-.83-.74-1.39-1.65-1.55-1.93-.16-.28-.02-.43.12-.57.12-.12.28-.32.42-.48.14-.16.18-.28.28-.46.09-.19.05-.35-.02-.49-.07-.14-.63-1.52-.86-2.08-.23-.56-.46-.48-.63-.49h-.54c-.19 0-.49.07-.74.35-.25.28-.97.95-.97 2.32s.99 2.69 1.13 2.88c.14.19 1.95 2.98 4.73 4.18.66.28 1.17.45 1.57.58.66.21 1.26.18 1.73.11.53-.08 1.64-.67 1.87-1.32.23-.65.23-1.21.16-1.32-.07-.12-.25-.19-.53-.32z"/><path fill="currentColor" d="M16 3a13 13 0 0 0-11.3 19.43L3 29l6.75-1.67A13 13 0 1 0 16 3zm0 23.65c-2.04 0-4.03-.55-5.77-1.59l-.41-.24-4.01.99 1.07-3.91-.27-.42A10.62 10.62 0 1 1 16 26.65z"/></svg></button> ›</div></div>
  ${x.id?`<div>${esc(x.appliance)} - ${esc(x.work)}<br><small>Work: ${x.date||"Not set"}${x.reminder?` • Reminder: ${x.reminder}`:""}${x.done?" • ✓ Work Completed":""} • ₹${Number(x.paid||0).toLocaleString("en-IN")} paid</small></div>`:"<small>Click to open customer folder</small>"}
  </div>`).join("");
  show(`<button class="close" data-close>×</button><h2>${title}</h2>${pay}${cards||"<div class='empty'>No records found</div>"}`);
@@ -397,6 +450,8 @@ document.addEventListener("click",e=>{
    if(x==="pin")show(`<button class="close" data-close>×</button><h2>Change PIN</h2><div class="field"><label>New 6-Digit PIN</label><input inputmode="numeric" maxlength="6"></div><button class="primary" id="savePin">Save PIN</button>`);
    if(x==="about")show(`<button class="close" data-close>×</button><h2>About / Help</h2><p>JAGESH ELECTRONIC customer reminder app.</p>`);
  }
+ const delBtn=e.target.closest("[data-delete-customer]");
+ if(delBtn){deleteCustomer(delBtn.dataset.deleteCustomer);return}
  const row=e.target.closest("[data-open-customer]");
  if(row && !e.target.closest("button")){openCustomer(row.dataset.openCustomer);return}
  if(e.target.id==="pickLocation"){saveCurrentLocation("f");return}
@@ -409,10 +464,10 @@ document.addEventListener("click",e=>{
  if(e.target.id==="eWork"){updateWorkTypes("eApp","eWork");return}
  if(e.target.id==="msgTemplate"){ $("customMsg").style.display=e.target.value==="custom"?"block":"none"; return; }
  if(e.target.id==="sendReminder"){
-   const phone=String(e.target.dataset.phone).replace(/\D/g,""),name=e.target.dataset.name,kind=$("msgTemplate").value,custom=$("customMsg").value.trim();
+   const phone=String(e.target.dataset.phone).replace(/\D/g,""),name=e.target.dataset.name,kind=$("msgTemplate").value,custom=$("customMsg").value.trim(),forcedJid=e.target.dataset.jid||"";
    const greet=reminderGreeting(name);
    const jobsForCustomer=data.find(c=>String(c.phone).replace(/\D/g,"")===phone);
-   const reminderJob=(jobsForCustomer?.jobs||[]).filter(j=>j.reminder).sort((a,b)=>String(b.reminder).localeCompare(String(a.reminder)))[0] || (jobsForCustomer?.jobs||[]).slice(-1)[0] || {};
+   const reminderJob=(jobsForCustomer?.jobs||[]).find(j=>forcedJid && String(j.id)===String(forcedJid)) || (jobsForCustomer?.jobs||[]).filter(j=>j.reminder).sort((a,b)=>String(b.reminder).localeCompare(String(a.reminder)))[0] || (jobsForCustomer?.jobs||[]).slice(-1)[0] || {};
    const appliance=String(reminderJob.appliance||"").trim();
    const reminderDate=String(reminderJob.reminder||"");
    const niceDate=reminderDate ? reminderDate.split("-").reverse().join("/") : "";
@@ -444,10 +499,26 @@ document.addEventListener("click",e=>{
  if(edit){const [cid,jid]=edit.dataset.edit.split("|");editCustomer(cid,jid);return}
  const callBtn=e.target.closest("[data-call]");
  if(callBtn){location.href="tel:"+callBtn.dataset.call;return}
+ const reminderBtn=e.target.closest("[data-reminder]");
+ if(reminderBtn){
+   const parts=String(reminderBtn.dataset.reminder||"").split("|");
+   const cid=parts[0],jid=parts[1]||"";
+   openCustomer(cid);
+   const rb=$("sendReminder");
+   if(rb){ if(jid) rb.dataset.jid=jid; rb.click(); }
+   return;
+ }
  const waBtn=e.target.closest("[data-wa]");
  if(waBtn){location.href="https://wa.me/"+waBtn.dataset.wa;return}
  const mapBtn=e.target.closest("[data-map]");
- if(mapBtn){location.href="https://www.google.com/maps/search/?api=1&query="+mapBtn.dataset.map;return}
+ if(mapBtn){
+   const dest=decodeURIComponent(mapBtn.dataset.map||"").trim();
+   if(!dest){toast("Customer GPS location/address is not saved");return}
+   // Use the same live device GPS navigation from every dashboard/list screen.
+   // If GPS is unavailable, Google Maps still opens with the saved destination.
+   openNavigation(dest);
+   return;
+ }
  if(e.target.id==="pinUnlock"){
    const v=$("lockPin").value.replace(/\D/g,"");
    if(v.length!==6){toast("PIN must be 6 digits");return}

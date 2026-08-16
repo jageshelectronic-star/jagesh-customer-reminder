@@ -1,12 +1,8 @@
-JAGESH ELECTRONIC FINAL V7
-Base: JAGESH_ELECTRONIC_LOCAL_TEST_FIXED_V6.zip
+JAGESH ELECTRONIC FINAL V12
 
-V7 fixes:
-- Bottom Customers navigation now opens the customer list.
-- Bottom Work / Reminder now opens all active reminders (overdue, today, and upcoming), with reminders sorted by date.
-- Dashboard now shows Upcoming Reminders for the next 30 days.
-- Overdue reminders are shown for any reminder date before today, including reminders older than one month.
-- Reminder logic uses the actual Reminder Date only; Work Date is no longer incorrectly treated as a reminder.
-- Local date calculation avoids UTC date-shift issues.
-- Completed work is excluded from active reminder lists.
-- Existing project functionality and original logo are retained.
+Changes:
+1. WhatsApp reminder messages now use a customer-name-based Sir/Madam salutation.
+2. The customer's saved name is included after Dear Sir/Dear Madam.
+3. AC reminder wording is: "Dear Sir/Madam, [Name], आपके AC की service की reminder date आ गई है..."
+4. The phrase "Automatic Reminder" has been removed from the generated message.
+5. WhatsApp is still manual: the app opens WhatsApp with the message pre-filled; it does not send automatically.

@@ -119,15 +119,75 @@ function save(){localStorage.setItem(KEY,JSON.stringify(data));render()}
 function show(html){$("sheet").innerHTML=html;$("overlay").style.display="flex"}
 function close(){$("overlay").style.display="none"}
 function toast(t){$("toast").textContent=t;$("toast").style.display="block";setTimeout(()=>$("toast").style.display="none",1600)}
+let locationWatchId=null;
 function saveCurrentLocation(prefix){
- if(!navigator.geolocation){toast("GPS is not supported");return}
- toast("Getting current GPS location…");
- navigator.geolocation.getCurrentPosition(pos=>{
-   const lat=pos.coords.latitude.toFixed(6),lon=pos.coords.longitude.toFixed(6);
-   pendingLocation={lat,lon,accuracy:Math.round(pos.coords.accuracy)};
-   const el=$(prefix+"Location"); if(el)el.value=`${lat}, ${lon} (±${pendingLocation.accuracy}m)`;
-   toast("Current location saved");
- },err=>toast("GPS permission/location failed"),{enableHighAccuracy:true,timeout:15000,maximumAge:0});
+ if(!navigator.geolocation){toast("GPS is not supported on this device/browser");return}
+ const field=$(prefix+"Location");
+ toast("Requesting device GPS permission…");
+ const opts={enableHighAccuracy:true,maximumAge:0,timeout:15000};
+ let best=null, tries=0, done=false;
+ const finish=()=>{
+   if(done)return; done=true;
+   if(best){
+     const lat=Number(best.coords.latitude), lon=Number(best.coords.longitude), acc=Math.round(best.coords.accuracy||0);
+     pendingLocation={lat:lat.toFixed(6),lon:lon.toFixed(6),accuracy:acc,source:"device-gps",timestamp:Date.now()};
+     if(field) field.value=`${lat.toFixed(6)}, ${lon.toFixed(6)} (GPS ±${acc}m)`;
+     toast("Current device GPS location saved");
+   }else toast("GPS नहीं मिला। Location ON करें और browser permission Allow करें।");
+ };
+ const success=pos=>{
+   tries++;
+   const acc=Number(pos.coords.accuracy)||99999;
+   if(!best || acc < Number(best.coords.accuracy||99999)) best=pos;
+   if(acc<=50 || tries>=3) finish();
+ };
+ const error=err=>{
+   // A permission prompt is triggered by getCurrentPosition itself.
+   if(err && err.code===1){toast("Location permission Allow करें, फिर GPS बटन दबाएँ"); done=true; return;}
+   if(tries>=2) finish();
+ };
+ try{
+   if(navigator.permissions && navigator.permissions.query){
+     navigator.permissions.query({name:"geolocation"}).then(st=>{
+       if(st.state==="denied"){toast("Browser में Location permission Block है। Settings में Allow करें");return;}
+       navigator.geolocation.getCurrentPosition(success,error,opts);
+       setTimeout(()=>{if(!done) navigator.geolocation.getCurrentPosition(success,error,opts)},4500);
+       setTimeout(finish,18000);
+     }).catch(()=>{
+       navigator.geolocation.getCurrentPosition(success,error,opts);
+       setTimeout(finish,18000);
+     });
+   }else{
+     navigator.geolocation.getCurrentPosition(success,error,opts);
+     setTimeout(finish,18000);
+   }
+ }catch(e){toast("GPS error: "+(e.message||"unknown"))}
+}
+
+async function pickContactEdit(){
+ try{
+   if(!('contacts' in navigator) || !navigator.contacts.select){toast("Contact picker is not supported here. Use Chrome on Android or enter manually.");return}
+   const contacts=await navigator.contacts.select(['name','tel'],{multiple:false});
+   const c=contacts&&contacts[0]; if(!c)return;
+   const name=Array.isArray(c.name)?(c.name[0]||""):String(c.name||"");
+   const tel=Array.isArray(c.tel)?(c.tel[0]||""):String(c.tel||"");
+   if($("eName")&&name)$("eName").value=name;
+   if($("ePhone")&&tel)$("ePhone").value=tel;
+   toast("Contact name and number added");
+ }catch(e){toast("Contact selection cancelled or unavailable")};
+}
+
+async function pickContact(){
+ try{
+   if(!('contacts' in navigator) || !navigator.contacts.select){toast("Contact picker is not supported here. Use Chrome on Android or enter manually.");return}
+   const contacts=await navigator.contacts.select(['name','tel'],{multiple:false});
+   const c=contacts&&contacts[0]; if(!c)return;
+   const name=Array.isArray(c.name)?(c.name[0]||""):String(c.name||"");
+   const tel=Array.isArray(c.tel)?(c.tel[0]||""):String(c.tel||"");
+   if($("fName")&&name)$("fName").value=name;
+   if($("fPhone")&&tel)$("fPhone").value=tel;
+   toast("Contact name and number added");
+ }catch(e){toast("Contact selection cancelled or unavailable")};
 }
 
 function render(){
@@ -145,7 +205,7 @@ function render(){
  $("completedBox").innerHTML=cp.length?cp.map(item).join(""):"No completed work";
 }
 function item(x){
- const addr=encodeURIComponent(x.c.address||"");
+ const addr=encodeURIComponent((x.c.lat&&x.c.lon)?`${x.c.lat},${x.c.lon}`:(x.c.address||""));
  const phone=String(x.c.phone||"").replace(/\D/g,"");
  return `<div class="work" style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center">
    <div><b>${esc(x.c.name)}</b><br>${esc(x.appliance)} - ${esc(x.work)}<br>
@@ -163,7 +223,7 @@ function addCustomer(){
  pendingLocation=null;
  show(`<button class="close" data-close>×</button><h2>Add Customer</h2>
  <div class="field"><label>Name *</label><input id="fName"></div>
- <div class="field"><label>Mobile *</label><input id="fPhone" inputmode="tel"></div>
+ <div class="field"><label>Mobile *</label><input id="fPhone" inputmode="tel"><button type="button" class="primary" id="pickContact" style="margin-top:6px">👤 Select from Contacts</button></div>
  <div class="field"><label>Alternate Number (Optional)</label><input id="fAlt"></div>
  <div class="field"><label>Address</label><textarea id="fAddress" placeholder="Customer address / location"></textarea></div>
  <button type="button" class="primary" id="pickLocation" style="margin:4px 0 10px">📍 Save Current GPS Location</button>
@@ -199,7 +259,7 @@ function getCustomerSalutation(name){
  if(femaleNames.has(first) || /(?:a|i|ee|ya|ika|ita|ini|sha|thi)$/.test(first)) return "Madam";
  return "Sir";
 }
-function reminderGreeting(name){ return `Dear ${getCustomerSalutation(name)}, ${name}`; }
+function reminderGreeting(name){ return `Dear ${getCustomerSalutation(name)}, ${name} Ji`; }
 
 function openCustomer(cid){
  const c=data.find(v=>String(v.id)===String(cid));
@@ -291,7 +351,7 @@ function editCustomer(cid,jid){
  if(!j)return;
  show(`<button class="close" data-close>×</button><h2>Edit Customer / Work</h2>
  <div class="field"><label>Name *</label><input id="eName" value="${esc(c.name)}"></div>
- <div class="field"><label>Mobile *</label><input id="ePhone" inputmode="tel" value="${esc(c.phone)}"></div>
+ <div class="field"><label>Mobile *</label><input id="ePhone" inputmode="tel" value="${esc(c.phone)}"><button type="button" class="primary" id="pickContactEdit" style="margin-top:6px">👤 Select from Contacts</button></div>
  <div class="field"><label>Alternate Number (Optional)</label><input id="eAlt" value="${esc(c.alt||"")}"></div>
  <div class="field"><label>Address</label><textarea id="eAddress">${esc(c.address||"")}</textarea></div>
  <div class="field"><label>Saved Location</label><input id="eLocation" value="${esc(c.location||"")}" readonly></div><button type="button" class="primary" id="editPickLocation">📍 Update Current GPS Location</button>
@@ -340,7 +400,9 @@ document.addEventListener("click",e=>{
  const row=e.target.closest("[data-open-customer]");
  if(row && !e.target.closest("button")){openCustomer(row.dataset.openCustomer);return}
  if(e.target.id==="pickLocation"){saveCurrentLocation("f");return}
+ if(e.target.id==="pickContact"){pickContact();return}
  if(e.target.id==="editPickLocation"){saveCurrentLocation("e");return}
+ if(e.target.id==="pickContactEdit"){pickContactEdit();return}
  if(e.target.id==="fApp"){updateWorkTypes("fApp","fWork");return}
  if(e.target.id==="eApp"){updateWorkTypes("eApp","eWork");return}
  if(e.target.id==="fWork"){updateWorkTypes("fApp","fWork");return}
@@ -349,8 +411,26 @@ document.addEventListener("click",e=>{
  if(e.target.id==="sendReminder"){
    const phone=String(e.target.dataset.phone).replace(/\D/g,""),name=e.target.dataset.name,kind=$("msgTemplate").value,custom=$("customMsg").value.trim();
    const greet=reminderGreeting(name);
-   const msg={service:`${greet}, आपकी service की reminder date आ गई है। कृपया अपनी सुविधा के अनुसार समय बताएं।\n🔧 JAGESH ELECTRONIC`,complete:`${greet}, आपका काम JAGESH ELECTRONIC द्वारा complete कर दिया गया है। धन्यवाद।`,led:`${greet}, आपके LED TV repair/service की reminder date आ गई है। कृपया अपनी सुविधा के अनुसार समय बताएं।\n📺 JAGESH ELECTRONIC`,ac:`${greet}, आपके AC की service की reminder date आ गई है। कृपया अपनी सुविधा के अनुसार समय बताएं।\n❄️ JAGESH ELECTRONIC`,fridge:`${greet}, आपके refrigerator की service/repair की reminder date आ गई है। कृपया अपनी सुविधा के अनुसार समय बताएं।\n🧊 JAGESH ELECTRONIC`,microwave:`${greet}, आपके microwave की service/repair की reminder date आ गई है। कृपया अपनी सुविधा के अनुसार समय बताएं।\n🍲 JAGESH ELECTRONIC`,custom:custom}[kind];
-   if(phone&&msg) location.href="https://wa.me/"+phone+"?text="+encodeURIComponent(msg); return;
+   const jobsForCustomer=data.find(c=>String(c.phone).replace(/\D/g,"")===phone);
+   const reminderJob=(jobsForCustomer?.jobs||[]).filter(j=>j.reminder).sort((a,b)=>String(b.reminder).localeCompare(String(a.reminder)))[0] || (jobsForCustomer?.jobs||[]).slice(-1)[0] || {};
+   const appliance=String(reminderJob.appliance||"").trim();
+   const reminderDate=String(reminderJob.reminder||"");
+   const niceDate=reminderDate ? reminderDate.split("-").reverse().join("/") : "";
+   const serviceText={
+     "AC":"AC की सर्विस/मेंटेनेंस",
+     "LED TV":"LED TV की सर्विस/रिपेयर",
+     "Refrigerator":"Refrigerator की सर्विस/रिपेयर",
+     "Microwave":"Microwave की सर्विस/रिपेयर"
+   }[appliance] || (appliance ? `${appliance} की सर्विस/रिपेयर` : "सर्विस/रिपेयर");
+   const msg={
+     service:`नमस्ते 🙏\n\n${greet},\nJAGESH ELECTRONIC की ओर से आपकी ${serviceText} का समय हो गया है।\n❄️ अच्छी performance और बेहतर कामकाज के लिए समय पर servicing करवाना जरूरी है।\n📅 आपकी अगली Service/Reminder Date: ${niceDate}\nअगर आप सर्विस करवाना चाहते हैं तो इसी WhatsApp पर YES लिखकर भेज दें।\n\n🔧 JAGESH ELECTRONIC 🔧\nReliable Home Appliance Services`,
+     complete:`नमस्ते 🙏\n\n${greet}, आपका काम JAGESH ELECTRONIC द्वारा पूरा कर दिया गया है। धन्यवाद।\n\n🔧 JAGESH ELECTRONIC 🔧`,
+     led:`नमस्ते 🙏\n\n${greet}, JAGESH ELECTRONIC की ओर से आपके LED TV की सर्विस/रिपेयर का समय हो गया है।\n📅 आपकी अगली Service/Reminder Date: ${niceDate}\nअगर आप सर्विस करवाना चाहते हैं तो इसी WhatsApp पर YES लिखकर भेज दें।\n\n📺 JAGESH ELECTRONIC 📺\nReliable Home Appliance Services`,
+     ac:`नमस्ते 🙏\n\n${greet}, JAGESH ELECTRONIC की ओर से आपके AC की सर्विस/मेंटेनेंस का समय हो गया है।\n❄️ AC की अच्छी cooling और बेहतर performance के लिए समय पर servicing करवाना जरूरी है।\n📅 आपकी अगली Service/Reminder Date: ${niceDate}\nअगर आप सर्विस करवाना चाहते हैं तो इसी WhatsApp पर YES लिखकर भेज दें।\n\n🔧 JAGESH ELECTRONIC 🔧\nReliable Home Appliance Services`,
+     fridge:`नमस्ते 🙏\n\n${greet}, JAGESH ELECTRONIC की ओर से आपके Refrigerator की सर्विस/रिपेयर का समय हो गया है।\n📅 आपकी अगली Service/Reminder Date: ${niceDate}\nअगर आप सर्विस करवाना चाहते हैं तो इसी WhatsApp पर YES लिखकर भेज दें।\n\n🧊 JAGESH ELECTRONIC 🧊\nReliable Home Appliance Services`,
+     microwave:`नमस्ते 🙏\n\n${greet}, JAGESH ELECTRONIC की ओर से आपके Microwave की सर्विस/रिपेयर का समय हो गया है।\n📅 आपकी अगली Service/Reminder Date: ${niceDate}\nअगर आप सर्विस करवाना चाहते हैं तो इसी WhatsApp पर YES लिखकर भेज दें।\n\n🍲 JAGESH ELECTRONIC 🍲\nReliable Home Appliance Services`,
+     custom:custom
+   }[kind];   if(phone&&msg) location.href="https://wa.me/"+phone+"?text="+encodeURIComponent(msg); return;
  }
  const complete=e.target.closest("[data-complete]");
  if(complete){

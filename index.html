@@ -33,7 +33,7 @@ textarea{min-height:70px}
 .primary{width:100%;padding:12px;background:#1769ff;color:white;border:0;border-radius:10px;font-weight:900}
 .menu{width:100%;padding:15px 5px;background:#fff;border:0;border-bottom:1px solid #ddd;text-align:left;font-weight:800;display:flex;justify-content:space-between}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.toast{position:fixed;bottom:82px;left:50%;transform:translateX(-50%);background:#18202d;color:#fff;padding:10px 14px;border-radius:9px;display:none;z-index:100}
+.recycle-list{display:flex;flex-direction:column;gap:10px;margin-top:10px}.recycle-item{background:#f8fafc;border:1px solid #e1e6ee;border-radius:12px;padding:12px;overflow:hidden}.recycle-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.recycle-actions .mini{width:auto;min-width:120px;padding:0 10px}.customer-search{margin:8px 0 12px;background:#fff;border:1px solid #dbe2ea;border-radius:12px;padding:10px}.customer-search input{font-size:15px}.toast{position:fixed;bottom:82px;left:50%;transform:translateX(-50%);background:#18202d;color:#fff;padding:10px 14px;border-radius:9px;display:none;z-index:100}
 @media(max-width:600px){.stats{gap:4px;grid-template-columns:repeat(3,1fr)}.card{padding:7px 2px}.card small{font-size:7px}.card b{font-size:18px}.brand{font-size:17px}.row{grid-template-columns:1fr}}
 </style>
 </head>
@@ -68,21 +68,25 @@ const LOGO="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTE
 document.getElementById("logo").src=LOGO;
 
 const KEY="jagesh_local_test_v2";
+const PIN_KEY="jagesh_pin_v7", RECYCLE_PIN_KEY="jagesh_recycle_pin_v1", RECYCLE_KEY="jagesh_recycle_bin_v1", BIO_KEY="jagesh_bio_credential_v7", LOCK_KEY="jagesh_app_lock_enabled_v8";
 let data=JSON.parse(localStorage.getItem(KEY)||"[]");
-const PIN_KEY="jagesh_pin_v7", BIO_KEY="jagesh_bio_credential_v7", LOCK_KEY="jagesh_app_lock_enabled_v8";
+let recycleBin=JSON.parse(localStorage.getItem(RECYCLE_KEY)||"[]");
+function saveRecycle(){localStorage.setItem(RECYCLE_KEY,JSON.stringify(recycleBin));}
+const DEFAULT_PIN="123456";
+function getRecyclePin(){let p=localStorage.getItem(RECYCLE_PIN_KEY); if(!p){p=localStorage.getItem(PIN_KEY)||DEFAULT_PIN; localStorage.setItem(RECYCLE_PIN_KEY,p);} return p;}
 let pendingLocation=null;
-function getPin(){return localStorage.getItem(PIN_KEY)}
+let customerSearch="";
+function getPin(){return localStorage.getItem(PIN_KEY)||DEFAULT_PIN}
 function lockEnabled(){return localStorage.getItem(LOCK_KEY)!=="0"}
 function setLockEnabled(v){localStorage.setItem(LOCK_KEY,v?"1":"0");if(!v){sessionStorage.setItem("jagesh_unlocked_v7","1");const s=$("lockScreen");if(s)s.remove();}else{sessionStorage.removeItem("jagesh_unlocked_v7");lockApp();}}
 function lockApp(){
  if(!lockEnabled())return;
- if(!getPin()){showLock(true);return}
  if(sessionStorage.getItem("jagesh_unlocked_v7")==="1")return;
  showLock(false);
 }
 function showLock(first){
- const setup=first?`<p>पहली बार 6-अंकों का PIN बनाइए।</p>`: `<p>App unlock करने के लिए PIN डालें या fingerprint/biometric इस्तेमाल करें।</p>`;
- document.body.insertAdjacentHTML("beforeend",`<div id="lockScreen" style="position:fixed;inset:0;background:#f4f6f9;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px"><div style="background:#fff;padding:22px;border-radius:18px;width:min(420px,100%);box-shadow:0 8px 30px #0002"><h2 style="margin-top:0">🔐 JAGESH ELECTRONIC</h2>${setup}<div class="field"><label>${first?"New 6-Digit PIN":"6-Digit PIN"}</label><input id="lockPin" inputmode="numeric" maxlength="6" autocomplete="one-time-code"></div><button class="primary" id="pinUnlock">${first?"Save PIN & Unlock":"Unlock with PIN"}</button>${first?"":"<button class='primary' id='bioUnlock' style='margin-top:8px;background:#0b7a3e'>👆 Fingerprint / Biometric</button>"}</div></div>`);
+ const setup=`<p>App unlock करने के लिए 6-अंकों का PIN डालें। नए डिवाइस/रीसेट पर डिफॉल्ट PIN: <b>${DEFAULT_PIN}</b></p>`;
+ document.body.insertAdjacentHTML("beforeend",`<div id="lockScreen" style="position:fixed;inset:0;background:#f4f6f9;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px"><div style="background:#fff;padding:22px;border-radius:18px;width:min(420px,100%);box-shadow:0 8px 30px #0002"><h2 style="margin-top:0">🔐 JAGESH ELECTRONIC</h2>${setup}<div class="field"><label>6-Digit PIN</label><input id="lockPin" inputmode="numeric" maxlength="6" autocomplete="one-time-code"></div><button class="primary" id="pinUnlock">Unlock with PIN</button><button class='primary' id='bioUnlock' style='margin-top:8px;background:#0b7a3e'>👆 Fingerprint / Biometric</button></div></div>`);
 }
 function unlockOK(){sessionStorage.setItem("jagesh_unlocked_v7","1");const s=$("lockScreen");if(s)s.remove()}
 async function biometricUnlock(){
@@ -200,11 +204,33 @@ function deleteCustomer(cid){
  const idx=data.findIndex(v=>String(v.id)===String(cid));
  if(idx<0)return;
  const c=data[idx];
- if(!confirm(`क्या आप ${c.name||'इस Customer'} को पूरी तरह Delete करना चाहते हैं?\n\nइस Customer का पूरा Work History भी Delete हो जाएगा।`))return;
+ if(!confirm(`क्या आप ${c.name||'इस Customer'} को Recycle Bin में भेजना चाहते हैं?\n\nCustomer और उसका पूरा Work History Recycle Bin में सुरक्षित रहेगा।`))return;
+ recycleBin.unshift({...c, _deletedAt:new Date().toISOString()});
  data.splice(idx,1);
+ saveRecycle();
  save();
  close();
- toast('🗑️ Customer Delete हो गया');
+ toast('🗑️ Customer Recycle Bin में चला गया');
+}
+function renderRecycle(){
+ if(!recycleBin.length){show(`<button class="close" data-close>×</button><h2>🗑️ Recycle Bin</h2><div class="empty">Recycle Bin खाली है।</div>`);return;}
+ const html=recycleBin.map((c,i)=>`<div class="recycle-item"><div><b>${esc(c.name||"Customer")}</b><div style="font-size:13px;color:#666;margin-top:5px">${esc(c.phone||"")}</div>${c._deletedAt?`<div style="font-size:12px;color:#777;margin-top:3px">Deleted: ${new Date(c._deletedAt).toLocaleString()}</div>`:""}</div><div class="recycle-actions"><button class="mini" data-restore-customer="${i}" style="background:#16803c;color:#fff">↩️ Restore</button><button class="mini" data-permanent-delete="${i}" style="background:#b91c1c;color:#fff">🗑️ Delete Forever</button></div></div>`).join('');
+ show(`<button class="close" data-close>×</button><h2>🗑️ Recycle Bin</h2><div class="recycle-list">${html}</div><button class="primary" data-empty-recycle style="background:#b91c1c;margin-top:12px">Empty Recycle Bin</button>`);
+}
+function restoreCustomer(i){
+ const c=recycleBin[Number(i)]; if(!c)return;
+ const restored={...c}; delete restored._deletedAt;
+ if(data.some(x=>String(x.id)===String(restored.id))) restored.id=Date.now()+Math.floor(Math.random()*1000);
+ data.push(restored); recycleBin.splice(Number(i),1); saveRecycle(); save(); renderRecycle(); toast('↩️ Customer Restore हो गया');
+}
+function permanentDelete(i){
+ if(!confirm('इस Customer को हमेशा के लिए Delete करना है? यह वापस नहीं आएगा।'))return;
+ recycleBin.splice(Number(i),1); saveRecycle(); renderRecycle(); toast('Customer permanently deleted');
+}
+function emptyRecycle(){
+ if(!recycleBin.length)return;
+ if(!confirm('Recycle Bin के सभी Customers को हमेशा के लिए Delete करना है?'))return;
+ recycleBin=[]; saveRecycle(); renderRecycle(); toast('Recycle Bin खाली कर दिया गया');
 }
 
 async function pickContactEdit(){
@@ -344,6 +370,8 @@ function list(type){
  let arr=[],title="";
  if(type==="customers"){
    arr=data.map(c=>({...((c.jobs&&c.jobs[0])||{id:null,appliance:"",work:""}),c}));
+   const q=customerSearch.trim().toLowerCase();
+   if(q) arr=arr.filter(x=>String(x.c.name||"").toLowerCase().includes(q)||String(x.c.phone||"").toLowerCase().includes(q)||String(x.c.alt||"").toLowerCase().includes(q));
    title="Total Customers";
  }
  if(type==="allwork"){arr=a;title="Total Work";}
@@ -378,7 +406,7 @@ function list(type){
  <div>${x.id?`<button class="mini edit" data-edit="${x.c.id}|${x.id}" title="Edit">✏️</button>`:""} ${type==="customers"?`<button class="mini" data-delete-customer="${x.c.id}" title="Delete Customer" style="background:#b91c1c">🗑️</button>`:""} <button class="mini phone" data-call="${esc(x.c.phone)}" title="Call">☎</button> <button class="mini wa" data-reminder="${x.c.id}|${x.id||""}" title="WhatsApp"><svg class="wa-svg" viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M19.11 17.21c-.28-.14-1.64-.81-1.89-.9-.25-.09-.44-.14-.63.14-.18.28-.72.9-.88 1.08-.16.19-.32.21-.6.07-.28-.14-1.18-.43-2.25-1.38-.83-.74-1.39-1.65-1.55-1.93-.16-.28-.02-.43.12-.57.12-.12.28-.32.42-.48.14-.16.18-.28.28-.46.09-.19.05-.35-.02-.49-.07-.14-.63-1.52-.86-2.08-.23-.56-.46-.48-.63-.49h-.54c-.19 0-.49.07-.74.35-.25.28-.97.95-.97 2.32s.99 2.69 1.13 2.88c.14.19 1.95 2.98 4.73 4.18.66.28 1.17.45 1.57.58.66.21 1.26.18 1.73.11.53-.08 1.64-.67 1.87-1.32.23-.65.23-1.21.16-1.32-.07-.12-.25-.19-.53-.32z"/><path fill="currentColor" d="M16 3a13 13 0 0 0-11.3 19.43L3 29l6.75-1.67A13 13 0 1 0 16 3zm0 23.65c-2.04 0-4.03-.55-5.77-1.59l-.41-.24-4.01.99 1.07-3.91-.27-.42A10.62 10.62 0 1 1 16 26.65z"/></svg></button> ›</div></div>
  ${x.id?`<div>${esc(x.appliance)} - ${esc(x.work)}<br><small>Work: ${x.date||"Not set"}${x.reminder?` • Reminder: ${x.reminder}`:""}${x.done?" • ✓ Work Completed":""} • ₹${Number(x.paid||0).toLocaleString("en-IN")} paid</small></div>`:"<small>Click to open customer folder</small>"}
  </div>`).join("");
- show(`<button class="close" data-close>×</button><h2>${title}</h2>${pay}${cards||"<div class='empty'>No records found</div>"}`);
+ show(`<button class="close" data-close>×</button><h2>${title}</h2>${pay}${type==="customers"?`<div class="customer-search"><label>Search Customer</label><input id="customerSearch" value="${esc(customerSearch)}" placeholder="Name या Mobile Number से Search करें" inputmode="search"></div>`:""}${cards||"<div class='empty'>No records found</div>"}`);
 }
 
 function workOptions(app,selected=""){
@@ -432,6 +460,10 @@ function more(){
  <button class="menu" data-more="about">ℹ️ About / Help <span>›</span></button>`);
 }
 
+document.addEventListener("input",e=>{
+ if(e.target.id==="customerSearch"){customerSearch=e.target.value;list("customers");const el=$("customerSearch");if(el){el.focus();try{el.setSelectionRange(customerSearch.length,customerSearch.length)}catch(_){}}}
+});
+
 document.addEventListener("click",e=>{
  const a=e.target.closest("[data-action]");
  if(a){const x=a.dataset.action;if(x==="more")more();else if(x==="home")list("customers");else if(x==="today" && a.closest("nav"))list("reminders");else list(x);return}
@@ -441,7 +473,7 @@ document.addEventListener("click",e=>{
  const m=e.target.closest("[data-more]");
  if(m){
    const x=m.dataset.more;
-   if(x==="recycle")show(`<button class="close" data-close>×</button><h2>Recycle Bin</h2><div class="field"><label>6-Digit PIN</label><input inputmode="numeric" maxlength="6"></div><button class="primary" id="unlock">Unlock</button>`);
+   if(x==="recycle")show(`<button class="close" data-close>×</button><h2>🗑️ Recycle Bin</h2><div class="field"><label>6-Digit PIN</label><input id="recyclePinInput" inputmode="numeric" maxlength="6" autocomplete="one-time-code"></div><button class="primary" id="unlock">Unlock</button><p style="font-size:12px;color:#777;margin-top:8px">Recycle Bin का PIN App PIN के साथ sync रहेगा। नए डिवाइस/रीसेट पर डिफॉल्ट PIN 123456 रहेगा।</p>`);
    if(x==="backup"){let b=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download="jagesh-electronic-backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(u),500);toast("Backup downloaded")}
    if(x==="drive")toast("Google Drive backup will be connected after HTTPS deployment");
    if(x==="bio")toast(window.PublicKeyCredential?"Biometric API available to test on HTTPS/PWA":"Biometric needs supported browser + HTTPS");
@@ -522,8 +554,7 @@ document.addEventListener("click",e=>{
  if(e.target.id==="pinUnlock"){
    const v=$("lockPin").value.replace(/\D/g,"");
    if(v.length!==6){toast("PIN must be 6 digits");return}
-   if(!getPin()){localStorage.setItem(PIN_KEY,v);unlockOK();toast("PIN created")}
-   else if(v===getPin()){unlockOK();toast("Unlocked")}
+   if(v===getPin()){unlockOK();toast("Unlocked")}
    else toast("Wrong PIN");
    return;
  }
@@ -541,11 +572,21 @@ document.addEventListener("click",e=>{
    }
    return;
  }
- if(e.target.id==="unlock")toast("Recycle Bin unlocked");
+ if(e.target.id==="unlock"){
+   const v=$("recyclePinInput")?.value.replace(/\D/g,"")||"";
+   if(v.length!==6){toast("PIN must be 6 digits");return;}
+   if(v===getRecyclePin()){renderRecycle();}else toast("Wrong Recycle Bin PIN");
+   return;
+ }
+ const restoreBtn=e.target.closest("[data-restore-customer]");
+ if(restoreBtn){restoreCustomer(restoreBtn.dataset.restoreCustomer);return}
+ const permBtn=e.target.closest("[data-permanent-delete]");
+ if(permBtn){permanentDelete(permBtn.dataset.permanentDelete);return}
+ if(e.target.closest("[data-empty-recycle]")){emptyRecycle();return}
  if(e.target.id==="savePin"){
  const v=e.target.parentElement.querySelector("input").value.replace(/\D/g,"");
  if(v.length!==6){toast("PIN must be 6 digits");return}
- localStorage.setItem(PIN_KEY,v);toast("PIN saved");close()
+ localStorage.setItem(PIN_KEY,v);localStorage.setItem(RECYCLE_PIN_KEY,v);toast("PIN saved");close()
 }
 });
 render();

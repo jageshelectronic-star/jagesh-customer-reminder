@@ -10,7 +10,7 @@ header{height:78px;background:#0b4c91;color:#fff;display:flex;align-items:center
 header img{width:58px;height:58px;object-fit:contain;border-radius:12px;background:#07111f}
 .brand{font-size:19px;font-weight:900}
 main{padding:12px;max-width:900px;margin:auto;padding-bottom:90px}
-.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.stats{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
 .card{background:white;border:1px solid #e1e6ee;border-radius:14px;padding:10px 4px;text-align:center;cursor:pointer}
 .card b{display:block;font-size:22px;margin:5px}
 .card small{font-size:9px;color:#687386}
@@ -28,7 +28,7 @@ nav button span{display:block;font-size:21px}
 input,select,textarea{width:100%;padding:11px;border:1px solid #ccd5e1;border-radius:9px}
 .mini{border:1px solid #dce2ea;background:#fff;border-radius:8px;width:34px;height:34px;font-size:16px}.wa{color:#16a34a}.popup-card:active{transform:scale(.99)}
 .popup-customer{transition:transform .12s,box-shadow .12s}.popup-customer:active{transform:scale(.99);box-shadow:0 2px 8px #0001}
-.mini.phone,.mini.wa{color:#16a34a}.mini.map{color:#1769ff}.mini.edit{color:#7c3aed}
+.mini.phone,.mini.wa{color:#16a34a}.mini.map{color:#1769ff}.mini.edit{color:#7c3aed}.wa-svg{width:18px;height:18px;display:inline-block;vertical-align:middle}.mini.wa{display:inline-flex;align-items:center;justify-content:center}
 textarea{min-height:70px}
 .primary{width:100%;padding:12px;background:#1769ff;color:white;border:0;border-radius:10px;font-weight:900}
 .menu{width:100%;padding:15px 5px;background:#fff;border:0;border-bottom:1px solid #ddd;text-align:left;font-weight:800;display:flex;justify-content:space-between}
@@ -43,13 +43,15 @@ textarea{min-height:70px}
 <div class="stats">
 <button class="card" data-action="customers">👥<b id="nCustomers">0</b><small>TOTAL CUSTOMERS</small></button>
 <button class="card" data-action="allwork">🔧<b id="nAllWork">0</b><small>TOTAL WORK</small></button>
-<button class="card" data-action="today">📅<b id="nToday">0</b><small>TODAY'S WORK</small></button>
+<button class="card" data-action="today">📅<b id="nToday">0</b><small>DUE TODAY</small></button>
 <button class="card" data-action="upcoming">🗓️<b id="nUpcoming">0</b><small>UPCOMING</small></button>
+<button class="card" data-action="due">💰<b id="nDue">0</b><small>PAYMENT DUE</small></button>
 <button class="card" data-action="overdue">⚠️<b id="nOverdue">0</b><small>OVERDUE</small></button>
 <button class="card" data-action="completed">✓<b id="nCompleted">0</b><small>COMPLETED</small></button>
 </div>
-<h2>Today's Work</h2><div id="todayBox" class="empty">No work for today</div>
-<h2>Overdue</h2><div id="overdueBox" class="empty">No overdue work</div>
+<h2>Due Today</h2><div id="todayBox" class="empty">No reminder due today</div>
+<h2>Upcoming Reminders (Next 30 Days)</h2><div id="upcomingBox" class="empty">No upcoming reminders</div>
+<h2>Overdue</h2><div id="overdueBox" class="empty">No overdue reminders</div>
 <h2>Completed Work</h2><div id="completedBox" class="empty">No completed work</div>
 </main>
 <button id="addBtn" class="fab">+</button>
@@ -67,24 +69,79 @@ document.getElementById("logo").src=LOGO;
 
 const KEY="jagesh_local_test_v2";
 let data=JSON.parse(localStorage.getItem(KEY)||"[]");
+const PIN_KEY="jagesh_pin_v7", BIO_KEY="jagesh_bio_credential_v7", LOCK_KEY="jagesh_app_lock_enabled_v8";
+let pendingLocation=null;
+function getPin(){return localStorage.getItem(PIN_KEY)}
+function lockEnabled(){return localStorage.getItem(LOCK_KEY)!=="0"}
+function setLockEnabled(v){localStorage.setItem(LOCK_KEY,v?"1":"0");if(!v){sessionStorage.setItem("jagesh_unlocked_v7","1");const s=$("lockScreen");if(s)s.remove();}else{sessionStorage.removeItem("jagesh_unlocked_v7");lockApp();}}
+function lockApp(){
+ if(!lockEnabled())return;
+ if(!getPin()){showLock(true);return}
+ if(sessionStorage.getItem("jagesh_unlocked_v7")==="1")return;
+ showLock(false);
+}
+function showLock(first){
+ const setup=first?`<p>पहली बार 6-अंकों का PIN बनाइए।</p>`: `<p>App unlock करने के लिए PIN डालें या fingerprint/biometric इस्तेमाल करें।</p>`;
+ document.body.insertAdjacentHTML("beforeend",`<div id="lockScreen" style="position:fixed;inset:0;background:#f4f6f9;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px"><div style="background:#fff;padding:22px;border-radius:18px;width:min(420px,100%);box-shadow:0 8px 30px #0002"><h2 style="margin-top:0">🔐 JAGESH ELECTRONIC</h2>${setup}<div class="field"><label>${first?"New 6-Digit PIN":"6-Digit PIN"}</label><input id="lockPin" inputmode="numeric" maxlength="6" autocomplete="one-time-code"></div><button class="primary" id="pinUnlock">${first?"Save PIN & Unlock":"Unlock with PIN"}</button>${first?"":"<button class='primary' id='bioUnlock' style='margin-top:8px;background:#0b7a3e'>👆 Fingerprint / Biometric</button>"}</div></div>`);
+}
+function unlockOK(){sessionStorage.setItem("jagesh_unlocked_v7","1");const s=$("lockScreen");if(s)s.remove()}
+async function biometricUnlock(){
+ if(!window.PublicKeyCredential||!navigator.credentials){toast("Biometric needs HTTPS + supported device");return}
+ try{
+   let raw=localStorage.getItem(BIO_KEY);
+   if(!raw){
+     const challenge=crypto.getRandomValues(new Uint8Array(32));
+     const cred=await navigator.credentials.create({publicKey:{challenge,rp:{name:"JAGESH ELECTRONIC"},user:{id:crypto.getRandomValues(new Uint8Array(16)),name:"jagesh",displayName:"JAGESH ELECTRONIC"},pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}],authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required"},timeout:60000}});
+     if(!cred)throw Error("No credential");
+     localStorage.setItem(BIO_KEY,btoa(String.fromCharCode(...new Uint8Array(cred.rawId))));
+     unlockOK();toast("Fingerprint unlocked");
+   }else{
+     const id=Uint8Array.from(atob(raw),c=>c.charCodeAt(0));
+     await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{type:"public-key",id}],userVerification:"required"},mediation:"required"});
+     unlockOK();toast("Biometric unlocked");
+   }
+ }catch(e){toast("Biometric failed — use PIN")}
+}
 
 const $=id=>document.getElementById(id);
-function today(){return new Date().toISOString().slice(0,10)}
+function today(){
+ const d=new Date(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");
+ return `${d.getFullYear()}-${m}-${day}`;
+}
+function addDaysISO(days){
+ const d=new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate()+days);
+ const m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");
+ return `${d.getFullYear()}-${m}-${day}`;
+}
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
 function jobs(){return data.flatMap(c=>(c.jobs||[]).map(j=>({...j,c})))}
 function save(){localStorage.setItem(KEY,JSON.stringify(data));render()}
 function show(html){$("sheet").innerHTML=html;$("overlay").style.display="flex"}
 function close(){$("overlay").style.display="none"}
 function toast(t){$("toast").textContent=t;$("toast").style.display="block";setTimeout(()=>$("toast").style.display="none",1600)}
+function saveCurrentLocation(prefix){
+ if(!navigator.geolocation){toast("GPS is not supported");return}
+ toast("Getting current GPS location…");
+ navigator.geolocation.getCurrentPosition(pos=>{
+   const lat=pos.coords.latitude.toFixed(6),lon=pos.coords.longitude.toFixed(6);
+   pendingLocation={lat,lon,accuracy:Math.round(pos.coords.accuracy)};
+   const el=$(prefix+"Location"); if(el)el.value=`${lat}, ${lon} (±${pendingLocation.accuracy}m)`;
+   toast("Current location saved");
+ },err=>toast("GPS permission/location failed"),{enableHighAccuracy:true,timeout:15000,maximumAge:0});
+}
 
 function render(){
- const a=jobs(),d=today(),u=new Date(Date.now()+30*86400000).toISOString().slice(0,10);
- const td=a.filter(x=>x.date===d&&!x.done),
-up=a.filter(x=>{const trigger=x.reminder||x.date;return trigger&&trigger>d&&trigger<=u&&!x.done;}),
-od=a.filter(x=>{const trigger=x.reminder||x.date;return trigger&&trigger<d&&!x.done}),cp=a.filter(x=>x.done);
- $("nCustomers").textContent=data.length;$("nAllWork").textContent=a.length;$("nToday").textContent=td.length;$("nUpcoming").textContent=up.length;$("nOverdue").textContent=od.length;$("nCompleted").textContent=cp.length;
- $("todayBox").innerHTML=td.length?td.map(item).join(""):"No work for today";
- $("overdueBox").innerHTML=od.length?od.map(item).join(""):"No overdue work";
+ const a=jobs(),d=today(),u=addDaysISO(30);
+ const reminderOf=x=>x.reminder||"";
+ const td=a.filter(x=>reminderOf(x)===d),
+ up=a.filter(x=>{const r=reminderOf(x);return r&&r>d&&r<=u;}).sort((x,y)=>String(x.reminder).localeCompare(String(y.reminder))),
+ od=a.filter(x=>{const r=reminderOf(x);return r&&r<d;}).sort((x,y)=>String(x.reminder).localeCompare(String(y.reminder))),
+ cp=a.filter(x=>x.done),
+ due=a.filter(x=>!x.done&&Number(x.total||0)>Number(x.paid||0));
+ $("nCustomers").textContent=data.length;$("nAllWork").textContent=a.length;$("nToday").textContent=td.length;$("nUpcoming").textContent=up.length;$("nOverdue").textContent=od.length;$("nCompleted").textContent=cp.length;$("nDue").textContent=due.length;
+ $("todayBox").innerHTML=td.length?td.map(item).join(""):"No reminder due today";
+ $("upcomingBox").innerHTML=up.length?up.map(item).join(""):"No upcoming reminders in the next 30 days";
+ $("overdueBox").innerHTML=od.length?od.map(item).join(""):"No overdue reminders";
  $("completedBox").innerHTML=cp.length?cp.map(item).join(""):"No completed work";
 }
 function item(x){
@@ -92,23 +149,24 @@ function item(x){
  const phone=String(x.c.phone||"").replace(/\D/g,"");
  return `<div class="work" style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center">
    <div><b>${esc(x.c.name)}</b><br>${esc(x.appliance)} - ${esc(x.work)}<br>
-   <small>${x.date||"No work date"} • ₹${Number(x.paid||0).toLocaleString("en-IN")} paid${x.reminder?` • Reminder: ${x.reminder}`:""}</small></div>
+   <small>${x.date||"No work date"} • ₹${Number(x.paid||0).toLocaleString("en-IN")} paid${x.reminder?` • Reminder: ${x.reminder}`:""}${Number(x.total||0)>Number(x.paid||0)?` • Due: ₹${Math.max(0,Number(x.total||0)-Number(x.paid||0)).toLocaleString("en-IN")}`:""}</small></div>
    <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end">
     <button class="mini edit" data-edit="${x.c.id}|${x.id}" title="Edit">✏️</button>
     <button class="mini phone" data-call="${esc(x.c.phone)}" title="Call">☎</button>
-    <button class="mini wa" data-wa="${phone}" title="WhatsApp">◉</button>
+    <button class="mini wa" data-wa="${phone}" title="WhatsApp" aria-label="WhatsApp"><svg class="wa-svg" viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M19.11 17.21c-.28-.14-1.64-.81-1.89-.9-.25-.09-.44-.14-.63.14-.18.28-.72.9-.88 1.08-.16.19-.32.21-.6.07-.28-.14-1.18-.43-2.25-1.38-.83-.74-1.39-1.65-1.55-1.93-.16-.28-.02-.43.12-.57.12-.12.28-.32.42-.48.14-.16.18-.28.18-.46.09-.19.05-.35-.02-.49-.07-.14-.63-1.52-.86-2.08-.23-.56-.46-.48-.63-.49h-.54c-.19 0-.49.07-.74.35-.25.28-.97.95-.97 2.32s.99 2.69 1.13 2.88c.14.19 1.95 2.98 4.73 4.18.66.28 1.17.45 1.57.58.66.21 1.26.18 1.73.11.53-.08 1.64-.67 1.87-1.32.23-.65.23-1.21.16-1.32-.07-.12-.25-.19-.53-.32z"/><path fill="currentColor" d="M16 3a13 13 0 0 0-11.3 19.43L3 29l6.75-1.67A13 13 0 1 0 16 3zm0 23.65c-2.04 0-4.03-.55-5.77-1.59l-.41-.24-4.01.99 1.07-3.91-.27-.42A10.62 10.62 0 1 1 16 26.65z"/></svg></button>
     <button class="mini map" data-map="${addr}" title="Navigation">➤</button>
    </div>
  </div>`
 }
 
 function addCustomer(){
+ pendingLocation=null;
  show(`<button class="close" data-close>×</button><h2>Add Customer</h2>
  <div class="field"><label>Name *</label><input id="fName"></div>
  <div class="field"><label>Mobile *</label><input id="fPhone" inputmode="tel"></div>
  <div class="field"><label>Alternate Number (Optional)</label><input id="fAlt"></div>
  <div class="field"><label>Address</label><textarea id="fAddress" placeholder="Customer address / location"></textarea></div>
- <button type="button" class="primary" id="pickLocation" style="margin:4px 0 10px">📍 Save Current Location / Map</button>
+ <button type="button" class="primary" id="pickLocation" style="margin:4px 0 10px">📍 Save Current GPS Location</button>
  <div class="field"><label>Saved Location</label><input id="fLocation" placeholder="Location will appear here" readonly></div>
  <div class="field"><label>Appliance</label><select id="fApp"><option>AC</option><option>LED TV</option><option>Refrigerator</option><option>Microwave</option><option>Other</option></select></div>
  <div class="field"><label>Work Type</label><select id="fWork"></select></div>
@@ -126,8 +184,8 @@ function saveCustomer(){
  const name=$("fName").value.trim(),phone=$("fPhone").value.trim();
  if(!name||!phone){toast("Name and mobile are required");return}
  const app=$("fApp").value,work=$("fWork").value,other=$("fOther").value.trim();
- if((app==="Other"||work==="Other")&&!other){toast("Write Other Work Details");return}
- data.push({id:Date.now(),name,phone,alt:$("fAlt").value.trim(),address:$("fAddress").value.trim(),location:$("fLocation").value.trim(),jobs:[{id:Date.now()+1,appliance:app,work:work==="Other"?other:work,date:$("fDate").value,reminder:$("fReminder").value,total:Number($("fTotal").value||0),paid:Number($("fPaid").value||0),method:$("fMethod").value,done:$("fDone").value==="1"}]});
+ if(work==="Other"&&!other){toast("Write Other Work Details");return}
+ data.push({id:Date.now(),name,phone,alt:$("fAlt").value.trim(),address:$("fAddress").value.trim(),location:$("fLocation").value.trim(),lat:pendingLocation?.lat||"",lon:pendingLocation?.lon||"",locationAccuracy:pendingLocation?.accuracy||"",jobs:[{id:Date.now()+1,appliance:app,work:work==="Other"?other:work,date:$("fDate").value,reminder:$("fReminder").value,total:Number($("fTotal").value||0),paid:Number($("fPaid").value||0),method:$("fMethod").value,done:$("fDone").value==="1"}]});
  save();close();toast("Customer saved successfully");
 }
 
@@ -142,7 +200,7 @@ function openCustomer(cid){
  <div class="row"><div class="notice"><b>Total Bill</b><br>₹${total.toLocaleString("en-IN")}</div><div class="notice"><b>Paid</b><br>₹${paid.toLocaleString("en-IN")}</div></div>
  <h2 style="font-size:16px">Work History</h2>
  ${(c.jobs||[]).map(j=>`<div class="work"><b>${esc(j.appliance)} - ${esc(j.work)}</b><br>
- <small>Work Date: ${j.date||"Not set"}${j.reminder?` • Reminder: ${j.reminder}`:""}${j.done?" • ✓ Completed":""}</small><br>
+ <small>Work Date: ${j.date||"Not set"}${j.reminder?` • Reminder: ${j.reminder}`:""}${j.done?" • ✓ Completed":""}${j.reminder?" • 🔔 Reminder stays active":""}</small><br>
  <small>Payment: ₹${Number(j.paid||0).toLocaleString("en-IN")} • ${esc(j.method||"Cash")}</small><br>
  <button class="mini edit" data-edit="${c.id}|${j.id}">✏️ Edit</button>
  ${j.done?"":"<button class='mini' data-complete='"+c.id+"|"+j.id+"'>✓ Complete</button>"}
@@ -158,30 +216,64 @@ function openCustomer(cid){
  </div>`);
 }
 function list(type){
- const a=jobs(),d=today(),u=new Date(Date.now()+30*86400000).toISOString().slice(0,10);
+ const a=jobs(),d=today(),u=addDaysISO(30);
  let arr=[],title="";
- if(type==="customers"){arr=data.map(c=>({...((c.jobs&&c.jobs[0])||{id:null,appliance:"",work:""}),c}));title="Total Customers";}
+ if(type==="customers"){
+   arr=data.map(c=>({...((c.jobs&&c.jobs[0])||{id:null,appliance:"",work:""}),c}));
+   title="Total Customers";
+ }
  if(type==="allwork"){arr=a;title="Total Work";}
- if(type==="today"){arr=a.filter(x=>x.date===d&&!x.done);title="Today's Work";}
- if(type==="upcoming"){arr=a.filter(x=>{const t=x.reminder||x.date;return t&&t>d&&t<=u&&!x.done;}).sort((x,y)=>String(x.reminder||x.date).localeCompare(String(y.reminder||y.date)));title="Upcoming / Reminders";}
- if(type==="overdue"){arr=a.filter(x=>{const t=x.reminder||x.date;return t&&t<d&&!x.done;}).sort((x,y)=>String(x.reminder||x.date).localeCompare(String(y.reminder||y.date)));title="Overdue";}
+ if(type==="today"){arr=a.filter(x=>x.reminder===d);title="Due Today Reminders";}
+ if(type==="upcoming"){
+   arr=a.filter(x=>x.reminder&&x.reminder>d&&x.reminder<=u)
+        .sort((x,y)=>String(x.reminder).localeCompare(String(y.reminder)));
+   title="Upcoming Reminders — Next 30 Days";
+ }
+ if(type==="due"){arr=a.filter(x=>!x.done&&Number(x.total||0)>Number(x.paid||0));title="Payment Due";}
+ if(type==="overdue"){
+   arr=a.filter(x=>x.reminder&&x.reminder<d)
+        .sort((x,y)=>String(x.reminder).localeCompare(String(y.reminder)));
+   title="Overdue Reminders";
+ }
  if(type==="completed"){arr=a.filter(x=>x.done);title="Completed Work";}
+ if(type==="reminders"){
+   // IMPORTANT: this list is independent of work completion/payment status.
+   // Any work that has a reminder date is shown here: overdue, due today,
+   // upcoming, completed/closed, and even very old reminders.
+   arr=a.filter(x=>String(x.reminder||"").trim()!=="")
+     .sort((x,y)=>String(x.reminder).localeCompare(String(y.reminder)));
+   title=`Work / Reminder — All Reminders (${arr.length})`;
+ }
  let pay="";
- if(type==="customers"){let p=a.reduce((s,x)=>s+Number(x.paid||0),0),due=a.reduce((s,x)=>s+Math.max(0,Number(x.total||0)-Number(x.paid||0)),0);pay=`<div class="row"><div class="notice"><b>Payment Received</b><br>₹${p.toLocaleString("en-IN")}</div><div class="notice"><b>Payment Due</b><br>₹${due.toLocaleString("en-IN")}</div></div>`;}
+ if(type==="customers"){
+   let p=a.reduce((s,x)=>s+Number(x.paid||0),0),due=a.reduce((s,x)=>s+Math.max(0,Number(x.total||0)-Number(x.paid||0)),0);
+   pay=`<div class="row"><div class="notice"><b>Payment Received</b><br>₹${p.toLocaleString("en-IN")}</div><div class="notice"><b>Payment Due</b><br>₹${due.toLocaleString("en-IN")}</div></div>`;
+ }
  const cards=arr.map(x=>`<div class="work popup-card" data-open-customer="${x.c.id}" style="cursor:pointer">
  <div style="display:flex;justify-content:space-between;align-items:center"><div><b>${esc(x.c.name)}</b><br><small>${esc(x.c.phone)}</small></div>
- <div>${x.id?`<button class="mini edit" data-edit="${x.c.id}|${x.id}">✏️</button>`:""} <button class="mini wa" data-wa="${String(x.c.phone).replace(/\D/g,"")}">💬</button> ›</div></div>
+ <div>${x.id?`<button class="mini edit" data-edit="${x.c.id}|${x.id}" title="Edit">✏️</button>`:""} <button class="mini phone" data-call="${esc(x.c.phone)}" title="Call">☎</button> <button class="mini wa" data-wa="${String(x.c.phone).replace(/\D/g,"")}" title="WhatsApp"><svg class="wa-svg" viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M19.11 17.21c-.28-.14-1.64-.81-1.89-.9-.25-.09-.44-.14-.63.14-.18.28-.72.9-.88 1.08-.16.19-.32.21-.6.07-.28-.14-1.18-.43-2.25-1.38-.83-.74-1.39-1.65-1.55-1.93-.16-.28-.02-.43.12-.57.12-.12.28-.32.42-.48.14-.16.18-.28.28-.46.09-.19.05-.35-.02-.49-.07-.14-.63-1.52-.86-2.08-.23-.56-.46-.48-.63-.49h-.54c-.19 0-.49.07-.74.35-.25.28-.97.95-.97 2.32s.99 2.69 1.13 2.88c.14.19 1.95 2.98 4.73 4.18.66.28 1.17.45 1.57.58.66.21 1.26.18 1.73.11.53-.08 1.64-.67 1.87-1.32.23-.65.23-1.21.16-1.32-.07-.12-.25-.19-.53-.32z"/><path fill="currentColor" d="M16 3a13 13 0 0 0-11.3 19.43L3 29l6.75-1.67A13 13 0 1 0 16 3zm0 23.65c-2.04 0-4.03-.55-5.77-1.59l-.41-.24-4.01.99 1.07-3.91-.27-.42A10.62 10.62 0 1 1 16 26.65z"/></svg></button> ›</div></div>
  ${x.id?`<div>${esc(x.appliance)} - ${esc(x.work)}<br><small>Work: ${x.date||"Not set"}${x.reminder?` • Reminder: ${x.reminder}`:""}${x.done?" • ✓ Work Completed":""} • ₹${Number(x.paid||0).toLocaleString("en-IN")} paid</small></div>`:"<small>Click to open customer folder</small>"}
  </div>`).join("");
  show(`<button class="close" data-close>×</button><h2>${title}</h2>${pay}${cards||"<div class='empty'>No records found</div>"}`);
 }
 
 function workOptions(app,selected=""){
- const m={"AC":["Repair","Service","Installation","Uninstallation","Gas Refilling","Other"],"LED TV":["Repair","Service","Installation","Panel/Display Work","Other"],"Refrigerator":["Repair","Service","Installation","Other"],"Microwave":["Repair","Service","Installation","Other"],"Other":["Repair","Service","Installation","Other"]};
+ const m={"AC":["Repair","Service","Installation","Uninstallation","Gas Refilling","Visit Charge","Other"],
+ "LED TV":["Repair","Backlight Change","Motherboard Repair","Motherboard New","Panel/Display Work","Visit Charge","Other"],
+ "Refrigerator":["Repair","Gas Refill","Freezer Change","Relay Change","Overload Change","Compressor Change","Thermostat Change","Visit Charge","Other"],
+ "Microwave":["Repair","Magnetron Change","Condenser Change","Door Switch Change","Diode Change","HVT Transformer Change","Reflector Change","Visit Charge","Other"],
+ "Other":["Repair","Visit Charge","Other"]};
  return (m[app]||m.Other).map(v=>`<option ${v===selected?"selected":""}>${v}</option>`).join("");
 }
-function updateWorkTypes(a,w){if($(a)&&$(w))$(w).innerHTML=workOptions($(a).value,$(w).value);}
+function updateWorkTypes(a,w){
+ if($(a)&&$(w)){
+   const old=$(w).value;$(w).innerHTML=workOptions($(a).value,old);
+   const other=$(a).value==="Other"||$(w).value==="Other";
+   const f=$(a).id==="fApp"?"fOther":"eOther"; const box=$(f); if(box)box.parentElement.style.display=other?"block":"none";
+ }
+}
 function editCustomer(cid,jid){
+ pendingLocation=null;
  const c=data.find(v=>String(v.id)===String(cid));
  if(!c)return;
  const j=(c.jobs||[]).find(v=>String(v.id)===String(jid));
@@ -191,7 +283,7 @@ function editCustomer(cid,jid){
  <div class="field"><label>Mobile *</label><input id="ePhone" inputmode="tel" value="${esc(c.phone)}"></div>
  <div class="field"><label>Alternate Number (Optional)</label><input id="eAlt" value="${esc(c.alt||"")}"></div>
  <div class="field"><label>Address</label><textarea id="eAddress">${esc(c.address||"")}</textarea></div>
- <div class="field"><label>Saved Location</label><input id="eLocation" value="${esc(c.location||"")}" readonly></div>
+ <div class="field"><label>Saved Location</label><input id="eLocation" value="${esc(c.location||"")}" readonly></div><button type="button" class="primary" id="editPickLocation">📍 Update Current GPS Location</button>
  <div class="field"><label>Appliance</label><select id="eApp">${["AC","LED TV","Refrigerator","Microwave","Other"].map(v=>`<option ${v===j.appliance?"selected":""}>${v}</option>`).join("")}</select></div>
  <div class="field"><label>Work Type</label><select id="eWork"></select></div>
  <div class="field"><label>Other Work Details</label><input id="eOther" placeholder="If Other, write details"></div>
@@ -210,6 +302,7 @@ function more(){
  <button class="menu" data-more="backup">💾 Backup / Restore <span>›</span></button>
  <button class="menu" data-more="drive">☁️ Google Drive Backup <span>›</span></button>
  <button class="menu" data-more="bio">🔐 Fingerprint / Biometric <span>›</span></button>
+ <button class="menu" data-more="locktoggle">🔒 App Lock <span>${lockEnabled()?"ON":"OFF"} ›</span></button>
  <button class="menu" data-more="language">🌐 Language <span>English / Hindi ›</span></button>
  <button class="menu" data-more="pin">🔢 Change PIN <span>›</span></button>
  <button class="menu" data-more="about">ℹ️ About / Help <span>›</span></button>`);
@@ -217,7 +310,7 @@ function more(){
 
 document.addEventListener("click",e=>{
  const a=e.target.closest("[data-action]");
- if(a){const x=a.dataset.action;if(x==="more")more();else if(x==="home"){close();render()}else list(x);return}
+ if(a){const x=a.dataset.action;if(x==="more")more();else if(x==="home")list("customers");else if(x==="today" && a.closest("nav"))list("reminders");else list(x);return}
  if(e.target.closest("#addBtn")){addCustomer();return}
  if(e.target.closest("[data-close]")){close();return}
  if(e.target.closest("[data-save-customer]")){saveCustomer();return}
@@ -228,19 +321,32 @@ document.addEventListener("click",e=>{
    if(x==="backup"){let b=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download="jagesh-electronic-backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(u),500);toast("Backup downloaded")}
    if(x==="drive")toast("Google Drive backup will be connected after HTTPS deployment");
    if(x==="bio")toast(window.PublicKeyCredential?"Biometric API available to test on HTTPS/PWA":"Biometric needs supported browser + HTTPS");
+   if(x==="locktoggle"){const next=!lockEnabled();setLockEnabled(next);toast(next?"App Lock ON":"App Lock OFF");more();return;}
    if(x==="language")toast("English is default. Hindi option is available.");
    if(x==="pin")show(`<button class="close" data-close>×</button><h2>Change PIN</h2><div class="field"><label>New 6-Digit PIN</label><input inputmode="numeric" maxlength="6"></div><button class="primary" id="savePin">Save PIN</button>`);
    if(x==="about")show(`<button class="close" data-close>×</button><h2>About / Help</h2><p>JAGESH ELECTRONIC customer reminder app.</p>`);
  }
  const row=e.target.closest("[data-open-customer]");
  if(row && !e.target.closest("button")){openCustomer(row.dataset.openCustomer);return}
+ if(e.target.id==="pickLocation"){saveCurrentLocation("f");return}
+ if(e.target.id==="editPickLocation"){saveCurrentLocation("e");return}
  if(e.target.id==="fApp"){updateWorkTypes("fApp","fWork");return}
  if(e.target.id==="eApp"){updateWorkTypes("eApp","eWork");return}
+ if(e.target.id==="fWork"){updateWorkTypes("fApp","fWork");return}
+ if(e.target.id==="eWork"){updateWorkTypes("eApp","eWork");return}
  if(e.target.id==="msgTemplate"){ $("customMsg").style.display=e.target.value==="custom"?"block":"none"; return; }
  if(e.target.id==="sendReminder"){
    const phone=String(e.target.dataset.phone).replace(/\D/g,""),name=e.target.dataset.name,kind=$("msgTemplate").value,custom=$("customMsg").value.trim();
    const msg={service:`Namaste ${name} 🙏\nJAGESH ELECTRONIC की ओर से आपके appliance की service/reminder date आ गई है। कृपया समय बताएं।\n🔧 JAGESH ELECTRONIC`,complete:`Namaste ${name} 🙏\nआपका काम JAGESH ELECTRONIC द्वारा complete कर दिया गया है। धन्यवाद।`,led:`Namaste ${name} 🙏\nआपके LED TV repair/service की reminder date आ गई है। कृपया संपर्क करें।\n📺 JAGESH ELECTRONIC`,ac:`Namaste ${name} 🙏\nआपके AC service/repair की reminder date आ गई है। कृपया संपर्क करें।\n❄️ JAGESH ELECTRONIC`,fridge:`Namaste ${name} 🙏\nआपके refrigerator service/repair की reminder date आ गई है।\n🧊 JAGESH ELECTRONIC`,microwave:`Namaste ${name} 🙏\nआपके microwave service/repair की reminder date आ गई है।\n🍲 JAGESH ELECTRONIC`,custom:custom}[kind];
    if(phone&&msg) location.href="https://wa.me/"+phone+"?text="+encodeURIComponent(msg); return;
+ }
+ const complete=e.target.closest("[data-complete]");
+ if(complete){
+   const [cid,jid]=complete.dataset.complete.split("|");
+   const c=data.find(v=>String(v.id)===String(cid));
+   const j=c&&c.jobs&&c.jobs.find(v=>String(v.id)===String(jid));
+   if(j){j.done=true;save();toast(j.reminder?"Work completed; reminder kept":"Work completed");openCustomer(cid);}
+   return;
  }
  const edit=e.target.closest("[data-edit]");
  if(edit){const [cid,jid]=edit.dataset.edit.split("|");editCustomer(cid,jid);return}
@@ -250,13 +356,22 @@ document.addEventListener("click",e=>{
  if(waBtn){location.href="https://wa.me/"+waBtn.dataset.wa;return}
  const mapBtn=e.target.closest("[data-map]");
  if(mapBtn){location.href="https://www.google.com/maps/search/?api=1&query="+mapBtn.dataset.map;return}
+ if(e.target.id==="pinUnlock"){
+   const v=$("lockPin").value.replace(/\D/g,"");
+   if(v.length!==6){toast("PIN must be 6 digits");return}
+   if(!getPin()){localStorage.setItem(PIN_KEY,v);unlockOK();toast("PIN created")}
+   else if(v===getPin()){unlockOK();toast("Unlocked")}
+   else toast("Wrong PIN");
+   return;
+ }
+ if(e.target.id==="bioUnlock"){biometricUnlock();return}
  if(e.target.id==="updateCustomer"){
    const cid=e.target.dataset.cid,jid=e.target.dataset.jid,c=data.find(v=>String(v.id)===String(cid));
    if(c){
      const j=(c.jobs||[]).find(v=>String(v.id)===String(jid));
      if(j){
-       c.name=$("eName").value.trim();c.phone=$("ePhone").value.trim();c.alt=$("eAlt").value.trim();c.address=$("eAddress").value.trim();c.location=$("eLocation").value.trim();
-       j.appliance=$("eApp").value;j.work=$("eWork").value;j.date=$("eDate").value;j.reminder=$("eReminder").value;
+       c.name=$("eName").value.trim();c.phone=$("ePhone").value.trim();c.alt=$("eAlt").value.trim();c.address=$("eAddress").value.trim();c.location=$("eLocation").value.trim(); if(pendingLocation){c.lat=pendingLocation.lat;c.lon=pendingLocation.lon;c.locationAccuracy=pendingLocation.accuracy;}
+       j.appliance=$("eApp").value;j.work=$("eWork").value==="Other"?$("eOther").value.trim():$("eWork").value;if((j.appliance==="Other"||$("eWork").value==="Other")&&!j.work){toast("Write Other Work Details");return}j.date=$("eDate").value;j.reminder=$("eReminder").value;
        j.total=Number($("eTotal").value||0);j.paid=Number($("ePaid").value||0);j.method=$("eMethod").value;j.done=$("eDone").value==="1";
        save();close();toast("Customer updated");
      }
@@ -264,8 +379,13 @@ document.addEventListener("click",e=>{
    return;
  }
  if(e.target.id==="unlock")toast("Recycle Bin unlocked");
- if(e.target.id==="savePin"){toast("PIN saved");close()}
+ if(e.target.id==="savePin"){
+ const v=e.target.parentElement.querySelector("input").value.replace(/\D/g,"");
+ if(v.length!==6){toast("PIN must be 6 digits");return}
+ localStorage.setItem(PIN_KEY,v);toast("PIN saved");close()
+}
 });
 render();
+lockApp();
 </script>
 </body></html>

@@ -120,48 +120,48 @@ function show(html){$("sheet").innerHTML=html;$("overlay").style.display="flex"}
 function close(){$("overlay").style.display="none"}
 function toast(t){$("toast").textContent=t;$("toast").style.display="block";setTimeout(()=>$("toast").style.display="none",1600)}
 let locationWatchId=null;
+let locationTimeoutId=null;
 function saveCurrentLocation(prefix){
- if(!navigator.geolocation){toast("GPS is not supported on this device/browser");return}
+ if(!navigator.geolocation){toast("इस डिवाइस/ब्राउज़र में GPS उपलब्ध नहीं है");return}
  const field=$(prefix+"Location");
- toast("Requesting device GPS permission…");
- const opts={enableHighAccuracy:true,maximumAge:0,timeout:15000};
- let best=null, tries=0, done=false;
- const finish=()=>{
+ toast("Device GPS location मांगी जा रही है…");
+ const opts={enableHighAccuracy:true,maximumAge:0,timeout:20000};
+ let best=null, done=false, samples=0;
+ const finish=(message)=>{
    if(done)return; done=true;
+   if(locationWatchId!==null){try{navigator.geolocation.clearWatch(locationWatchId)}catch(e){} locationWatchId=null}
+   if(locationTimeoutId){clearTimeout(locationTimeoutId);locationTimeoutId=null}
    if(best){
      const lat=Number(best.coords.latitude), lon=Number(best.coords.longitude), acc=Math.round(best.coords.accuracy||0);
      pendingLocation={lat:lat.toFixed(6),lon:lon.toFixed(6),accuracy:acc,source:"device-gps",timestamp:Date.now()};
      if(field) field.value=`${lat.toFixed(6)}, ${lon.toFixed(6)} (GPS ±${acc}m)`;
-     toast("Current device GPS location saved");
-   }else toast("GPS नहीं मिला। Location ON करें और browser permission Allow करें।");
+     toast(`Current device GPS saved (±${acc}m)`);
+   }else toast(message||"GPS नहीं मिला। फोन की Location ON करके फिर कोशिश करें।");
  };
  const success=pos=>{
-   tries++;
+   if(done)return;
+   samples++;
    const acc=Number(pos.coords.accuracy)||99999;
    if(!best || acc < Number(best.coords.accuracy||99999)) best=pos;
-   if(acc<=50 || tries>=3) finish();
+   // Accept a good fresh fix quickly; otherwise keep listening for better GPS samples.
+   if(acc<=35 || samples>=6) finish();
  };
  const error=err=>{
-   // A permission prompt is triggered by getCurrentPosition itself.
-   if(err && err.code===1){toast("Location permission Allow करें, फिर GPS बटन दबाएँ"); done=true; return;}
-   if(tries>=2) finish();
+   if(done)return;
+   if(err && err.code===1){
+     finish("Location permission बंद है। Android में Location permission Allow करके फिर GPS बटन दबाएं।");
+   }else if(err && err.code===2){
+     toast("Device GPS location उपलब्ध नहीं है। Location/GPS ON करें और खुले स्थान में कोशिश करें।");
+   }
  };
  try{
-   if(navigator.permissions && navigator.permissions.query){
-     navigator.permissions.query({name:"geolocation"}).then(st=>{
-       if(st.state==="denied"){toast("Browser में Location permission Block है। Settings में Allow करें");return;}
-       navigator.geolocation.getCurrentPosition(success,error,opts);
-       setTimeout(()=>{if(!done) navigator.geolocation.getCurrentPosition(success,error,opts)},4500);
-       setTimeout(finish,18000);
-     }).catch(()=>{
-       navigator.geolocation.getCurrentPosition(success,error,opts);
-       setTimeout(finish,18000);
-     });
-   }else{
-     navigator.geolocation.getCurrentPosition(success,error,opts);
-     setTimeout(finish,18000);
-   }
- }catch(e){toast("GPS error: "+(e.message||"unknown"))}
+   // Do NOT query navigator.permissions first: getCurrentPosition/watchPosition must be
+   // called directly from the user's button tap so Android/Chrome can show its permission prompt.
+   locationWatchId=navigator.geolocation.watchPosition(success,error,opts);
+   // Also request an immediate fresh fix; whichever gives the best reading wins.
+   navigator.geolocation.getCurrentPosition(success,error,opts);
+   locationTimeoutId=setTimeout(()=>finish("GPS fix नहीं मिला। Location ON करें, permission Allow करें और फिर कोशिश करें।"),25000);
+ }catch(e){finish("GPS error: "+(e.message||"unknown"))}
 }
 
 async function pickContactEdit(){

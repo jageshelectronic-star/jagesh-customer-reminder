@@ -1,8 +1,11 @@
-JAGESH ELECTRONIC FINAL V12
+JAGESH ELECTRONIC FINAL V15
 
-Changes:
-1. WhatsApp reminder messages now use a customer-name-based Sir/Madam salutation.
-2. The customer's saved name is included after Dear Sir/Dear Madam.
-3. AC reminder wording is: "Dear Sir/Madam, [Name], आपके AC की service की reminder date आ गई है..."
-4. The phrase "Automatic Reminder" has been removed from the generated message.
-5. WhatsApp is still manual: the app opens WhatsApp with the message pre-filled; it does not send automatically.
+GPS update:
+- Current Location uses the device Geolocation API directly from the user action.
+- It requests a fresh high-accuracy fix and listens for multiple GPS readings, keeping the best accuracy.
+- Address text is never converted into GPS coordinates.
+- Android/browser location permission must be allowed by the user.
+
+IMPORTANT: For reliable browser GPS, run the app from HTTPS (or localhost). Opening index.html directly from a ZIP/file:// can block or limit browser geolocation on Android/Chrome. A normal website/PWA install over HTTPS is recommended.
+
+All existing project files/functions are retained from V14; only the GPS acquisition flow and this README were updated.

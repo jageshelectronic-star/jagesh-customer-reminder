@@ -190,6 +190,17 @@ function saveCustomer(){
 }
 
 
+function getCustomerSalutation(name){
+ const n=String(name||"").trim().toLowerCase().replace(/\s+/g," ");
+ if(/^(mr\.?|mister|shri|sh\.?|श्री)\s+/i.test(n)) return "Sir";
+ if(/^(mrs\.?|ms\.?|miss|smt\.?|smti\.?|श्रीमती|सुश्री|श्री\s*मति)\s+/i.test(n)) return "Madam";
+ const first=n.split(/\s+/)[0].replace(/[^a-z]/g,"");
+ const femaleNames=new Set(["aarti","anjali","anita","anju","archana","asha","babita","bhavna","deepa","deepika","divya","garima","geeta","gita","kajal","kalpana","kamini","kavita","komal","lakshmi","laxmi","madhu","manisha","meena","meenakshi","monika","monika","neha","neetu","nikita","nisha","pooja","puja","pragya","preeti","priyanka","radha","rakhi","rekha","richa","ritu","riya","ruchi","sakshi","seema","shalini","shikha","shreya","simran","sonali","sonam","suman","sunita","swati","tanvi","usha","vandana","varsha","vidya","yogita"]);
+ if(femaleNames.has(first) || /(?:a|i|ee|ya|ika|ita|ini|sha|thi)$/.test(first)) return "Madam";
+ return "Sir";
+}
+function reminderGreeting(name){ return `Dear ${getCustomerSalutation(name)}, ${name}`; }
+
 function openCustomer(cid){
  const c=data.find(v=>String(v.id)===String(cid));
  if(!c)return;
@@ -337,7 +348,8 @@ document.addEventListener("click",e=>{
  if(e.target.id==="msgTemplate"){ $("customMsg").style.display=e.target.value==="custom"?"block":"none"; return; }
  if(e.target.id==="sendReminder"){
    const phone=String(e.target.dataset.phone).replace(/\D/g,""),name=e.target.dataset.name,kind=$("msgTemplate").value,custom=$("customMsg").value.trim();
-   const msg={service:`Namaste ${name} 🙏\nJAGESH ELECTRONIC की ओर से आपके appliance की service/reminder date आ गई है। कृपया समय बताएं।\n🔧 JAGESH ELECTRONIC`,complete:`Namaste ${name} 🙏\nआपका काम JAGESH ELECTRONIC द्वारा complete कर दिया गया है। धन्यवाद।`,led:`Namaste ${name} 🙏\nआपके LED TV repair/service की reminder date आ गई है। कृपया संपर्क करें।\n📺 JAGESH ELECTRONIC`,ac:`Namaste ${name} 🙏\nआपके AC service/repair की reminder date आ गई है। कृपया संपर्क करें।\n❄️ JAGESH ELECTRONIC`,fridge:`Namaste ${name} 🙏\nआपके refrigerator service/repair की reminder date आ गई है।\n🧊 JAGESH ELECTRONIC`,microwave:`Namaste ${name} 🙏\nआपके microwave service/repair की reminder date आ गई है।\n🍲 JAGESH ELECTRONIC`,custom:custom}[kind];
+   const greet=reminderGreeting(name);
+   const msg={service:`${greet}, आपकी service की reminder date आ गई है। कृपया अपनी सुविधा के अनुसार समय बताएं।\n🔧 JAGESH ELECTRONIC`,complete:`${greet}, आपका काम JAGESH ELECTRONIC द्वारा complete कर दिया गया है। धन्यवाद।`,led:`${greet}, आपके LED TV repair/service की reminder date आ गई है। कृपया अपनी सुविधा के अनुसार समय बताएं।\n📺 JAGESH ELECTRONIC`,ac:`${greet}, आपके AC की service की reminder date आ गई है। कृपया अपनी सुविधा के अनुसार समय बताएं।\n❄️ JAGESH ELECTRONIC`,fridge:`${greet}, आपके refrigerator की service/repair की reminder date आ गई है। कृपया अपनी सुविधा के अनुसार समय बताएं।\n🧊 JAGESH ELECTRONIC`,microwave:`${greet}, आपके microwave की service/repair की reminder date आ गई है। कृपया अपनी सुविधा के अनुसार समय बताएं।\n🍲 JAGESH ELECTRONIC`,custom:custom}[kind];
    if(phone&&msg) location.href="https://wa.me/"+phone+"?text="+encodeURIComponent(msg); return;
  }
  const complete=e.target.closest("[data-complete]");

@@ -1,11 +1,27 @@
-JAGESH ELECTRONIC FINAL V15
+JAGESH ELECTRONIC V25 - Firebase Cloud Ready
 
-GPS update:
-- Current Location uses the device Geolocation API directly from the user action.
-- It requests a fresh high-accuracy fix and listens for multiple GPS readings, keeping the best accuracy.
-- Address text is never converted into GPS coordinates.
-- Android/browser location permission must be allowed by the user.
+Included:
+- index.html : V25 app with Firebase Email/Password login and Firestore Cloud Sync
+- jagesh-original-logo.png : original V25 logo asset
+- firestore.rules : user-isolated Firestore rules
 
-IMPORTANT: For reliable browser GPS, run the app from HTTPS (or localhost). Opening index.html directly from a ZIP/file:// can block or limit browser geolocation on Android/Chrome. A normal website/PWA install over HTTPS is recommended.
+Firebase project configured in index.html:
+projectId = jagesh-electronic
 
-All existing project files/functions are retained from V14; only the GPS acquisition flow and this README were updated.
+Cloud data path used by the app:
+users/{Firebase Auth UID}/app/appData
+
+IMPORTANT - ONE FINAL FIREBASE CONSOLE STEP
+1. Open Firebase Console for jagesh-electronic.
+2. Go to Build -> Firestore Database -> Rules.
+3. Replace the current rules with the contents of firestore.rules.
+4. Click Publish.
+
+Authentication:
+Email/Password is expected to be enabled. The app has Login and Create New Account screens.
+
+Existing V25 local data:
+On the first login of an account, if that account has no Cloud data and the device has old V25 local data, the app asks whether to import that old data into the logged-in account. This avoids automatically mixing the old device data into a second technician account.
+
+Important:
+The app must be served from HTTPS / Firebase Hosting (or another secure origin) for Firebase web authentication and the existing GPS feature to work reliably.

@@ -2278,18 +2278,24 @@ JAGESH ELECTRONIC`;
         }
       }catch(_){}
       if(!exited)try{
-        /* Chrome normally ignores window.close() when this page was not
-           opened by script, so do not treat it as a successful exit. */
+        /* First ask the browser/PWA window to close. Chrome may ignore this
+           for windows that were not created by script, so keep going. */
         window.close();
       }catch(_){}
+
+      /*
+       * Chrome/PWA does NOT expose a standard JavaScript API that can force
+       * an installed web app to terminate and return to Android Home.
+       * Do not navigate to about:blank or an Android intent here: those
+       * navigations can leave the installed app sitting on a blank screen.
+       *
+       * For an installed standalone PWA, the useful browser-level fallback
+       * is to go back out of the app's history/task. For a normal Chrome tab,
+       * the same operation simply returns to the page that launched it.
+       */
       if(!exited){
-        setTimeout(function(){
-          if(document.visibilityState !== 'hidden'){
-            try{location.replace('about:blank');}catch(_){
-              try{history.go(-1);}catch(__){}
-            }
-          }
-        },120);
+        try{history.go(-1);}
+        catch(_){try{history.back();}catch(__){}}
       }
       setTimeout(function(){exitPrompting=false;},350);
     }else{
